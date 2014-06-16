@@ -1,0 +1,13 @@
+CACHE MANIFEST
+ 
+# Version 0.01
+ 
+NETWORK:
+*
+ 
+CACHE:
+index.html
+ui/css/styles.css
+ui/css/jquery.mobile-1.4.2.min.css
+ui/js/scripts-concat.js
+ui/js/scripts-concat.min.js

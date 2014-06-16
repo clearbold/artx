@@ -1,0 +1,29 @@
+{
+  "name": "mitartx",
+  "description": "MIT ArtX webapp",
+  "version": "0.1.0",
+  "author": {
+    "name": "Clearbold",
+    "url": "http://www.clearbold.com"
+  },
+  "owner": {
+    "name": "MIT Hyperstudio",
+    "url": "http://hyperstudio.mit.edu/",
+    "phone": "1-617-258-6512"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-concat": "^0.4.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-sass": "^0.7.3",
+    "grunt-contrib-uglify": "^0.5.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-imageoptim": "^1.4.1",
+    "grunt-notify": "^0.3.0",
+    "grunt-text-replace": "^0.3.12",
+    "grunt-webfont": "^0.4.2",
+    "matchdep": "^0.3.0",
+    "grunt-shell": "^0.7.0",
+    "grunt-contrib-copy": "^0.5.0"
+  }
+}
