@@ -1,1 +1,283 @@
 // UI styles for MIT ArtX
+
+/* IE10 Metro responsive
+ Required for Windows 8 Metro split-screen snapping with IE10
+ Source: http://timkadlec.com/2012/10/ie10-snap-mode-and-responsive-design/ */
+@-ms-viewport {
+  width: device-width;
+}
+/* Scrollbar fixes for IE10 */
+.no-touchcapable {
+    -ms-overflow-style: scrollbar;
+}
+
+html {
+    background-color:$page-bg;
+    color:$text-color;
+    @include font-smoothing(on);
+}
+
+/* This triggers a redraw in IE to Fix IE8's :before content rendering. */
+html:hover [class^="icon-"]{-ms-zoom: 1;}
+
+body {
+    font-family:"Lato", "sans-serif";
+    font-weight:300;
+    letter-spacing:1px;
+}
+
+/* Picturefill overrides (we assume images to be block elements by default) */
+span[data-picture], 
+span[data-picture] span,
+img {
+    display:block;
+}
+
+a {
+    display:inline-block;
+    text-decoration:none;
+    color:$link-color;
+    @include transition(color .1s linear, background-color .1s linear, border-color .1s linear);
+    border-bottom:1px solid transparent;
+    
+    &:hover {
+        color:$link-hover-color;
+        border-color:$link-hover-color;
+    }
+}
+
+.btn {
+    display:inline-block;
+    vertical-align:middle;
+    background-color:$black-20pct;
+    padding:.5em;
+    line-height:1;
+    border:none;
+    
+    &:hover {
+        background-color:$black-40pct;
+        border:none;
+    }
+    
+    &.btn-round {
+        border-radius:100%;
+    }
+
+    &.btn-left {
+        float:left;
+    }
+
+    &.btn-right {
+        float:right;
+    }
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6,
+p,
+ul,
+ol {
+   margin:0 0 $spacing-unit; 
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    font-weight:400;
+    line-height:1.2;
+}
+
+h1, .h1 {
+    @include font-size(20px, false);
+}
+
+h2, .h2 {
+    @include font-size(18px, false);
+}
+
+h3, .h3 {
+    @include font-size(16px, false);
+}
+
+h4, .h4 {
+    @include font-size(14px, false);
+}
+
+h5, .h5 {
+    @include font-size(13px, false);
+}
+h6, .h6 {
+    @include font-size(12px, false);
+}
+
+ul.plain,
+ul.listview {
+    list-style:none;
+    margin-left:0;
+    padding-left:0;
+}
+
+ul.listview {
+    position:relative;
+    margin-left:-($spacing-unit);
+    margin-right:-($spacing-unit);
+    
+    li {
+        border-bottom:1px solid $gray-dark;
+    }
+
+    a {
+        background-color:lighten($page-bg, 5);
+        display:block;
+        position:relative;
+        padding:.75em $spacing-unit;
+        line-height:1;
+        color:$white;
+        border:none;
+        
+        &:after {
+            content:"\e055";
+            font-family: 'artx';
+            speak: none;
+            font-style: normal;
+            font-weight: normal;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1;
+            position:absolute;
+            right:$spacing-unit;
+            color:$link-color;
+        }
+
+        &:hover {
+            &:after {
+                color:$link-hover-color;
+            }
+        }
+    }
+}
+
+ul {
+    h1,h2,h3,h4,h5,h6 {
+        margin-bottom:0;
+    }
+}
+
+hr {
+    height:1px;
+    border:0;
+    border-top:1px solid $main-color-dark;
+    border-bottom:none;
+    background:none;
+    padding:0;
+    margin:($spacing-unit) 0;
+    clear:both;
+}
+
+.wrapper {
+    width:100%;
+    overflow:hidden;
+}
+
+.masthead,
+.footer {
+    width:100%;
+}
+
+.masthead {
+    background:$masthead-bg;
+    text-align:center;
+    padding:8px $spacing-unit;
+    
+    h1, .h1 {
+        margin:0;
+        @include font-size(17px);
+        
+        a {
+            color:$white;
+            border:none;
+        }
+    }
+
+    .btn-left,
+    .btn-right {
+        position:absolute;
+        margin-top:-.25em;
+    }
+    .btn-left {
+        left:$spacing-unit;
+    }
+    .btn-right {
+        right:$spacing-unit;
+    }
+}
+
+.footer {
+    background:$footer-bg;
+    text-align:center;
+    padding:7px $spacing-unit;
+}
+
+.positionfixed {
+    .masthead, .footer {
+        position:fixed;
+        width:auto;
+        left:0;
+        right:0;
+    }
+    .masthead {
+        top:0;
+        box-shadow:0 10px 20px $page-bg;
+    }
+    .footer {
+        bottom:0;
+        box-shadow:0 -10px 20px $page-bg;
+    }
+    .content {
+        padding:57px $spacing-unit;
+    }
+}
+
+.content {
+    padding:$spacing-unit;
+}
+
+
+
+// Color swatches for styleguide
+.swatches {
+    margin-left:0;
+    padding-left:0;
+
+    li {
+        text-align:center;
+        display:inline-block;
+        margin-right:20px;
+        margin-bottom:10px;
+    }
+
+    .swatch {
+        display:block;
+        width:50px;
+        height:50px;
+        margin:0 auto;
+        background-color:$gray-lighter;
+    }
+    .swatch-base {
+        background-color:$main-color;
+    }
+    .swatch-dark {
+        background-color:$main-color-dark;
+    }
+    .swatch-medium {
+        background-color:$main-color-medium;
+    }
+    .swatch-light {
+        background-color:$main-color-light;
+    }
+    .swatch-bg {
+        background-color:$main-color-bg;
+    }
+    .swatch-accent {
+        background-color:$accent-color;
+    }
+}

@@ -7,6 +7,7 @@ $gray-mediumlight: rgb(167,168,172);  // #A7A8AC
 $gray: rgb(128,129,132);              // #808184
 $gray-mediumdark: rgb(110,110,110);   // #6e6e6e
 $gray-dark: rgb(72,72,72);            // #484848
+$gray-darker: rgb(38,38,38);          // #484848
 $black: rgb(0,0,0);                   // #000000
 
 // Transparent colors:
@@ -20,15 +21,29 @@ $black-70pct: rgba(0,0,0,.7);
 $black-80pct: rgba(0,0,0,.8);
 $black-90pct: rgba(0,0,0,.9);
 
-$yellow: rgb(252,205,3);
-$orange: rgb(204,102,0);
+// Color scheme: Monochromatic theme Aqua
+$main-color: rgb(46,241,255);
+$main-color-light: lighten($main-color, 10);
+$main-color-medium: darken($main-color, 30);
+$main-color-dark: darken($main-color, 40);
+$main-color-bg: lighten($main-color, 30);
+
+$accent-color:rgb(76,255,101);
+
+// Color variables:
+$page-bg: $gray-darker;
+$masthead-bg: $gray-dark;
+$footer-bg: $gray-dark;
+$text-color:$white;
+$link-color:$main-color;
+$link-hover-color:$accent-color;
 
 $base-font-size:    16px;
 $base-line-height:  24px;
 $base-spacing-unit: $base-line-height;
 $half-spacing-unit: $base-line-height/2;
-$vertical-spacing-mobile: 12px;
-$vertical-spacing-desktop: 24px;
+$spacing-unit: 20px;
+$spacing-desktop: 24px;
 
 $open-quote:    \201C;
 $close-quote:   \201D;

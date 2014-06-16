@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
 
-    <title>ArtX - MIT Hyperstudio</title>
+    <title>ArtX Template List</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -31,30 +31,31 @@
     <meta name="msapplication-TileColor" content="#ffffff" />
     
     <!-- Styles -->
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
     <link rel="stylesheet" href="ui/css/styles.css" />
 
     <script src="ui/js/standalone/modernizr-2.7.1.min.js?cb=1"></script>
 
 </head>
-<body class="ui-page-theme-a">
+<body>
     
-    <div id="pagewrapper" data-role="page" class="page">
+    <div class="wrapper">
 
-        <header class="masthead" role="banner" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <h1>ArtX</h1>
+        <header class="masthead" role="banner">
+            <p class="h1">ArtX</p>
         </header> <!-- /header -->
 
-        <div class="content ui-content" role="main">
-            Content!
-        </div> <!-- /ui-content -->
+        <div class="content" role="main">
+            <h1>Template List</h1>
 
-    </div> <!-- /page -->
+            <ul class="listview">
+                <li><a href="discover.html">Discover</a></li>
+                <li><a href="styleguide.html">Styleguide</a></li>
+            </ul>
+        </div>
 
-    <!-- jQuery Mobile -->
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+    </div> <!-- /wrapper -->
 
+    <!-- Javascript -->
     <script src="ui/js/scripts-concat.min.js"></script>
 
 </body>
