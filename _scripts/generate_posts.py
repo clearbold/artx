@@ -2,89 +2,132 @@
 
 import sys
 import requests
+import requests_cache
 import yaml
+import time
 import re
 
-#TODO: caching, exhibitions, aaply event changes to locations (or abstract them in parent class), docstrings
+#TODO: same folder for each type?
+#TODO: rel or abs paths?
 
-class JSONFeedReader:
+SETTINGS = {"post_types": [{"type": "event", "url": "http://artx.herokuapp.com/events.json", "dest": "../_source/_posts/"}, {"type": "location","url": "http://artx.herokuapp.com/locations.json", "dest": "../_source/_posts/"}]}
 
-    def __init__(self, url):
-        self.url = url
-        self.posts = requests.get(self.url).json()
+    
+def main():
 
-class EventFeedReader(JSONFeedReader):
+    for post_type in SETTINGS['post_types']:
+        feed = fetch(post_type['url'])
+        for i in feed:
+            post = factory(post_type['type'], i)
+            post.clean_content()
+            filename = post.set_path(post_type['dest'])
+            post.write(filename)
 
-    def __init__(self):
-        JSONFeedReader.__init__(self, "http://artx.herokuapp.com/events.json")
-        
-    def generate_posts(self):
-        for i in range(len(self.posts)):
-            post = self.posts[i]
-            post['location'] = "" # temporary
+            
+def fetch(src):
 
-            #Todo: String formatting, add new lines between entries
-            # for key in post:
-                #if isinstance(post, basestring):
-                #    post[key] = post[key].encode('ascii', 'ignore') + "\n" 
-                #else:
-                #    post[key] = str(post[key])            
+        """Fetch JSON post feed from either url or cache """
 
+    #TODO: is this right? Does the requests get method check the cache automatically first?
 
-            e = Event(post['name'], post['id'], post['image'], post['description'], post['url'], post['tags'])
-            filename = "../_source/posts/event-" + str(i) + ".html"
-            filewrite = file(filename, 'w')
-            yaml.dump(e, filewrite)
-            filewrite.close()
-        
-class LocationFeedReader(JSONFeedReader):
+    requests_cache.install_cache(expire_after=10)
 
-    def __init__(self):
-        JSONFeedReader.__init__(self, "http://artx.herokuapp.com/locations.json")
-
-    def generate_posts(self):
-        for post in self.posts:
-
-            for key in post:
-                post[key] = str(post[key]) + "\n"
-
-            l = Location(post_json['name'], post_json['id'], post_json['image'], post_json['description'], post_json['url'], post_json['latitude'], post_json['longitude'], post_json['created_at'], post_json['updated_at'])
-        
-class Post:
-
-    title = ""
-
-    def __init__(self, name, id, image, description, url):
-        self.name = name
-        self.id = id
-        self.image = image
-        self.description = description
-        self.url = url
-
-class Event(Post): 
-
-    def __init__(self, name, id, image, description, url, tags):
-        Post.__init__(self, name, id, image, description, url)    
-        self.tags = tags
-
-    #TODO title, location, dates fine tuning       
-       
-class Location(Post):
-
-    def __init__(self, name, id, image, description, url, latitude, longitutde, created_at, updated_at): 
-
-        Post.__init__(self, name, id, image, description, url)
-        self.latitude = latitude
-        self.longitude = longitude
-        self.created_at = created_at
-        self.updated_at = updated_at
+    return requests.get(src).json()
 
                 
-# Gather our code in a main() function
-def main():
-    e = EventFeedReader()
-    e.generate_posts()
+def factory(type, json):
+
     
+    class Post:
+
+        
+        def __init__(self, json):
+            self.json = json
+
+                        
+        def clean_content(self):
+
+            """Converts post content to ascii string in preparation for YAML dump"""
+            
+            for key in self.json:
+                if not isinstance(json[key], basestring):
+                    json[key] = str(json[key])
+                json[key] = json[key].encode('ascii', 'ignore')
+                key = key.encode('ascii', 'ignore')     
+
+                
+        def clean_title(self):
+
+            """Takes a string, replaces whitespace with '-', converts to lowercase, removes all characters not specified as valid filename chars in settings"""
+
+             valid_chars = "-abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            title = self.json['name'].strip().replace(" ", "-").lower()
+            title = ''.join(c for c in title if c in valid_chars)
+            return title
+
+        
+        def clean_date(self, date_str):
+
+            """Takes a string, extracts date (assumes format Month d(d), yyyy), converts to format YYYY-MM-DD"""
+            #TODO: How to handle edge cas
+            # This is the pattern most dates are in
+            # pattern = re.compile("[A-Za-z]*\s\d{1,2},\s\d{2,4}")
+            # match = re.search(pattern, date_str)
+            # if match:
+            #    date_str = match.group()
+            #    converted_from = "%B %d, %Y"
+            #    converted_to = "%Y-%m-%d"
+            #    return time.strftime(converted_to, (time.strptime(date_str, converted_from)))
+
+            # Temporary
+            return "9999-99-99"
+
+                
+        def write(self, filename):
+
+            """Takes a filename and dumps post data as YAML into file"""
+
+            file_write = file(filename, 'w')
+            yaml.dump(self.json, file_write)
+            file_write.close()               
+
+
+    class Event(Post):
+
+        def __init__(self, json):
+            Post.__init__(self, json)
+            
+        def clean_content(self):
+            #TODO: location customization code here?
+            self.json['type'] = "event"
+            Post.clean_content(self)
+
+        def set_path(self, dest):
+            title = Post.clean_date(self, self.json['dates']) + "-" + Post.clean_title(self)
+            path = dest + title + ".html"
+            return path
+            
+    class Location(Post):
+
+        def __init__(self, json):
+            Post.__init__(self, json)
+
+        def clean_content(self):
+            self.json['type'] = "location"
+            Post.clean_content(self)
+            
+        def set_path(self, dest):
+            title = Post.clean_date(self, self.json['created_at']) + "-" + Post.clean_title(self)
+            path = dest + title + ".html"
+            return path
+            
+            
+    if type == "event":
+        return Event(json)
+    if type == "location":
+        return Location(json)
+
+        
 if __name__ == '__main__':
   main()
 
