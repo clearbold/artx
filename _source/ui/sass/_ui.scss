@@ -378,8 +378,8 @@ hr {
 /* Favorites carousel styles */
 .favorite-slider {
     position:relative;
-    margin:0 -($spacing-unit);
-    padding-bottom:$spacing-unit;
+    margin:0 (-$spacing-unit) -2px;
+    padding-bottom:0;
     clear:both;
 
     ul {
@@ -392,7 +392,7 @@ hr {
         height:100px;
         overflow:hidden;
         float:left;
-        margin-left:9px;
+        margin-left:5px;
     }
     a {
         border:none;
