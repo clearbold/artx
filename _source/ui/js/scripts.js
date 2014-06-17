@@ -72,7 +72,27 @@ ArtX.setupSkipLinks = function() {
 /* Set up Favorites slider in footer
    ========================================================================== */
 ArtX.setupFavoriteSlider = function() {
+    var $favoriteSlider = $("#favorite-slider");
+    if ($favoriteSlider.length > 0) {
+        console.log("Initializing favorites slider");
 
+        var favSlideInstance = $favoriteSlider.bxSlider({
+            minSlides:3,
+            maxSlides:4,
+            slideWidth:300,
+            slideMargin:5
+        });
+
+        $('#favorite-slider-next').click(function(){
+          favSlideInstance.goToNextSlide();
+          return false;
+        });
+
+        $('#favorite-slider-previous').click(function(){
+          favSlideInstance.goToPrevSlide();
+          return false;
+        });
+    }
 };
 
   
