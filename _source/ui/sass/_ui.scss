@@ -26,11 +26,53 @@ body {
     letter-spacing:1px;
 }
 
+/* Skipnav links */
+/* Changing any of the positioning CSS will most likely break the skip link in some browser, so if you change it, test it */
+.skiplinkholder {
+    p {
+        margin:0;
+    }
+    a, a:link, a:visited {
+        display:block;
+        width:99%;
+        position:absolute;
+        top:0;
+        left:-400%;
+        z-index:2;
+        
+        /* Visual styling. Change this as desired */
+        color:$white;
+        background:$black;
+        text-decoration:none;
+        border-bottom:solid #ccc 2px;
+        padding:5px;
+    }
+    a:focus, a:active {
+        left:0;
+        top:0;
+        z-index:1002;
+    }
+}
+.skiptargetholder {
+    position:absolute;
+    left:-400%;
+}
+/* You may find on certain page layouts that the skip link is appearing underneath other elements on the page in IE7 and below. If this is the case then try uncommenting the two statements below, and if that does not work then try increasing the z-index value above as well */
+/*
+*+html #skiplinkholder a:focus, *+html #skip a:active {position:relative}
+* html #skiplinkholder a:active {position:relative}
+*/
+
 /* Picturefill overrides (we assume images to be block elements by default) */
 span[data-picture], 
 span[data-picture] span,
 img {
     display:block;
+}
+
+img {
+    max-width:100%;
+    height:auto;
 }
 
 a {
@@ -49,18 +91,32 @@ a {
 .btn {
     display:inline-block;
     vertical-align:middle;
+    position:relative;
     background-color:$black-20pct;
     padding:.5em;
     line-height:1;
     border:none;
     
-    &:hover {
-        background-color:$black-40pct;
-        border:none;
-    }
-    
     &.btn-round {
-        border-radius:100%;
+        border-radius:50%;
+        @include transition(box-shadow .2s linear);
+        background-color:transparent;
+        
+        &:after {
+            -webkit-transition: -webkit-transform 0.2s, opacity 0.2s;
+            -moz-transition: -moz-transform 0.2s, opacity 0.2s;
+            transition: transform 0.2s, opacity 0.2s;
+            content:"";
+            pointer-events: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left:0;
+            top:0;
+            border-radius: 50%;
+            background-color:$black-30pct;
+            z-index:-1;
+        }
     }
 
     &.btn-left {
@@ -72,12 +128,33 @@ a {
     }
 }
 
+.no-touchcapable .btn {
+    &:hover {
+        background-color:$black-40pct;
+        border:none;
+    }
+    &.btn-round {
+
+        &:hover {
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.2);
+            background-color:transparent;
+
+            &:after {
+                -webkit-transform: scale(0.85);
+                -moz-transform: scale(0.85);
+                -ms-transform: scale(0.85);
+                transform: scale(0.85);
+            }
+        }
+    }
+}
+
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6,
 p,
 ul,
 ol {
-   margin:0 0 $spacing-unit; 
+   margin:0 0 ($spacing-unit*1.5); 
 }
 
 h1, h2, h3, h4, h5, h6,
@@ -173,6 +250,15 @@ hr {
     clear:both;
 }
 
+// Clearfix
+.cf {
+    &:after{
+        content:"";
+        display:table;
+        clear:both;
+    }
+}
+
 .wrapper {
     width:100%;
     overflow:hidden;
@@ -186,7 +272,7 @@ hr {
 .masthead {
     background:$masthead-bg;
     text-align:center;
-    padding:8px $spacing-unit;
+    padding:11px $spacing-unit;
     
     h1, .h1 {
         margin:0;
@@ -201,7 +287,7 @@ hr {
     .btn-left,
     .btn-right {
         position:absolute;
-        margin-top:-.25em;
+        margin-top:-.3em;
     }
     .btn-left {
         left:$spacing-unit;
@@ -215,6 +301,13 @@ hr {
     background:$footer-bg;
     text-align:center;
     padding:7px $spacing-unit;
+}
+.footer-header {
+    h2 {
+        float:left;
+        line-height:33px;
+        margin-bottom:$spacing-unit/2;
+    }
 }
 
 .positionfixed {
@@ -233,7 +326,7 @@ hr {
         box-shadow:0 -10px 20px $page-bg;
     }
     .content {
-        padding:57px $spacing-unit;
+        padding:60px $spacing-unit (154px+$spacing-unit);
     }
 }
 
@@ -279,5 +372,45 @@ hr {
     }
     .swatch-accent {
         background-color:$accent-color;
+    }
+}
+
+/* Favorites carousel styles */
+.favorite-slider {
+    position:relative;
+    margin:0 -($spacing-unit);
+    padding-bottom:$spacing-unit;
+    clear:both;
+
+    ul {
+        list-style:none;
+        margin:0;
+        padding:0;
+    }
+    li {
+        width:100px;
+        height:100px;
+        overflow:hidden;
+        float:left;
+        margin-left:9px;
+    }
+    a {
+        border:none;
+        
+        img {
+            -webkit-transition: -webkit-transform 0.2s, opacity 0.2s;
+            -moz-transition: -moz-transform 0.2s, opacity 0.2s;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        &:focus,
+        &:hover {
+            img {
+                -webkit-transform: scale(1.2);
+                -moz-transform: scale(1.2);
+                -ms-transform: scale(1.2);
+                transform: scale(1.2);
+            } 
+        }
     }
 }

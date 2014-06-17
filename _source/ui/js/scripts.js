@@ -54,7 +54,7 @@ ArtX.util = {
 
 /* Set up Accessible Skiplinks
    ========================================================================== */
-   ArtX.setupSkipLinks = function() {
+ArtX.setupSkipLinks = function() {
     /* Skiplink Javascript for Safari and Chrome */
     if ($("#skiptarget").length > 0) {
         var is_webkit = navigator.userAgent.toLowerCase().indexOf('webkit') > -1;
@@ -68,6 +68,13 @@ ArtX.util = {
         }
     }
 };
+
+/* Set up Favorites slider in footer
+   ========================================================================== */
+ArtX.setupFavoriteSlider = function() {
+
+};
+
   
 
 /* Initialize/Fire
@@ -79,17 +86,20 @@ ArtX.startup = {
         picturefill();
         ArtX.setupSkipLinks();
 
+        ArtX.setupFavoriteSlider();
+
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
 
         // Check for caching updates
+        /*
         if (window.applicationCache) {
             applicationCache.addEventListener('updateready', function() {
                 if (confirm('An update is available. Reload now?')) {
                     window.location.reload();
                 }
             });
-        }
+        }*/
     },
     finalize : function() {
         //console.log("Initial load: scripting finalized");
