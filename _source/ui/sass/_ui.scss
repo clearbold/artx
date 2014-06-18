@@ -583,26 +583,28 @@ hr {
     a {
         border:none;
         
-        img {
-            -webkit-transition: -webkit-transform 0.2s, opacity 0.2s;
-            -moz-transition: -moz-transform 0.2s, opacity 0.2s;
-            transition: transform 0.2s, opacity 0.2s;
-            
-            -webkit-transform: translatez(0);
-            -moz-transform: translatez(0);
-                -ms-transform: translatez(0);
-                -o-transform: translatez(0);
-                transform: translatez(0);
-        }
-
-        &:focus,
-        &:hover {
+        .no-touchcapable & {
             img {
-                -webkit-transform: scale(1.2);
-                -moz-transform: scale(1.2);
-                -ms-transform: scale(1.2);
-                transform: scale(1.2);
-            } 
+                -webkit-transition: -webkit-transform 0.2s, opacity 0.2s;
+                -moz-transition: -moz-transform 0.2s, opacity 0.2s;
+                transition: transform 0.2s, opacity 0.2s;
+                
+                -webkit-transform: translatez(0);
+                -moz-transform: translatez(0);
+                    -ms-transform: translatez(0);
+                    -o-transform: translatez(0);
+                    transform: translatez(0);
+            }
+
+            &:focus,
+            &:hover {
+                img {
+                    -webkit-transform: scale(1.2);
+                    -moz-transform: scale(1.2);
+                    -ms-transform: scale(1.2);
+                    transform: scale(1.2);
+                } 
+            }
         }
     }
 
