@@ -5,34 +5,30 @@ import requests
 import requests_cache
 import yaml
 import time
+import datetime
 import re
 
 #TODO: same folder for each type?
 #TODO: rel or abs paths?
 
-SETTINGS = {"post_types": [{"type": "event", "url": "http://artx.herokuapp.com/events.json", "dest": "../_source/_posts/"}, {"type": "location","url": "http://artx.herokuapp.com/locations.json", "dest": "../_source/_posts/"}]}
+SETTINGS = {"feeds": [{"type": "event", "url": "http://artx.herokuapp.com/events.json"}, {"type": "location","url": "http://artx.herokuapp.com/locations.json"}]}
 
     
 def main():
 
-    for post_type in SETTINGS['post_types']:
-        feed = fetch(post_type['url'])
-        for i in feed:
-            post = factory(post_type['type'], i)
-            post.clean_content()
-            filename = post.set_path(post_type['dest'])
-            post.write(filename)
+    for feed in SETTINGS['feeds']:
+        posts_json = fetch(feed['type'], feed['url'])
+        for i in posts_json:
+            post = factory(feed['type'], i)
+            post.generate()
 
             
-def fetch(src):
+def fetch(type, src):
+    """Fetch JSON post feed from either url or cache """
 
-        """Fetch JSON post feed from either url or cache """
-
-    #TODO: is this right? Does the requests get method check the cache automatically first?
-
-    requests_cache.install_cache(expire_after=10)
-
-    return requests.get(src).json()
+    session = requests_cache.CachedSession(type, expire_after=1800)
+    response = session.get(src)
+    return response.json()
 
                 
 def factory(type, json):
@@ -43,34 +39,28 @@ def factory(type, json):
         
         def __init__(self, json):
             self.json = json
-
+            self.name = self.json['name']
+            self.path = "../_source/_posts/"
                         
-        def clean_content(self):
+        def generate(self):
 
             """Converts post content to ascii string in preparation for YAML dump"""
             
+            # Encode all fetched data as ascii string 
             for key in self.json:
                 if not isinstance(json[key], basestring):
                     json[key] = str(json[key])
                 json[key] = json[key].encode('ascii', 'ignore')
-                key = key.encode('ascii', 'ignore')     
-
+                key = key.encode('ascii', 'ignore')  
                 
-        def clean_title(self):
-
-            """Takes a string, replaces whitespace with '-', converts to lowercase, removes all characters not specified as valid filename chars in settings"""
-
-             valid_chars = "-abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            title = self.json['name'].strip().replace(" ", "-").lower()
+            # Clean title   
+            valid_chars = "-abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            title = self.name.strip().replace(" ", "-").lower()
             title = ''.join(c for c in title if c in valid_chars)
-            return title
-
-        
-        def clean_date(self, date_str):
-
-            """Takes a string, extracts date (assumes format Month d(d), yyyy), converts to format YYYY-MM-DD"""
-            #TODO: How to handle edge cas
-            # This is the pattern most dates are in
+            
+         
+            # Clean date
+            #TODO: refactor after more specs received from client
             # pattern = re.compile("[A-Za-z]*\s\d{1,2},\s\d{2,4}")
             # match = re.search(pattern, date_str)
             # if match:
@@ -80,14 +70,12 @@ def factory(type, json):
             #    return time.strftime(converted_to, (time.strptime(date_str, converted_from)))
 
             # Temporary
-            return "9999-99-99"
+            date = datetime.datetime.now().strftime("%Y-%m-%d")
+            
+            self.path += date + "-" + title + ".html" 
 
-                
-        def write(self, filename):
-
-            """Takes a filename and dumps post data as YAML into file"""
-
-            file_write = file(filename, 'w')
+            # Write YAML dump to file    
+            file_write = file(self.path, 'w')
             yaml.dump(self.json, file_write)
             file_write.close()               
 
@@ -96,30 +84,12 @@ def factory(type, json):
 
         def __init__(self, json):
             Post.__init__(self, json)
-            
-        def clean_content(self):
-            #TODO: location customization code here?
-            self.json['type'] = "event"
-            Post.clean_content(self)
-
-        def set_path(self, dest):
-            title = Post.clean_date(self, self.json['dates']) + "-" + Post.clean_title(self)
-            path = dest + title + ".html"
-            return path
+          
             
     class Location(Post):
 
         def __init__(self, json):
             Post.__init__(self, json)
-
-        def clean_content(self):
-            self.json['type'] = "location"
-            Post.clean_content(self)
-            
-        def set_path(self, dest):
-            title = Post.clean_date(self, self.json['created_at']) + "-" + Post.clean_title(self)
-            path = dest + title + ".html"
-            return path
             
             
     if type == "event":
