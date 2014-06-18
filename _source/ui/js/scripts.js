@@ -69,24 +69,41 @@ ArtX.setupSkipLinks = function() {
     }
 };
 
-/* Set up Discover slider
+/* Set up Peeking slider
    ========================================================================== */
-ArtX.setupDiscover = function() {
-    var $discoverSlider = $("#discover-slider");
-    if ($discoverSlider.length > 0) {
-        console.log("Initializing Discover slider");
 
-        var discSlideInstance = $discoverSlider.bxSlider({
-            oneToOneTouch:false
+ArtX.setupPeekSlider = function() {
+    // Assumption -- there will only ever be one peek-style slider per page/screen
+    var $peekSlider = $(".slider-style-peek").find("ul");
+    if ($peekSlider.length > 0) {
+        console.log("Initializing peeking slider");
+
+        var peekSlideInstance = $peekSlider.bxSlider({
+            oneToOneTouch:false,
+            pager:false,
+            auto:false,
+            onSliderLoad: function(currentIndex) {
+                //console.log("currentIndex: " + currentIndex);
+                $peekSlider.find("li").eq(currentIndex).addClass("slide-prev");
+                $peekSlider.find("li").eq(currentIndex+2).addClass("slide-next");
+            },
+            onSlideBefore: function($slideElement, oldIndex, newIndex) {
+                //console.log("oldIndex: " + oldIndex);
+                //console.log("newIndex: " + newIndex);
+                $(".slide-prev").removeClass("slide-prev");
+                $(".slide-next").removeClass("slide-next");
+                $peekSlider.find("li").eq(newIndex).addClass("slide-prev");
+                $peekSlider.find("li").eq(newIndex+2).addClass("slide-next");
+            }
         });
 
-        $('#discover-slider-next').click(function(){
-          discSlideInstance.goToNextSlide();
+        $('#peek-slider-next').click(function(){
+          peekSlideInstance.goToNextSlide();
           return false;
         });
 
-        $('#discover-slider-previous').click(function(){
-          discSlideInstance.goToPrevSlide();
+        $('#peek-slider-previous').click(function(){
+          peekSlideInstance.goToPrevSlide();
           return false;
         });
     }
@@ -149,6 +166,7 @@ ArtX.startup = {
         picturefill();
         ArtX.setupSkipLinks();
 
+        ArtX.setupPeekSlider();
         ArtX.setupFavoriteSlider();
         ArtX.setupFavoriteStars();
 

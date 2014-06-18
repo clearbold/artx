@@ -418,8 +418,13 @@ hr {
 .event-image {
     display:block;
     border-bottom:none;
-    cursor:pointer;
     background:$black-20pct;
+    text-align:center;
+    
+    a {
+        display:inline-block;
+        cursor:pointer;
+    }
     
     img {
         margin:0 auto;
@@ -440,6 +445,33 @@ hr {
     font-size:90%;
 }
 
+/* bxSlider overrides */
+.bx-wrapper {
+    margin: 0 auto;
+    
+    .bx-controls-direction,
+    .bx-pager {
+        display:none;
+    }
+    
+    .bx-viewport {
+       -moz-box-shadow: none;
+       -webkit-box-shadow: none;
+       box-shadow: none;
+       border:  none;
+       left:0;
+       background: transparent;
+    }
+
+    .bx-loading {
+        background: url(/ui/img/ajax-loader.gif) center center no-repeat transparent;
+    }
+
+    .no-touchcapable & .bx-pager {
+        display:block;
+    }
+}
+
 /* Discover slider styles */
 .discover-slider {
     position:relative;
@@ -457,6 +489,63 @@ hr {
             top:$spacing-unit/2;
             left:$spacing-unit/2;
         }
+    }
+}
+
+/* Peeking slider styles */
+.slider-style-peek {
+    .bx-wrapper {
+
+        li {
+            z-index:1;
+        }
+        
+        .event-image {
+            position:relative;
+            @include transition(left .5s linear);
+            
+            left:0;
+        }
+
+        .slide-prev,
+        .slide-next {
+            z-index:2;
+        }
+        .slide-prev .event-image {
+            left:($spacing-unit);
+        }
+        .slide-next .event-image {
+            left:(-$spacing-unit);
+        }
+    }
+}
+// Side controls for non-touch devices
+.peek-slider-previous,
+.peek-slider-next {
+    display:none;
+}
+.no-touchcapable .slider-style-peek .bx-wrapper {
+    ~ .peek-slider-previous,
+    ~ .peek-slider-next {
+        display:block;
+        position:absolute;
+        width:$spacing-unit;
+        height:100%;
+        background-color:transparent;
+        z-index:5;
+        top:0;
+        
+        //TODO: figure out a good hover/focus solution for accessibility
+        &:focus,
+        &:hover {
+            background-color:transparent;
+        }
+    }
+    ~ .peek-slider-previous {
+        left:0;
+    }
+    ~ .peek-slider-next {
+        right:0;
     }
 }
 
@@ -524,26 +613,6 @@ hr {
 
     /* bxSlider overrides */
     .bx-wrapper {
-        margin: 0 auto 5px;
-        
-        .bx-controls-direction,
-        .bx-pager {
-            display:none;
-        }
-        
-        .bx-viewport {
-           -moz-box-shadow: none;
-           -webkit-box-shadow: none;
-           box-shadow: none;
-           border:  none;
-           //left: -5px;
-           left:0;
-           background: transparent;
-        }
-
-        .bx-loading {
-            background: url(/ui/img/ajax-loader.gif) center center no-repeat transparent;
-        }
 
         a  {
             position:relative;
@@ -573,18 +642,18 @@ hr {
 
         padding:0 (33px + $spacing-unit * 2);
 
-        .favorite-slider-previous,
-        .favorite-slider-next {
+        .bx-wrapper ~ .favorite-slider-previous,
+        .bx-wrapper ~ .favorite-slider-next {
             display:block;
             position:absolute;
             top:50%;
             margin-top:-1em;
         } 
 
-        .favorite-slider-previous {
+        .bx-wrapper ~ .favorite-slider-previous {
             left:$spacing-unit;
         }
-        .favorite-slider-next {
+        .bx-wrapper ~ .favorite-slider-next {
             right:$spacing-unit;
         }
     }
