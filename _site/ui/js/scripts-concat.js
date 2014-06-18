@@ -12080,7 +12080,7 @@ if (typeof define !== 'undefined' && define.amd) {
 				start: {x: 0, y: 0},
 				end: {x: 0, y: 0}
 			}
-			slider.viewport.bind('touchstart', onTouchStart);
+			slider.viewport.bind('touchstart MSPointerDown pointerdown', onTouchStart);
 		}
 
 		/**
@@ -12096,13 +12096,14 @@ if (typeof define !== 'undefined' && define.amd) {
 				// record the original position when touch starts
 				slider.touch.originalPos = el.position();
 				var orig = e.originalEvent;
+				var touchPoints = (typeof orig.changedTouches != 'undefined') ? orig.changedTouches : [orig];
 				// record the starting touch x, y coordinates
-				slider.touch.start.x = orig.changedTouches[0].pageX;
-				slider.touch.start.y = orig.changedTouches[0].pageY;
+				slider.touch.start.x = touchPoints[0].pageX;
+				slider.touch.start.y = touchPoints[0].pageY;
 				// bind a "touchmove" event to the viewport
-				slider.viewport.bind('touchmove', onTouchMove);
+				slider.viewport.bind('touchmove MSPointerMove pointermove', onTouchMove);
 				// bind a "touchend" event to the viewport
-				slider.viewport.bind('touchend', onTouchEnd);
+				slider.viewport.bind('touchend MSPointerUp pointerup', onTouchEnd);
 			}
 		}
 
@@ -12114,9 +12115,10 @@ if (typeof define !== 'undefined' && define.amd) {
 		 */
 		var onTouchMove = function(e){
 			var orig = e.originalEvent;
+			var touchPoints = (typeof orig.changedTouches != 'undefined') ? orig.changedTouches : [orig];
 			// if scrolling on y axis, do not prevent default
-			var xMovement = Math.abs(orig.changedTouches[0].pageX - slider.touch.start.x);
-			var yMovement = Math.abs(orig.changedTouches[0].pageY - slider.touch.start.y);
+			var xMovement = Math.abs(touchPoints[0].pageX - slider.touch.start.x);
+			var yMovement = Math.abs(touchPoints[0].pageY - slider.touch.start.y);
 			// x axis swipe
 			if((xMovement * 3) > yMovement && slider.settings.preventDefaultSwipeX){
 				e.preventDefault();
@@ -12128,11 +12130,11 @@ if (typeof define !== 'undefined' && define.amd) {
 				var value = 0;
 				// if horizontal, drag along x axis
 				if(slider.settings.mode == 'horizontal'){
-					var change = orig.changedTouches[0].pageX - slider.touch.start.x;
+					var change = touchPoints[0].pageX - slider.touch.start.x;
 					value = slider.touch.originalPos.left + change;
 				// if vertical, drag along y axis
 				}else{
-					var change = orig.changedTouches[0].pageY - slider.touch.start.y;
+					var change = touchPoints[0].pageY - slider.touch.start.y;
 					value = slider.touch.originalPos.top + change;
 				}
 				setPositionProperty(value, 'reset', 0);
@@ -12146,12 +12148,13 @@ if (typeof define !== 'undefined' && define.amd) {
 		 *  - DOM event object
 		 */
 		var onTouchEnd = function(e){
-			slider.viewport.unbind('touchmove', onTouchMove);
+			slider.viewport.unbind('touchmove MSPointerMove pointermove', onTouchMove);
 			var orig = e.originalEvent;
+			var touchPoints = (typeof orig.changedTouches != 'undefined') ? orig.changedTouches : [orig];
 			var value = 0;
 			// record end x, y positions
-			slider.touch.end.x = orig.changedTouches[0].pageX;
-			slider.touch.end.y = orig.changedTouches[0].pageY;
+			slider.touch.end.x = touchPoints[0].pageX;
+			slider.touch.end.y = touchPoints[0].pageY;
 			// if fade mode, check if absolute x distance clears the threshold
 			if(slider.settings.mode == 'fade'){
 				var distance = Math.abs(slider.touch.start.x - slider.touch.end.x);
@@ -12184,7 +12187,7 @@ if (typeof define !== 'undefined' && define.amd) {
 					}
 				}
 			}
-			slider.viewport.unbind('touchend', onTouchEnd);
+			slider.viewport.unbind('touchend MSPointerUp pointerup', onTouchEnd);
 		}
 
 		/**
@@ -12452,8 +12455,7 @@ if (typeof define !== 'undefined' && define.amd) {
 		return this;
 	}
 
-})(jQuery);
-;/* https://gist.github.com/bobslaede/1221602, see user comment by jtangelder */
+})(jQuery);;/* https://gist.github.com/bobslaede/1221602, see user comment by jtangelder */
 
 ;(function(Modernizr, window) {
     Modernizr.addTest('positionfixed', function () {
@@ -12562,6 +12564,29 @@ ArtX.setupSkipLinks = function() {
     }
 };
 
+/* Set up Discover slider
+   ========================================================================== */
+ArtX.setupDiscover = function() {
+    var $discoverSlider = $("#discover-slider");
+    if ($discoverSlider.length > 0) {
+        console.log("Initializing Discover slider");
+
+        var discSlideInstance = $discoverSlider.bxSlider({
+            oneToOneTouch:false
+        });
+
+        $('#discover-slider-next').click(function(){
+          discSlideInstance.goToNextSlide();
+          return false;
+        });
+
+        $('#discover-slider-previous').click(function(){
+          discSlideInstance.goToPrevSlide();
+          return false;
+        });
+    }
+};
+
 /* Set up Favorites slider in footer
    ========================================================================== */
 ArtX.setupFavoriteSlider = function() {
@@ -12571,9 +12596,10 @@ ArtX.setupFavoriteSlider = function() {
 
         var favSlideInstance = $favoriteSlider.bxSlider({
             minSlides:3,
-            maxSlides:3,
-            slideWidth:100,
-            slideMargin:5
+            maxSlides:4,
+            slideWidth:300,
+            slideMargin:5,
+            oneToOneTouch:false
         });
 
         $('#favorite-slider-next').click(function(){
@@ -12588,7 +12614,26 @@ ArtX.setupFavoriteSlider = function() {
     }
 };
 
-  
+/* Set up Favorite stars
+   ========================================================================== */
+
+ArtX.setupFavoriteStars = function() {
+    var $favoriteStars = $(".favorite-star");
+    if ($favoriteStars.length > 0) {
+        console.log("Initializing favorite stars");
+
+        $favoriteStars.click(function() {
+            var $thisStarIcon = $(this).find(".icon");
+            if ($thisStarIcon.hasClass("icon-star")) {
+                $thisStarIcon.removeClass("icon-star").addClass("icon-star2");
+            } else {
+                $thisStarIcon.removeClass("icon-star2").addClass("icon-star");
+            }
+            return false;
+        });
+       
+    }
+};
 
 /* Initialize/Fire
    ========================================================================== */
@@ -12600,6 +12645,7 @@ ArtX.startup = {
         ArtX.setupSkipLinks();
 
         ArtX.setupFavoriteSlider();
+        ArtX.setupFavoriteStars();
 
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);

@@ -76,15 +76,19 @@ img {
 }
 
 a {
-    display:inline-block;
+    //display:inline-block;
     text-decoration:none;
     color:$link-color;
-    @include transition(color .1s linear, background-color .1s linear, border-color .1s linear);
-    border-bottom:1px solid transparent;
+    @include transition(color .1s linear, background-color .1s linear);    
     
+    &:focus {
+        outline:none;
+    }
+
+    &:focus,
     &:hover {
         color:$link-hover-color;
-        border-color:$link-hover-color;
+        background-color:$black-40pct;
     }
 }
 
@@ -129,12 +133,14 @@ a {
 }
 
 .no-touchcapable .btn {
+    &:focus,
     &:hover {
         background-color:$black-40pct;
         border:none;
     }
     &.btn-round {
 
+        &:focus,
         &:hover {
             box-shadow: 0 0 0 4px rgba(255,255,255,0.2);
             background-color:transparent;
@@ -187,7 +193,8 @@ h6, .h6 {
 }
 
 ul.plain,
-ul.listview {
+ul.listview,
+ul.bxslider {
     list-style:none;
     margin-left:0;
     padding-left:0;
@@ -197,13 +204,14 @@ ul.listview {
     position:relative;
     margin-left:-($spacing-unit);
     margin-right:-($spacing-unit);
+    background-color:lighten($page-bg, 5);
     
     li {
         border-bottom:1px solid $gray-dark;
     }
 
     a {
-        background-color:lighten($page-bg, 5);
+        background-color:transparent;
         display:block;
         position:relative;
         padding:.75em $spacing-unit;
@@ -225,7 +233,10 @@ ul.listview {
             color:$link-color;
         }
 
+        &:focus,
         &:hover {
+            background-color:$black-10pct;
+
             &:after {
                 color:$link-hover-color;
             }
@@ -279,8 +290,11 @@ hr {
         @include font-size(17px);
         
         a {
+            display:inline-block;
             color:$white;
-            border:none;
+            padding:.5em;
+            position:relative;
+            margin:-.5em 0;
         }
     }
 
@@ -310,12 +324,17 @@ hr {
     }
 }
 
+.content {
+    padding:$spacing-unit;
+}
+
 .positionfixed {
     .masthead, .footer {
         position:fixed;
         width:auto;
         left:0;
         right:0;
+        z-index:2;
     }
     .masthead {
         top:0;
@@ -326,14 +345,21 @@ hr {
         box-shadow:0 -10px 20px $page-bg;
     }
     .content {
-        padding:60px $spacing-unit (154px+$spacing-unit);
+        position:relative;
+        padding:(45px+$spacing-unit) $spacing-unit 144px;
+        z-index:1;
+    }
+
+    &.no-touchcapable {
+        .content {
+            padding:(45px+$spacing-unit) $spacing-unit 184px;
+        } 
+    }
+
+    .layout-nofooter .content {
+        padding-bottom:$spacing-unit !important;
     }
 }
-
-.content {
-    padding:$spacing-unit;
-}
-
 
 
 // Color swatches for styleguide
@@ -375,6 +401,65 @@ hr {
     }
 }
 
+/* Favorite stars */
+.favorite-star {
+    display:inline-block;
+    vertical-align:middle;
+    border-bottom:none;
+    padding:.5em;
+    
+    &:focus,
+    &:hover {
+        background-color:inherit;
+    }
+}
+
+/* Event blocks */
+.event-image {
+    display:block;
+    border-bottom:none;
+    cursor:pointer;
+    background:$black-20pct;
+    
+    img {
+        margin:0 auto;
+    }
+}
+
+.event-info {
+    padding:$spacing-unit;
+    position:relative;
+    margin:0 auto;
+    max-width:640px;
+}
+.event-title {
+    margin-bottom:.3em;
+}
+.event-venue {
+    text-transform:uppercase;
+    font-size:90%;
+}
+
+/* Discover slider styles */
+.discover-slider {
+    position:relative;
+    margin:(-$spacing-unit) (-$spacing-unit) 0;
+    
+    ul {
+        margin:0;
+    }
+    
+    .event-info {
+        padding-left:($spacing-unit*3);
+        
+        .favorite-star {
+            position:absolute;
+            top:$spacing-unit/2;
+            left:$spacing-unit/2;
+        }
+    }
+}
+
 /* Favorites carousel styles */
 .favorite-slider {
     position:relative;
@@ -387,6 +472,10 @@ hr {
         list-style:none;
         margin:0;
         padding:0;
+        
+        .no-js & {
+            text-align:center;
+        }
     }
     li {
         width:100px;
@@ -397,6 +486,9 @@ hr {
         .no-js & {
             margin-left:5px;
             margin-bottom:5px;
+            float:none;
+            display:inline-block;
+            vertical-align:top;
         }
     }
     a {
@@ -469,7 +561,7 @@ hr {
 }
 
 .no-touchcapable .favorite-slider {
-    margin: 0 (-$spacing-unit) 40px;
+    margin: 0 (-$spacing-unit) 30px;
 
     .bx-wrapper {
         .bx-pager {

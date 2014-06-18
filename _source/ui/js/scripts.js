@@ -69,6 +69,29 @@ ArtX.setupSkipLinks = function() {
     }
 };
 
+/* Set up Discover slider
+   ========================================================================== */
+ArtX.setupDiscover = function() {
+    var $discoverSlider = $("#discover-slider");
+    if ($discoverSlider.length > 0) {
+        console.log("Initializing Discover slider");
+
+        var discSlideInstance = $discoverSlider.bxSlider({
+            oneToOneTouch:false
+        });
+
+        $('#discover-slider-next').click(function(){
+          discSlideInstance.goToNextSlide();
+          return false;
+        });
+
+        $('#discover-slider-previous').click(function(){
+          discSlideInstance.goToPrevSlide();
+          return false;
+        });
+    }
+};
+
 /* Set up Favorites slider in footer
    ========================================================================== */
 ArtX.setupFavoriteSlider = function() {
@@ -80,7 +103,8 @@ ArtX.setupFavoriteSlider = function() {
             minSlides:3,
             maxSlides:4,
             slideWidth:300,
-            slideMargin:5
+            slideMargin:5,
+            oneToOneTouch:false
         });
 
         $('#favorite-slider-next').click(function(){
@@ -95,7 +119,26 @@ ArtX.setupFavoriteSlider = function() {
     }
 };
 
-  
+/* Set up Favorite stars
+   ========================================================================== */
+
+ArtX.setupFavoriteStars = function() {
+    var $favoriteStars = $(".favorite-star");
+    if ($favoriteStars.length > 0) {
+        console.log("Initializing favorite stars");
+
+        $favoriteStars.click(function() {
+            var $thisStarIcon = $(this).find(".icon");
+            if ($thisStarIcon.hasClass("icon-star")) {
+                $thisStarIcon.removeClass("icon-star").addClass("icon-star2");
+            } else {
+                $thisStarIcon.removeClass("icon-star2").addClass("icon-star");
+            }
+            return false;
+        });
+       
+    }
+};
 
 /* Initialize/Fire
    ========================================================================== */
@@ -107,6 +150,7 @@ ArtX.startup = {
         ArtX.setupSkipLinks();
 
         ArtX.setupFavoriteSlider();
+        ArtX.setupFavoriteStars();
 
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
