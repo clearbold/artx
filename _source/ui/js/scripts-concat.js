@@ -12614,6 +12614,7 @@ ArtX.setupFavoriteSlider = function() {
         var favSlideInstance = $favoriteSlider.bxSlider({
             minSlides:3,
             maxSlides:4,
+            moveSlides:1,
             slideWidth:300,
             slideMargin:5,
             oneToOneTouch:false
