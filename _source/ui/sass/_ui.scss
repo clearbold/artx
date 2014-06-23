@@ -88,7 +88,7 @@ a {
     &:focus,
     &:hover {
         color:$link-hover-color;
-        background-color:$black-40pct;
+        background-color:$black-20pct;
     }
 }
 
@@ -421,10 +421,34 @@ hr {
     vertical-align:middle;
     border-bottom:none;
     padding:.5em;
+    background-color:rgba(0,0,0,.01);
     
     &:focus,
     &:hover {
         background-color:inherit;
+    }
+
+    .icon {
+        position:relative;
+        border-radius:50%;
+        @include transition(box-shadow .2s linear);
+        background-color:transparent;
+        z-index:1;
+        
+        &:after {
+            -webkit-transition: -webkit-transform 0.2s, opacity 0.2s;
+            -moz-transition: -moz-transform 0.2s, opacity 0.2s;
+            transition: transform 0.2s, opacity 0.2s;
+            content:"";
+            pointer-events: none;
+            position: absolute;
+            width: 1.5em;
+            height: 1.5em;
+            left:-.25em;
+            top:-.25em;
+            border-radius: 100%;
+            background-color:$black-30pct;
+        }
     }
 }
 
