@@ -69,6 +69,67 @@ ArtX.setupSkipLinks = function() {
     }
 };
 
+/* Set up slide-in menu panels
+   ========================================================================== */
+
+ArtX.setupSlidingPanels = function() {
+
+    var $masthead = $(".masthead"),
+        $footer = $(".footer"),
+        mastheadHeight = $masthead.outerHeight,
+        footerHeight = $footer.outerHeight,
+        $slidingMenuPanel = $("#menu-panel"),
+        $slidingTagsPanel = $("#tags-panel"),
+        menuSliderOptions,
+        tagsSliderOptions;
+
+    if (($slidingMenuPanel.length > 0) || ($slidingTagsPanel.length > 0) ) {
+        if (ArtX.el.html.hasClass("positionfixed")) {
+            menuSliderOptions = {
+                name: 'menu-panel',
+                side: 'right',
+                displace: false
+            };
+            tagsSliderOptions = {
+                name: 'tags-panel',
+                side: 'left', // By default
+                displace: false
+            };
+        } else {
+            menuSliderOptions = {
+                name: 'menu-panel',
+                side: 'right'
+            };
+            tagsSliderOptions = {
+                name: 'tags-panel',
+                side: 'left' // By default
+            };
+        }
+
+        // Initialize Menu panel
+        if ($slidingMenuPanel.length > 0) {
+            console.log("Initializing Menu sliding panel");
+
+            var $slidingMenuTrigger = $("#menu-trigger");
+
+            $slidingMenuTrigger.sidr(menuSliderOptions);
+        }
+        
+        // Initialize Tags panel
+        if ($slidingTagsPanel.length > 0) {
+            console.log("Initializing Tags sliding panel");
+
+            var $slidingTagsTrigger = $("#tags-trigger");
+
+            $slidingTagsTrigger.sidr(tagsSliderOptions);
+        }
+
+
+    }
+   
+};
+
+
 /* Set up Peeking slider
    ========================================================================== */
 
@@ -119,6 +180,7 @@ ArtX.setupFavoriteSlider = function() {
         var favSlideInstance = $favoriteSlider.bxSlider({
             minSlides:3,
             maxSlides:4,
+            moveSlides:1,
             slideWidth:300,
             slideMargin:5,
             oneToOneTouch:false
@@ -166,6 +228,7 @@ ArtX.startup = {
         picturefill();
         ArtX.setupSkipLinks();
 
+        ArtX.setupSlidingPanels();
         ArtX.setupPeekSlider();
         ArtX.setupFavoriteSlider();
         ArtX.setupFavoriteStars();

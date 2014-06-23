@@ -271,8 +271,8 @@ hr {
 }
 
 .wrapper {
-    width:100%;
-    overflow:hidden;
+    //width:100%;
+    //overflow:hidden;
 }
 
 .masthead,
@@ -360,14 +360,18 @@ hr {
     }
     .content {
         position:relative;
-        padding:(45px+$spacing-unit) $spacing-unit 144px;
+        padding:(46px+$spacing-unit) $spacing-unit 144px;
         z-index:1;
     }
-
+    
     &.no-touchcapable {
         .content {
-            padding:(45px+$spacing-unit) $spacing-unit 184px;
+            padding:(46px+$spacing-unit) $spacing-unit 184px;
         } 
+    }
+
+    .sidr {
+        top:46px;
     }
 
     .layout-nofooter .content {
@@ -699,4 +703,26 @@ hr {
     }
 }
 
+/* Overriding some sidr styles */
+.sidr {
+    height:auto;
+    bottom:0;
+
+    ul {
+        margin-bottom:0;
+
+        li {
+
+            line-height:3em;
+
+            &:hover,
+            &.active,
+            &.sidr-class-active {
+                border-top:1px solid transparent;
+                line-height:3em;
+            }
+        }
+
+    }
+}
 
