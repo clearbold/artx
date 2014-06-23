@@ -1,10 +1,10 @@
 <div id="menu-panel" class="menu-panel">
   <ul>
-    <li><a href="home.html">Discover ArtsConnect</a></li>
-    <li><a href="#">By Date</a></li>
-    <li><a href="#">By Location</a></li>
-    <li><a href="#">Favorites</a></li>
-    <li><a href="#">History</a></li>
-    <li><a href="#">Settings</a></li>
+    <li{% if page.active == "home" %} class="active"{% endif %}><a href="home.html">Discover ArtsConnect</a></li>
+    <li{% if page.active == "bydate" %} class="active"{% endif %}><a href="#">By Date</a></li>
+    <li{% if page.active == "bylocation" %} class="active"{% endif %}><a href="#">By Location</a></li>
+    <li{% if page.active == "favorites" %} class="active"{% endif %}><a href="#">Favorites</a></li>
+    <li{% if page.active == "history" %} class="active"{% endif %}><a href="#">History</a></li>
+    <li{% if page.active == "settings" %} class="active"{% endif %}><a href="#">Settings</a></li>
   </ul>
 </div>

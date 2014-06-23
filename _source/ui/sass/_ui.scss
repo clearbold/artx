@@ -324,18 +324,34 @@ hr {
         line-height:33px;
         text-align:left;
         margin-bottom:0;
+        
+        a {
+            display:block;
+            padding:7px $spacing-unit;
+            position:relative;
+        }
+        .icon {
+            position:absolute;
+            right:$spacing-unit;
+            top:17px;
+        }
     }
 
-    a {
-        display:block;
+    h2.related {
+        float:left;
         padding:7px $spacing-unit;
-        position:relative;
+        
+        a {
+            display:inline;
+            padding:0;
+        }
     }
-    .icon {
-        position:absolute;
-        right:$spacing-unit;
-        top:17px;
+
+    .btn-right {
+        margin-right:$spacing-unit;
+        margin-top:7px;
     }
+
 }
 
 .content {
@@ -352,11 +368,11 @@ hr {
     }
     .masthead {
         top:0;
-        box-shadow:0 10px 20px $page-bg;
+        box-shadow:0 10px 20px $black-40pct;
     }
     .footer {
         bottom:0;
-        box-shadow:0 -10px 20px $page-bg;
+        box-shadow:0 -10px 20px $black-20pct;
     }
     .content {
         position:relative;
@@ -419,12 +435,15 @@ hr {
     }
 }
 
-/* Favorite stars */
-.favorite-star {
+/* Favorite stars, similar event symbols */
+.favorite-star,
+.event-symbol {
     display:inline-block;
     vertical-align:middle;
     border-bottom:none;
     padding:.5em;
+}
+.favorite-star {
     background-color:rgba(0,0,0,.01);
     
     &:focus,
@@ -449,7 +468,7 @@ hr {
             width: 1.5em;
             height: 1.5em;
             left:-.25em;
-            top:-.25em;
+            top:-.21em;
             border-radius: 100%;
             background-color:$black-30pct;
         }
@@ -457,6 +476,7 @@ hr {
 }
 
 /* Event blocks */
+
 .event-image {
     display:block;
     border-bottom:none;
@@ -485,6 +505,31 @@ hr {
 .event-venue {
     text-transform:uppercase;
     font-size:90%;
+}
+
+.event-info .event-symbol {
+    position:absolute;
+}
+
+.event-detail { // not in a slider
+    position:relative;
+    margin:(-$spacing-unit) (-$spacing-unit) 0;
+    
+    .event-title,
+    .event-venue,
+    .event-date {
+        position:relative;
+        padding-left:($spacing-unit*2);
+
+    }
+    .event-symbol {
+        top:-($spacing-unit/2);
+        left:-($spacing-unit/2);
+        @include font-size(16px, false);
+    }
+    .event-venue {
+        margin-bottom:.5em;
+    }
 }
 
 /* bxSlider overrides */
@@ -521,18 +566,20 @@ hr {
     
     ul {
         margin:0;
-    }
-    
+    } 
+
     .event-info {
         padding-left:($spacing-unit*3);
         
-        .favorite-star {
+        .event-symbol {
             position:absolute;
             top:$spacing-unit/2;
             left:$spacing-unit/2;
         }
     }
 }
+
+
 
 /* Peeking slider styles */
 .slider-style-peek {
@@ -723,6 +770,16 @@ hr {
             }
         }
 
+    }
+
+    &.right {
+        box-shadow:-10px 0 20px $black-20pct;
+    }
+
+    &.left {
+        left: -260px;
+        right: auto;
+        box-shadow:10px 0 20px $black-20pct;
     }
 }
 

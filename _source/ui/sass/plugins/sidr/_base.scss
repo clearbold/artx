@@ -34,7 +34,7 @@
     font-size: $sidr-font-size;
     background: $sidr-background;
     color: $sidr-text-color;
-    box-shadow: $sidr-background-shadow-color, 0, 0, 5px, 5px, inset;
+    //box-shadow: inset 0 0 5px 5px $sidr-background-shadow-color;
 
     h1, h2, h3, h4, h5, h6 {
         font-size: $sidr-font-size - 4;
@@ -44,7 +44,7 @@
         color: $sidr-text-color;
         line-height: 24px;
         @include linear-gradient(lighten($sidr-background, 10%), darken($sidr-background, 10%));
-        box-shadow:rgba(#000, .2), 0, 5px, 5px, 3px;
+        //box-shadow: 0 5px 5px 3px rgba(#000, .2);
     }
 
     p {
@@ -81,7 +81,8 @@
                 line-height: 49px;
 
                 > a, > span {
-                    box-shadow: $sidr-background-shadow-color, 0, 0, 15px, 3px, inset;
+                    //box-shadow: inset 0 0 15px 3px $sidr-background-shadow-color;
+                    background:darken($sidr-background, 5%);
                 }
             }
 
@@ -110,7 +111,8 @@
                         line-height: 41px;
 
                         > a, > span {
-                            box-shadow: $sidr-background-shadow-color, 0, 0, 15px, 3px, inset;
+                            //box-shadow: inset 0 0 15px 3px $sidr-background-shadow-color;
+                            background:darken($sidr-background, 5%);
                         }
                     }
 
