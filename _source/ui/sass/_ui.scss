@@ -317,10 +317,24 @@ hr {
     padding:7px $spacing-unit;
 }
 .footer-header {
+    position:relative;
+    margin:-7px (-$spacing-unit) 0;
+
     h2 {
-        float:left;
         line-height:33px;
-        margin-bottom:$spacing-unit/2;
+        text-align:left;
+        margin-bottom:0;
+    }
+
+    a {
+        display:block;
+        padding:7px $spacing-unit;
+        position:relative;
+    }
+    .icon {
+        position:absolute;
+        right:$spacing-unit;
+        top:17px;
     }
 }
 
@@ -472,7 +486,7 @@ hr {
     }
 }
 
-/* Discover slider styles */
+/* Home screen slider styles */
 .discover-slider {
     position:relative;
     margin:(-$spacing-unit) (-$spacing-unit) 0;
