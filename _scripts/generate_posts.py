@@ -38,45 +38,38 @@ def factory(type, json):
 
         
         def __init__(self, json):
+
+            # The JSON post contents
             self.json = json
+
+            # Post name
             self.name = self.json['name']
+
+            # Path to post folder
             self.path = "../_source/_posts/"
-                        
+
+            # Date to be prepended to post title - defaults to now
+            self.date = datetime.datetime.now().isoformat()
+                            
         def generate(self):
 
-            """Converts post content to ascii string in preparation for YAML dump"""
-            
-            # Encode all fetched data as ascii string 
-            for key in self.json:
-                if not isinstance(json[key], basestring):
-                    json[key] = str(json[key])
-                json[key] = json[key].encode('ascii', 'ignore')
-                key = key.encode('ascii', 'ignore')  
+            """Generate post title and dump JSON contents into YAML file"""
                 
-            # Clean title   
-            valid_chars = "-abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            title = self.name.strip().replace(" ", "-").lower()
-            title = ''.join(c for c in title if c in valid_chars)
-            
-         
-            # Clean date
-            #TODO: refactor after more specs received from client
-            # pattern = re.compile("[A-Za-z]*\s\d{1,2},\s\d{2,4}")
-            # match = re.search(pattern, date_str)
-            # if match:
-            #    date_str = match.group()
-            #    converted_from = "%B %d, %Y"
-            #    converted_to = "%Y-%m-%d"
-            #    return time.strftime(converted_to, (time.strptime(date_str, converted_from)))
-
-            # Temporary
-            date = datetime.datetime.now().strftime("%Y-%m-%d")
-            
-            self.path += date + "-" + title + ".html" 
+            # Format and assemble post location as 'path/YYYY-mm-dd-postname.html'  
+            valid_chars = "abcdefghijklmnopqrstuvwxyz"
+            words_unformatted = self.name.split(" ")
+            words_formatted = []
+            for i in range(len(words_unformatted)):
+                word = words_unformatted[i].strip().lower()
+                word = ''.join(c for c in word if c in valid_chars)
+                words_formatted.append(word)
+            title = "-".join(words_formatted)
+            date_prefix = self.date.split("T")[0]
+            self.path += date_prefix + "-" + title + ".html" 
 
             # Write YAML dump to file    
             file_write = file(self.path, 'w')
-            yaml.dump(self.json, file_write)
+            yaml.safe_dump(self.json, file_write)
             file_write.close()               
 
 
@@ -84,14 +77,18 @@ def factory(type, json):
 
         def __init__(self, json):
             Post.__init__(self, json)
-          
+            if json.get('start_date'):
+                self.date = json['start_date']
+                
             
     class Location(Post):
 
         def __init__(self, json):
             Post.__init__(self, json)
-            
-            
+            if json.get('created_at'):
+                self.date = self.json['created_at']
+
+                          
     if type == "event":
         return Event(json)
     if type == "location":
@@ -100,5 +97,3 @@ def factory(type, json):
         
 if __name__ == '__main__':
   main()
-
-  
