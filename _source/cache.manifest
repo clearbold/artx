@@ -1,6 +1,6 @@
 CACHE MANIFEST
  
-# Version 0.12
+# Version 0.23
  
 NETWORK:
 *
@@ -10,6 +10,7 @@ index.html
 home.html
 event.html
 exhibition.html
+venue.html
 styleguide.html
 ui/css/fonts/artx.eot
 ui/css/fonts/artx.svg

@@ -433,7 +433,7 @@ hr {
 
 /* Favorite stars, similar event symbols */
 .favorite-star,
-.event-symbol {
+.item-symbol {
     display:inline-block;
     vertical-align:middle;
     border-bottom:none;
@@ -475,7 +475,7 @@ hr {
 
 /* Event blocks */
 
-.event-image {
+.item-image {
     display:block;
     border-bottom:none;
     background:$black-20pct;
@@ -491,42 +491,50 @@ hr {
     }
 }
 
-.event-info {
+.item-info {
     padding:$spacing-unit;
     position:relative;
     margin:0 auto;
     max-width:640px;
 }
-.event-title {
+.item-title {
     margin-bottom:.3em;
 }
-.event-venue {
+.item-venue {
     text-transform:uppercase;
     font-size:90%;
 }
 
-.event-info .event-symbol {
+.item-info .item-symbol {
     position:absolute;
 }
 
-.event-detail { // not in a slider
+.item-detail { // not in a slider
     position:relative;
     margin:(-$spacing-unit) (-$spacing-unit) 0;
     
-    .event-title,
-    .event-venue,
-    .event-date {
+    .item-title,
+    .item-venue,
+    .item-date,
+    .item-location,
+    .item-website {
         position:relative;
         padding-left:($spacing-unit*2);
 
     }
-    .event-symbol {
+    .item-symbol {
         top:-($spacing-unit/2);
         left:-($spacing-unit/2);
         @include font-size(16px, false);
     }
-    .event-venue {
+    .item-venue {
         margin-bottom:.5em;
+    }
+}
+
+.venue-detail {
+    .item-title {
+        padding-left:0;
     }
 }
 
@@ -566,10 +574,10 @@ hr {
         margin:0;
     } 
 
-    .event-info {
+    .item-info {
         padding-left:($spacing-unit*3);
         
-        .event-symbol {
+        .item-symbol {
             position:absolute;
             top:$spacing-unit/2;
             left:$spacing-unit/2;
@@ -587,7 +595,7 @@ hr {
             z-index:1;
         }
         
-        .event-image {
+        .item-image {
             position:relative;
             @include transition(left .5s linear);
             
@@ -598,10 +606,10 @@ hr {
         .slide-next {
             z-index:2;
         }
-        .slide-prev .event-image {
+        .slide-prev .item-image {
             left:($spacing-unit);
         }
-        .slide-next .event-image {
+        .slide-next .item-image {
             left:(-$spacing-unit);
         }
     }
