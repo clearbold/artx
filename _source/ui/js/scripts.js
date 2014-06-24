@@ -137,6 +137,19 @@ ArtX.setupSlidingPanels = function() {
    
 };
 
+/* Set up Back button
+   ========================================================================== */
+// This will be used if we go back to a back button solution (removed for now)
+ArtX.setupBackButton = function() {
+    var $backButton = $(".btn-back");
+    if ($backButton.length > 0) {
+        console.log("Initializing back button");
+
+        $backButton.click(function() {
+            window.history.back();
+        });
+    }
+}
 
 /* Set up Peeking slider
    ========================================================================== */
@@ -251,6 +264,7 @@ ArtX.startup = {
         $('a[href="#"]').click(function(e){e.preventDefault();});
         picturefill();
         ArtX.setupSkipLinks();
+        ArtX.setupBackButton();
 
         ArtX.setupSlidingPanels();
         ArtX.setupPeekSlider();

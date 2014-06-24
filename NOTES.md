@@ -4,6 +4,8 @@ ArtX Notes and Questions
 Notes
 -----
 
+* The paper prototype had a "back" button at top left on the subpages like "Event", "Exhibition", and "Venue". We've replaced that with a Tags button which slides out a menu, so that the tags will be ever-present and easy to access.
+
 * There's an assumption in place that we can get main images that are at least 640 x 320, and that all images in a given set (all feature images, for example, or all thumbnail images) will have the same width/height ratio.  If images will be different sizes or ratios, we will probably need to tweak the styles once we are pulling in real content.
 
 * Currently there is a bit of a jump as the main slider moves from first to last or last to first, due to something about the cloned slides required for "infinite loop" sliding (still in progress).

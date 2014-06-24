@@ -252,6 +252,17 @@ ul {
     }
 }
 
+dl {
+    overflow:hidden;
+    
+    dt {
+        float:left;
+    }
+    dd {
+        margin-left:4em;
+    }
+}
+
 hr {
     height:1px;
     border:0;
