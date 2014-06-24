@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
 
-    <title>Workshop with artist Jason Middlebrook - ArtX</title>
+    <title>Favorites - ArtX</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -92,7 +92,7 @@
     </script>
 
 </head>
-<body id="page--event" class="page--event">
+<body id="page--favorites" class="page--favorites">
 
     <!-- Skip navigation link for screen reader and keyboard users -->
     <div class="skiplinkholder"><p><a id="skiplink" href="#skiptarget">Skip to main content (Press Enter).</a></p></div>
@@ -106,38 +106,50 @@
     <!-- Skip nav target -->
     <p class="skiptargetholder"><a id="skiptarget" name="skiptarget" class="skip" tabindex="-1"></a></p>
 
-    <h1><a href="index.html">Event</a></h1>
+    <h1><a href="index.html">Favorites</a></h1>
 </header> <!-- /header -->
 
             <div class="content" role="main">
 
-            <div class="item-block item-detail">
-                <div class="item-image">
-                    <img src="/ui/img/rect-middlebrook.jpg" alt="" />
-                </div>
-                <div class="item-info">
-                    <h2 class="item-title">
-                        Workshop with artist Jason Middlebrook
-                        <a href="#" class="favorite-star item-symbol" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
-                    </h2>
-                    <p class="item-venue"><a href="venue.html"><span class="item-symbol"><i class="icon icon-location"></i></span>ICA Boston</a></p>
-                    <p class="item-date"><span class="item-symbol"><i class="icon icon-calendar"></i></span>Sat, May 3, 10:15-1:15</p>
-                    <div class="item-description">
-                        <p>A featured artist in the ICA&rsquo;s collection, Jason Middlebrook commonly uses organic motifs and materials to explore the relationship between nature and culture. Join him for this special introduction to his creative process, tools, and materials; working with wood planks provided by the artist, participants will prepare works to take home at a later date. All skill levels welcome.</p>
-
-                        <p><i>A limited number of full scholarships are available for Boston Public School teachers with advance registration. For information, contact Leah Kandel at lkandel@icaboston.org.</i></p>
+            <div class="thumb-list">
+                <div class="item-block cf">
+                    <div class="item-image">
+                        <a href="exhibition.html">
+                            <img src="/ui/img/square-quilts.jpg" alt="" />
+                        </a>
+                    </div>
+                    <div class="item-info">
+                        <h2 class="item-title">
+                            <a href="exhibition.html" class="truncate">Quilts and Color: The Roy Pilgrim Collection</a>
+                        </h2>
+                        <p class="item-venue">Museum of Fine Arts</p>
+                        <p class="item-date">May 3 (closing soon)</p>
+                        <a href="#" class="favorite-star item-symbol" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
                     </div>
                 </div>
-            </div>
-                   
+
+                <div class="item-block cf">
+                    <div class="item-image">
+                        <a href="event.html">
+                            <img src="/ui/img/square-middlebrook.jpg" alt="" />
+                        </a>
+                    </div>
+                    <div class="item-info">
+                        <h2 class="item-title">
+                            <a href="event.html" class="truncate">Workshop with artist Jason Middlebrook</a>
+                        </h2>
+                        <p class="item-venue">ICA Boston</p>
+                        <p class="item-date">May 3</p>
+                        <a href="#" class="favorite-star item-symbol" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
+                    </div>
+                </div>
+            </div> <!-- /thumb-list -->
         </div> <!-- /content -->
 
         <footer class="footer">
             <div class="footer-header cf">
-                <h2 class="h3 related">Related: <a href="#">hand-made</a></h2>
-                <a href="#" class="btn btn-round btn-right"><i class="icon icon-reload"></i><span class="visuallyhidden">Refresh</span></a>
+                <h2 class="h3"><a href="#">My favorites <i class="icon icon-fast-forward"></i></a></h2>
             </div>
-
             <div class="favorite-slider">
 
     <ul id="favorite-slider" class="bxslider cf">
@@ -165,7 +177,7 @@
     <li><a href="home.html">Discover ArtsConnect</a></li>
     <li><a href="#">By Date</a></li>
     <li><a href="#">By Location</a></li>
-    <li><a href="#">Favorites</a></li>
+    <li class="active"><a href="#">Favorites</a></li>
     <li><a href="#">History</a></li>
     <li><a href="#">Settings</a></li>
   </ul>

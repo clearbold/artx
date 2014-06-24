@@ -549,6 +549,64 @@ hr {
     }
 }
 
+/* Item thumbnail list (ex. Favorites) */
+.thumb-list {
+    max-width:640px;
+    margin:0 auto;
+
+    .item-block {
+        clear:left;
+        margin-bottom:$spacing-unit;
+    }
+    .item-image {
+        width:30%;
+        float:left;
+        max-width:160px;
+        margin-right:$spacing-unit;
+    }
+    .item-info {
+        width:64%;
+        float:left;
+        padding-top:0;
+        padding-left:0;
+        padding-bottom:0;
+    }
+    .item-info {
+        @include font-size(14px, false);
+        
+        @include mq($lap-start) {
+            @include font-size(16px, false);
+        }
+    }
+    .item-venue {
+        @include font-size(12px, false);
+        
+        @include mq($lap-start) {
+            @include font-size(14px, false);
+        }
+    }
+    .item-title {
+        padding-right:$spacing-unit;
+        @include font-size(16px, false);
+        
+        @include mq($lap-start) {
+            @include font-size(18px, false);
+        }
+
+        .truncate {
+            display:inline-block;
+        }
+    }
+    .item-symbol {
+        top:-($spacing-unit/1.75);
+        right:-($spacing-unit/1.5);
+        @include font-size(16px, false);
+    }
+    p {
+        margin-bottom:0;
+    }
+}
+
 /* bxSlider overrides */
 .bx-wrapper {
     margin: 0 auto;

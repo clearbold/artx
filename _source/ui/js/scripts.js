@@ -149,7 +149,7 @@ ArtX.setupBackButton = function() {
             window.history.back();
         });
     }
-}
+};
 
 /* Set up Peeking slider
    ========================================================================== */
@@ -241,6 +241,28 @@ ArtX.setupFavoriteStars = function() {
     }
 };
 
+/* Set up Text Truncation 
+   ========================================================================== */
+ArtX.setupTextTruncation = function() {
+    
+    var textToTruncate = $(".truncate");
+    if(textToTruncate.length > 0) {
+        console.log("Initializing text truncation");
+        textToTruncate.trunk8({
+            lines: 2,
+            tooltip: false
+        });
+
+        // Set up a resize event for truncated text
+        ArtX.el.win.resize(function() {
+            textToTruncate.trunk8({
+                lines: 2,
+                tooltip: false
+            });
+        });  
+    }
+};
+
 /* Initialize/Fire
    ========================================================================== */
 ArtX.startup = {
@@ -264,7 +286,8 @@ ArtX.startup = {
         $('a[href="#"]').click(function(e){e.preventDefault();});
         picturefill();
         ArtX.setupSkipLinks();
-        ArtX.setupBackButton();
+        //ArtX.setupBackButton();
+        ArtX.setupTextTruncation();
 
         ArtX.setupSlidingPanels();
         ArtX.setupPeekSlider();
