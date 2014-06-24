@@ -378,18 +378,12 @@ hr {
     }
     .content {
         position:relative;
-        padding:(46px+$spacing-unit) $spacing-unit 144px;
+        padding:(45px+$spacing-unit) $spacing-unit 147px;
         z-index:1;
-    }
-    
-    &.no-touchcapable {
-        .content {
-            padding:(46px+$spacing-unit) $spacing-unit 184px;
-        } 
     }
 
     .sidr {
-        top:46px;
+        top:45px;
     }
 
     .layout-nofooter .content {
@@ -448,9 +442,11 @@ hr {
 .favorite-star {
     background-color:rgba(0,0,0,.01);
     
-    &:focus,
-    &:hover {
-        background-color:inherit;
+    .no-touchcapable & {
+        &:focus,
+        &:hover {
+            background-color:rgba(0,0,0,.01);
+        }
     }
 
     .icon {
@@ -723,13 +719,6 @@ hr {
 }
 
 .no-touchcapable .favorite-slider {
-    margin: 0 (-$spacing-unit) 30px;
-
-    .bx-wrapper {
-        .bx-pager {
-            display:block;
-        }
-    }
 
     @include mq(436px) {
 

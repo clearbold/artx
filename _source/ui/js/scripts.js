@@ -183,7 +183,8 @@ ArtX.setupFavoriteSlider = function() {
             moveSlides:1,
             slideWidth:300,
             slideMargin:5,
-            oneToOneTouch:false
+            oneToOneTouch:false,
+            pager:false
         });
 
         $('#favorite-slider-next').click(function(){
