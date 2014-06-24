@@ -1,13 +1,30 @@
 CACHE MANIFEST
  
-# Version 0.02
+# Version 0.12
  
 NETWORK:
 *
  
 CACHE:
 index.html
+home.html
+event.html
+exhibition.html
+styleguide.html
+ui/css/fonts/artx.eot
+ui/css/fonts/artx.svg
+ui/css/fonts/artx.ttf
+ui/css/fonts/artx.woff
 ui/css/styles.css
-ui/css/jquery.mobile-1.4.2.min.css
+ui/img/ajax-loader.gif
+ui/img/controls.png
+ui/img/rect-bamboo.jpg
+ui/img/rect-knights.jpg
+ui/img/rect-middlebrook.jpg
+ui/img/rect-quilts.jpg
+ui/img/square-bamboo.jpg
+ui/img/square-knights.jpg
+ui/img/square-middlebrook.jpg
+ui/img/square-quilts.jpg
 ui/js/scripts-concat.js
 ui/js/scripts-concat.min.js

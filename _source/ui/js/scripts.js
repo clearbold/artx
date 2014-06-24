@@ -112,7 +112,11 @@ ArtX.setupSlidingPanels = function() {
 
             var $slidingMenuTrigger = $("#menu-trigger");
 
-            $slidingMenuTrigger.sidr(menuSliderOptions);
+            $slidingMenuTrigger
+                .sidr(menuSliderOptions)
+                .click(function(e) {
+                    e.preventDefault();
+                });
         }
         
         // Initialize Tags panel
@@ -121,7 +125,11 @@ ArtX.setupSlidingPanels = function() {
 
             var $slidingTagsTrigger = $("#tags-trigger");
 
-            $slidingTagsTrigger.sidr(tagsSliderOptions);
+            $slidingTagsTrigger
+                .sidr(tagsSliderOptions)
+                .click(function(e) {
+                    e.preventDefault();
+                });
         }
 
 
@@ -225,6 +233,21 @@ ArtX.setupFavoriteStars = function() {
 ArtX.startup = {
     init : function () {
         //console.log("Initial load: scripting initializing");
+
+        function testCache(document,navigator,standalone) {
+            if ((standalone in navigator) && navigator[standalone]) {
+                if (window.applicationCache) {
+                    console.log("Standalone app with cache, set up listener for cache updates");
+                    applicationCache.addEventListener('updateready', function() {
+                        if (confirm('An update is available. Reload now?')) {
+                            window.location.reload();
+                        }
+                    });
+                }
+            }
+        }
+        testCache(document,window.navigator,'standalone');
+
         $('a[href="#"]').click(function(e){e.preventDefault();});
         picturefill();
         ArtX.setupSkipLinks();
@@ -236,16 +259,6 @@ ArtX.startup = {
 
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
-
-        // Check for caching updates
-        /*
-        if (window.applicationCache) {
-            applicationCache.addEventListener('updateready', function() {
-                if (confirm('An update is available. Reload now?')) {
-                    window.location.reload();
-                }
-            });
-        }*/
     },
     finalize : function() {
         //console.log("Initial load: scripting finalized");

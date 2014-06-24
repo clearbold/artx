@@ -286,6 +286,7 @@ module.exports = function(grunt) {
             jekyllSources: {
                 files: [
                     '_source/**/*.html',
+                    '_source/**/*.manifest',
                     '*.yml',
                     '_source/ui/img/*'
                 ],
