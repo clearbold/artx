@@ -85,10 +85,12 @@ a {
         outline:none;
     }
 
-    &:focus,
-    &:hover {
-        color:$link-hover-color;
-        background-color:$black-20pct;
+    .no-touchcapable & {
+        &:focus,
+        &:hover {
+            color:$link-hover-color;
+            background-color:$black-20pct;
+        }
     }
 }
 
@@ -104,7 +106,7 @@ a {
     &.btn-round {
         border-radius:50%;
         @include transition(box-shadow .2s linear);
-        background-color:transparent;
+        background-color:rgba(0,0,0,.01);
         z-index:1;
         
         &:after {
@@ -112,7 +114,7 @@ a {
             -moz-transition: -moz-transform 0.2s, opacity 0.2s;
             transition: transform 0.2s, opacity 0.2s;
             content:"";
-            pointer-events: none;
+            //pointer-events: none;
             position: absolute;
             width: 100%;
             height: 100%;
