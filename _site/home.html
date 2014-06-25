@@ -110,7 +110,6 @@
 </header> <!-- /header -->
 
             <div class="content" role="main">
-
             <div class="discover-slider slider-style-peek">
 
                 <ul id="discover-slider" class="bxslider cf">
@@ -180,8 +179,7 @@
                 <a href="#" id="peek-slider-previous" class="peek-slider-previous" title="Previous"><span class="visuallyhidden">Previous</span></a>
                 <a href="#" id="peek-slider-next" class="peek-slider-next" title="Next"><span class="visuallyhidden">Next</span></a>
 
-            </div> <!-- /discover-slider -->
-
+            </div> <!-- /discover-slider -->            
         </div> <!-- /content -->
 
         <footer class="footer">
@@ -218,6 +216,7 @@
     <li><a href="#">Favorites</a></li>
     <li><a href="#">History</a></li>
     <li><a href="#">Settings</a></li>
+    <li><a href="#">Log out</a></li>
   </ul>
 </div>
 
@@ -229,6 +228,34 @@
     <li><a href="#">2D</a></li>
     <li><a href="#">3D</a></li>
   </ul>
+</div>
+
+    <div id="signup-popup" class="modal reveal-modal">
+    <div id="signup-popup-target" class="modal-content">
+        <h2>Sign up</h2>
+                <p>Introductory copy lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus, architecto itaque mollitia saepe ab sint omnis quia temporibus officiis aperiam.</p>
+
+        <form id="signup-form" name="signup-form" method="post" action="">
+            <p>
+                <label for="signup-email">Email</label>
+                <input type="email" id="signup-email" name="signup-email" required="required" />
+            </p>
+
+            <p>
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" name="signup-password" required="required" />
+            </p>
+
+            <p>
+                <label for="signup-confirmpassword">Confirm Password</label>
+                <input type="password" id="signup-confirmpassword" name="signup-confirmpassword" required="required" />
+            </p>
+
+            <button type="submit">Submit</button>
+            <p><small>Already have an account? <a href="#">Sign in</a></small></p>
+        </form>
+    </div>
+    <a href="#" class="btn btn-round close-reveal-modal close"><i class="icon icon-cross"></i><span class="visuallyhidden">Close</a>
 </div>
 
     <!-- Javascript -->

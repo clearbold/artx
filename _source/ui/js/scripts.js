@@ -263,6 +263,35 @@ ArtX.setupTextTruncation = function() {
     }
 };
 
+/* Set up Signup Modal 
+   ========================================================================== */
+ArtX.setupSignupModal = function() {
+    console.log("Setting up Signup Modal window");
+
+    var isSignedIn = true,
+        $signupModalObj = $("#signup-popup");
+
+    // DEV NOTE: This should be replaced with a more robust solution in the final site.
+    // This detection is just for demo purposes.
+
+    if ($("#favorite-notsignedin").length > 0) {
+        isSignedIn = false;
+    }
+
+    console.log("Signed in? " + isSignedIn);
+
+    if (!isSignedIn) {
+        $signupModalObj.foundation('reveal', 'open');
+    }
+
+    // Set up behavior on modal close
+    $(document).on("click", ".close-reveal-modal, .reveal-modal-bg", function() {
+        $signupModalObj.foundation('reveal', 'close');
+        //console.log("Modal closed");
+    });
+
+};
+
 /* Initialize/Fire
    ========================================================================== */
 ArtX.startup = {
@@ -286,6 +315,7 @@ ArtX.startup = {
         $('a[href="#"]').click(function(e){e.preventDefault();});
         picturefill();
         ArtX.setupSkipLinks();
+        ArtX.setupSignupModal();
         //ArtX.setupBackButton();
         ArtX.setupTextTruncation();
 

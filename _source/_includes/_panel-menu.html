@@ -6,5 +6,6 @@
     <li{% if page.active == "favorites" %} class="active"{% endif %}><a href="#">Favorites</a></li>
     <li{% if page.active == "history" %} class="active"{% endif %}><a href="#">History</a></li>
     <li{% if page.active == "settings" %} class="active"{% endif %}><a href="#">Settings</a></li>
+    <li>{% if page.mode == "loggedout" %}<a href="#">Sign in</a>{% else %}<a href="#">Log out</a>{% endif %}</li>
   </ul>
 </div>

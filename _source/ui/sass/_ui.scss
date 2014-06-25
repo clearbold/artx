@@ -274,6 +274,59 @@ hr {
     clear:both;
 }
 
+
+label {
+    font-weight:bold;
+    display:block;
+    @include font-size(14px, false);
+    margin-bottom:.25em;
+}
+
+input[type=text],
+input[type=email],
+input[type=password] {
+    -webkit-appearance: none;
+    border-radius: 0;
+    border:none;
+    padding:.5em 1em;
+    background-color:$white;
+    color: $black;
+    @include font-smoothing(on);
+    display:block;
+    width:100%;
+    max-width:240px;
+}
+button {
+    white-space:nowrap;
+    text-decoration:none;
+    @include font-smoothing(on);
+    @include font-size(16px, false);
+    font-weight:400;
+    text-align:center;
+    margin:0 0 $spacing-unit; 
+    padding-top:   0 !important;
+    padding-bottom:0 !important;
+    overflow:hidden !important;
+    cursor:pointer;
+    border:none;
+    padding-right:1em;
+    padding-left: 1em;
+    line-height:2;
+    
+    @include transition(color .1s linear, background-color .1s linear);
+
+    background-color:$main-color-dark;
+    color:$white;
+    
+    &:hover {
+        background-color:darken($main-color-dark, 10);
+        color:$white;
+    }
+}
+form > *:last-child {
+    margin-bottom:0;   
+}
+
 // Clearfix
 .cf {
     &:after{
@@ -424,6 +477,12 @@ hr {
     }
     .swatch-base {
         background-color:$main-color;
+    }
+    .swatch-darkest {
+        background-color:$main-color-darkest;
+    }
+    .swatch-darker {
+        background-color:$main-color-darker;
     }
     .swatch-dark {
         background-color:$main-color-dark;
@@ -720,6 +779,17 @@ hr {
     padding-bottom:0;
     clear:both;
     background: darken($footer-bg, 5);
+    
+    p {
+        min-height:100px;
+        max-width:640px;
+        margin:0 auto;
+        padding:$spacing-unit;
+        
+        .lt-ie9 & {
+            min-height:(100px - ($spacing-unit*2));
+        }
+    }
 
     ul {
         list-style:none;
@@ -851,3 +921,36 @@ hr {
     }
 }
 
+/* Modal styles */
+.reveal-modal {
+    margin-left: -45%;
+    width: 90%;
+    background-color:$main-color-dark;
+    padding:$spacing-unit;
+    
+    @include mq($lap-start) {
+        padding:$spacing-desktop;
+    }
+    
+    .close-reveal-modal {
+        font-size:inherit;
+    }
+}
+.modal-content {
+    a {
+        color:$accent-color;
+        
+        &:hover {
+            color:$white;
+        }
+    }
+    button {
+        background-color:$main-color-darker;
+        color:$white;
+        
+        &:hover {
+            background-color:$main-color-darkest;
+            color:$white;
+        }
+    }
+}
