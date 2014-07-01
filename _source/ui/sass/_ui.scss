@@ -42,7 +42,7 @@ body {
         
         /* Visual styling. Change this as desired */
         color:$white;
-        background:$black;
+        background:#000;
         text-decoration:none;
         border-bottom:solid #ccc 2px;
         padding:5px;
@@ -323,9 +323,57 @@ button {
         color:$white;
     }
 }
-form > *:last-child {
+.modal form > *:last-child {
     margin-bottom:0;   
 }
+
+// Custom checkboxes
+.js .custom-checkbox {
+    position:relative;
+    
+    input {
+        position: absolute;
+        right: $spacing-unit+2;
+        top: 10px;
+        margin: 0;
+        z-index: 0;
+    }
+
+    label {
+        font-weight:normal;
+        background-color:lighten($page-bg, 5);
+        display: block;
+        position: relative;
+        z-index: 1;
+        line-height: 1;
+        padding:10px 30px 10px $spacing-unit;
+        margin: 0;
+        cursor: pointer;
+        background-image:url("/ui/img/sprite-checkboxes.png");
+        background-repeat:no-repeat;
+        background-position: 95% 10px;
+        
+        &.hover,
+        &.focus {
+            background-position: 95% -90px;
+        }
+
+        &.checked {
+            background-position: 95% -190px;
+        }
+
+        &.checkedHover,
+        &.checkedFocus {
+            background-position: 95% -290px;
+        }
+
+        &.focus {
+            background-color:lighten($page-bg, 2);
+            outline:none;
+        }
+    }
+}
+
 
 // Clearfix
 .cf {
@@ -466,6 +514,7 @@ form > *:last-child {
         display:inline-block;
         margin-right:20px;
         margin-bottom:10px;
+        @include font-size(12px);
     }
 
     .swatch {

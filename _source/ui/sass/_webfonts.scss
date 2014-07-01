@@ -4,11 +4,11 @@
 // Icon font from Icomoon.io
 @font-face {
     font-family: 'artx';
-    src:url('fonts/artx.eot?7b0v9w');
-    src:url('fonts/artx.eot?#iefix7b0v9w') format('embedded-opentype'),
-        url('fonts/artx.woff?7b0v9w') format('woff'),
-        url('fonts/artx.ttf?7b0v9w') format('truetype'),
-        url('fonts/artx.svg?7b0v9w#artx') format('svg');
+    src:url('fonts/artx.eot?qwz1q0');
+    src:url('fonts/artx.eot?#iefixqwz1q0') format('embedded-opentype'),
+        url('fonts/artx.woff?qwz1q0') format('woff'),
+        url('fonts/artx.ttf?qwz1q0') format('truetype'),
+        url('fonts/artx.svg?qwz1q0#artx') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -27,6 +27,12 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-check:before {
+    content: "\e116";
+}
+.icon-checkmark:before {
+    content: "\e603";
+}
 .icon-calendar:before {
     content: "\e600";
 }

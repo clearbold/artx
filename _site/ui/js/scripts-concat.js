@@ -13194,7 +13194,56 @@ if (typeof jQuery === "undefined" &&
 		return this;
 	}
 
-})(jQuery);;/*
+})(jQuery);;/**
+ * --------------------------------------------------------------------
+ * jQuery customInput plugin
+ * Author: Maggie Costello Wachs maggie@filamentgroup.com, Scott Jehl, scott@filamentgroup.com
+ * Copyright (c) 2009 Filament Group 
+ * licensed under MIT (filamentgroup.com/examples/mit-license.txt)
+ * --------------------------------------------------------------------
+ */
+
+(function ($) {
+
+    $.fn.customInput = function(){
+        return $(this).each(function(){ 
+            if($(this).is('[type=checkbox],[type=radio]')){
+                var input = $(this);
+                
+                // get the associated label using the input's id
+                var label = $('label[for="'+input.attr('id')+'"]');
+                
+                // wrap the input + label in a div 
+                input.add(label).wrapAll('<div class="custom-'+ input.attr('type') +'"></div>');
+                
+                // necessary for browsers that don't support the :hover pseudo class on labels
+                label.hover(
+                    function(){ $(this).addClass('hover'); },
+                    function(){ $(this).removeClass('hover'); }
+                );
+                
+                //bind custom event, trigger it, bind click,focus,blur events                   
+                input.bind('updateState', function(){   
+                    input.is(':checked') ? label.addClass('checked') : label.removeClass('checked checkedHover checkedFocus'); 
+                })
+                .trigger('updateState')
+                .click(function(){ 
+                    $('input[name="'+ $(this).attr('name') +'"]').trigger('updateState'); 
+                })
+                .focus(function(){ 
+                    label.addClass('focus'); 
+                    if(input.is(':checked')){  $(this).addClass('checkedFocus'); } 
+                })
+                .blur(function(){ label.removeClass('focus checkedFocus'); });
+            }
+        });
+    };
+
+}(jQuery));
+
+
+    
+    ;/*
  * Sidr
  * https://github.com/artberri/sidr
  *
@@ -14000,30 +14049,19 @@ ArtX.setupSlidingPanels = function() {
         mastheadHeight = $masthead.outerHeight,
         footerHeight = $footer.outerHeight,
         $slidingMenuPanel = $("#menu-panel"),
-        $slidingTagsPanel = $("#tags-panel"),
-        menuSliderOptions,
-        tagsSliderOptions;
+        menuSliderOptions;
 
-    if (($slidingMenuPanel.length > 0) || ($slidingTagsPanel.length > 0) ) {
+    if ($slidingMenuPanel.length > 0) {
         if (ArtX.el.html.hasClass("positionfixed")) {
             menuSliderOptions = {
                 name: 'menu-panel',
                 side: 'right',
                 displace: false
             };
-            tagsSliderOptions = {
-                name: 'tags-panel',
-                side: 'left', // By default
-                displace: false
-            };
         } else {
             menuSliderOptions = {
                 name: 'menu-panel',
                 side: 'right'
-            };
-            tagsSliderOptions = {
-                name: 'tags-panel',
-                side: 'left' // By default
             };
         }
 
@@ -14039,35 +14077,19 @@ ArtX.setupSlidingPanels = function() {
                     e.preventDefault();
                 });
         }
-        
-        // Initialize Tags panel
-        if ($slidingTagsPanel.length > 0) {
-            console.log("Initializing Tags sliding panel");
-
-            var $slidingTagsTrigger = $("#tags-trigger");
-
-            $slidingTagsTrigger
-                .sidr(tagsSliderOptions)
-                .click(function(e) {
-                    e.preventDefault();
-                });
-        }
-
-
     }
    
 };
 
 /* Set up Back button
    ========================================================================== */
-// This will be used if we go back to a back button solution (removed for now)
 ArtX.setupBackButton = function() {
     var $backButton = $(".btn-back");
     if ($backButton.length > 0) {
         console.log("Initializing back button");
 
         $backButton.click(function() {
-            window.history.back();
+            location.href=document.referrer;
         });
     }
 };
@@ -14122,7 +14144,6 @@ ArtX.setupFavoriteSlider = function() {
         var favSlideInstance = $favoriteSlider.bxSlider({
             minSlides:3,
             maxSlides:4,
-            moveSlides:1,
             slideWidth:300,
             slideMargin:5,
             oneToOneTouch:false,
@@ -14213,6 +14234,18 @@ ArtX.setupSignupModal = function() {
 
 };
 
+/* Set up custom checkboxes 
+   ========================================================================== */
+ArtX.setupCustomCheckboxes = function() {
+    var $checkboxes = $("input[type=checkbox]");
+
+    if ($checkboxes.length > 0) {
+        console.log("Setting up custom checkboxes");
+
+        $checkboxes.customInput();
+    }
+};
+
 /* Initialize/Fire
    ========================================================================== */
 ArtX.startup = {
@@ -14237,13 +14270,14 @@ ArtX.startup = {
         picturefill();
         ArtX.setupSkipLinks();
         ArtX.setupSignupModal();
-        //ArtX.setupBackButton();
+        ArtX.setupBackButton();
         ArtX.setupTextTruncation();
 
         ArtX.setupSlidingPanels();
         ArtX.setupPeekSlider();
         ArtX.setupFavoriteSlider();
         ArtX.setupFavoriteStars();
+        ArtX.setupCustomCheckboxes();
 
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);

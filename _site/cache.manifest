@@ -1,6 +1,6 @@
 CACHE MANIFEST
  
-# Version 0.37
+# Version 0.44
  
 NETWORK:
 *
@@ -8,8 +8,11 @@ NETWORK:
 CACHE:
 index.html
 home.html
+home-with-signup.html
 event.html
 exhibition.html
+favorites.html
+interests.html
 venue.html
 styleguide.html
 ui/css/fonts/artx.eot

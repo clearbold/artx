@@ -79,30 +79,19 @@ ArtX.setupSlidingPanels = function() {
         mastheadHeight = $masthead.outerHeight,
         footerHeight = $footer.outerHeight,
         $slidingMenuPanel = $("#menu-panel"),
-        $slidingTagsPanel = $("#tags-panel"),
-        menuSliderOptions,
-        tagsSliderOptions;
+        menuSliderOptions;
 
-    if (($slidingMenuPanel.length > 0) || ($slidingTagsPanel.length > 0) ) {
+    if ($slidingMenuPanel.length > 0) {
         if (ArtX.el.html.hasClass("positionfixed")) {
             menuSliderOptions = {
                 name: 'menu-panel',
                 side: 'right',
                 displace: false
             };
-            tagsSliderOptions = {
-                name: 'tags-panel',
-                side: 'left', // By default
-                displace: false
-            };
         } else {
             menuSliderOptions = {
                 name: 'menu-panel',
                 side: 'right'
-            };
-            tagsSliderOptions = {
-                name: 'tags-panel',
-                side: 'left' // By default
             };
         }
 
@@ -118,35 +107,19 @@ ArtX.setupSlidingPanels = function() {
                     e.preventDefault();
                 });
         }
-        
-        // Initialize Tags panel
-        if ($slidingTagsPanel.length > 0) {
-            console.log("Initializing Tags sliding panel");
-
-            var $slidingTagsTrigger = $("#tags-trigger");
-
-            $slidingTagsTrigger
-                .sidr(tagsSliderOptions)
-                .click(function(e) {
-                    e.preventDefault();
-                });
-        }
-
-
     }
    
 };
 
 /* Set up Back button
    ========================================================================== */
-// This will be used if we go back to a back button solution (removed for now)
 ArtX.setupBackButton = function() {
     var $backButton = $(".btn-back");
     if ($backButton.length > 0) {
         console.log("Initializing back button");
 
         $backButton.click(function() {
-            window.history.back();
+            location.href=document.referrer;
         });
     }
 };
@@ -201,7 +174,6 @@ ArtX.setupFavoriteSlider = function() {
         var favSlideInstance = $favoriteSlider.bxSlider({
             minSlides:3,
             maxSlides:4,
-            moveSlides:1,
             slideWidth:300,
             slideMargin:5,
             oneToOneTouch:false,
@@ -292,6 +264,18 @@ ArtX.setupSignupModal = function() {
 
 };
 
+/* Set up custom checkboxes 
+   ========================================================================== */
+ArtX.setupCustomCheckboxes = function() {
+    var $checkboxes = $("input[type=checkbox]");
+
+    if ($checkboxes.length > 0) {
+        console.log("Setting up custom checkboxes");
+
+        $checkboxes.customInput();
+    }
+};
+
 /* Initialize/Fire
    ========================================================================== */
 ArtX.startup = {
@@ -316,13 +300,14 @@ ArtX.startup = {
         picturefill();
         ArtX.setupSkipLinks();
         ArtX.setupSignupModal();
-        //ArtX.setupBackButton();
+        ArtX.setupBackButton();
         ArtX.setupTextTruncation();
 
         ArtX.setupSlidingPanels();
         ArtX.setupPeekSlider();
         ArtX.setupFavoriteSlider();
         ArtX.setupFavoriteStars();
+        ArtX.setupCustomCheckboxes();
 
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
