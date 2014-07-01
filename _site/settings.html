@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
 
-    <title>Favorites - ArtX</title>
+    <title>Settings - ArtX</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -92,7 +92,7 @@
     </script>
 
 </head>
-<body id="page--favorites" class="page--favorites">
+<body id="page--settings" class="page--settings">
 
     <!-- Skip navigation link for screen reader and keyboard users -->
     <div class="skiplinkholder"><p><a id="skiplink" href="#skiptarget">Skip to main content (Press Enter).</a></p></div>
@@ -100,50 +100,73 @@
     <div class="wrapper">
 
     <header class="masthead" role="banner">
-    <a href="#" class="btn btn-round btn-left btn-back functionality-trigger" title="Back"><i class="icon icon-arrow-left"></i><span class="visuallyhidden">Back</span></a>
     <a href="#menu-panel" id="menu-trigger" class="btn btn-round btn-right functionality-trigger" title="Menu"><i class="icon icon-menu"></i><span class="visuallyhidden">Menu</span></a>
     
     <!-- Skip nav target -->
     <p class="skiptargetholder"><a id="skiptarget" name="skiptarget" class="skip" tabindex="-1"></a></p>
 
-    <h1><a href="index.html">Favorites</a></h1>
+    <h1><a href="index.html">Settings</a></h1>
 </header> <!-- /header -->
 
             <div class="content" role="main">
+            <form id="settings-form" name="settings-form" method="post" action="">
+                <p>
+                    <label for="settings-email">Email</label>
+                    <input type="email" id="settings-email" name="settings-email" value="you@example.com" required="required" />
+                </p>
 
-            <div class="thumb-list">
-                <div class="item-block cf">
-                    <div class="item-image">
-                        <a href="exhibition.html">
-                            <img src="/ui/img/square-quilts.jpg" alt="" />
-                        </a>
+                <hr />
+
+                <p>
+                    <label for="settings-password">Password</label>
+                    <input type="password" id="settings-password" name="settings-password" value="password" required="required" />
+                </p>
+
+                <hr />
+
+                <h2 class="label">Notifications</h2>
+                <div class="toggle-list">
+                    <div class="toggle-item">
+                        <label>Send me weekly emails</label>
+                        <div class="onoffswitch">
+                            <input type="checkbox" name="settings-weeklyemail" class="onoffswitch-checkbox" id="settings-weeklyemail">
+                            <label class="onoffswitch-label" for="settings-weeklyemail">
+                                <span class="onoffswitch-inner"></span>
+                                <span class="onoffswitch-switch"></span>
+                            </label>
+                        </div>
                     </div>
-                    <div class="item-info">
-                        <h2 class="item-title">
-                            <a href="exhibition.html" class="truncate">Quilts and Color: The Roy Pilgrim Collection</a>
-                        </h2>
-                        <p class="item-venue">Museum of Fine Arts</p>
-                        <p class="item-date">May 3 (closing soon)</p>
-                        <a href="#" class="favorite-star item-symbol" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
+                    <div class="toggle-item">
+                        <label>Send me a reminder the day before a saved event</label>
+                        <div class="onoffswitch">
+                            <input type="checkbox" name="settings-reminder-event" class="onoffswitch-checkbox" id="settings-reminder-event">
+                            <label class="onoffswitch-label" for="settings-reminder-event">
+                                <span class="onoffswitch-inner"></span>
+                                <span class="onoffswitch-switch"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="toggle-item">
+                        <label>Send me a reminder the week before an exhibition closes</label>
+                        <div class="onoffswitch">
+                            <input type="checkbox" name="settings-reminder-exhibition" class="onoffswitch-checkbox" id="settings-reminder-exhibition">
+                            <label class="onoffswitch-label" for="settings-reminder-exhibition">
+                                <span class="onoffswitch-inner"></span>
+                                <span class="onoffswitch-switch"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
-                <div class="item-block cf">
-                    <div class="item-image">
-                        <a href="event.html">
-                            <img src="/ui/img/square-middlebrook.jpg" alt="" />
-                        </a>
-                    </div>
-                    <div class="item-info">
-                        <h2 class="item-title">
-                            <a href="event.html" class="truncate">Workshop with artist Jason Middlebrook</a>
-                        </h2>
-                        <p class="item-venue">ICA Boston</p>
-                        <p class="item-date">May 3</p>
-                        <a href="#" class="favorite-star item-symbol" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
-                    </div>
-                </div>
-            </div> <!-- /thumb-list -->
+                <hr />
+
+                <button type="submit">Submit</button>
+
+                <ul class="listview">
+                    <li><a href="interests.html">Manage My Interests</a></li>
+                </ul>
+
+            </form>         
         </div> <!-- /content -->
 
     </div> <!-- /wrapper -->
@@ -154,9 +177,9 @@
     <li><a href="home.html">Discover ArtsConnect</a></li>
     <li><a href="#">By Date</a></li>
     <li><a href="#">By Location</a></li>
-    <li class="active"><a href="favorites.html">Favorites</a></li>
+    <li><a href="favorites.html">Favorites</a></li>
     <li><a href="#">History</a></li>
-    <li><a href="settings.html">Settings</a></li>
+    <li class="active"><a href="settings.html">Settings</a></li>
     <li><a href="#">Log out</a></li>
   </ul>
 </div>

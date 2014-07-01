@@ -1,0 +1,67 @@
+---
+layout: subpage-standalone
+title: Settings
+titlebar: Settings
+active: settings
+---
+
+        <div class="content" role="main">
+            <form id="settings-form" name="settings-form" method="post" action="">
+                <p>
+                    <label for="settings-email">Email</label>
+                    <input type="email" id="settings-email" name="settings-email" value="you@example.com" required="required" />
+                </p>
+
+                <hr />
+
+                <p>
+                    <label for="settings-password">Password</label>
+                    <input type="password" id="settings-password" name="settings-password" value="password" required="required" />
+                </p>
+
+                <hr />
+
+                <h2 class="label">Notifications</h2>
+                <div class="toggle-list">
+                    <div class="toggle-item">
+                        <label>Send me weekly emails</label>
+                        <div class="onoffswitch">
+                            <input type="checkbox" name="settings-weeklyemail" class="onoffswitch-checkbox" id="settings-weeklyemail">
+                            <label class="onoffswitch-label" for="settings-weeklyemail">
+                                <span class="onoffswitch-inner"></span>
+                                <span class="onoffswitch-switch"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="toggle-item">
+                        <label>Send me a reminder the day before a saved event</label>
+                        <div class="onoffswitch">
+                            <input type="checkbox" name="settings-reminder-event" class="onoffswitch-checkbox" id="settings-reminder-event">
+                            <label class="onoffswitch-label" for="settings-reminder-event">
+                                <span class="onoffswitch-inner"></span>
+                                <span class="onoffswitch-switch"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="toggle-item">
+                        <label>Send me a reminder the week before an exhibition closes</label>
+                        <div class="onoffswitch">
+                            <input type="checkbox" name="settings-reminder-exhibition" class="onoffswitch-checkbox" id="settings-reminder-exhibition">
+                            <label class="onoffswitch-label" for="settings-reminder-exhibition">
+                                <span class="onoffswitch-inner"></span>
+                                <span class="onoffswitch-switch"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <button type="submit">Submit</button>
+
+                <ul class="listview">
+                    <li><a href="interests.html">Manage My Interests</a></li>
+                </ul>
+
+            </form>         
+        </div> <!-- /content -->

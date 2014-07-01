@@ -1003,3 +1003,53 @@ button {
         }
     }
 }
+
+/* Toggle switch overrides */
+.toggle-item {
+    margin-bottom:$spacing-unit;
+    position:relative;
+    min-height:35px;
+    
+    > label,
+    .onoffswitch {
+        display:inline-block;
+        vertical-align:middle;
+    }
+
+    > label {
+        width:70%;
+        padding-right:$spacing-unit;
+        font-weight:normal;
+    }
+}
+
+.onoffswitch * {
+    -moz-box-sizing:content-box;
+    -webkit-box-sizing:content-box;
+    box-sizing:content-box;
+}
+.onoffswitch .onoffswitch-inner:before, 
+.onoffswitch .onoffswitch-inner:after {
+    -moz-box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+    box-sizing: border-box;
+}
+.onoffswitch-inner:before {
+    color:$gray-darker;
+}
+
+.onoffswitch-inner:after {
+    background-color: $gray-light; 
+    color:$gray-mediumdark;
+}
+.onoffswitch-label {
+    border:none;
+    margin:0;
+}
+.onoffswitch-switch {
+    border:none;
+    box-shadow:0 0 5px rgba(0,0,0,.2);
+    width: 31px; 
+    margin: 2px;
+    right: 45px;
+}

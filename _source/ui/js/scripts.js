@@ -1,3 +1,23 @@
+/**
+ * App Cache Handling
+ * Here is the simplified version. Courtesy of Mike Koss.
+ * 
+ * See, http://labnote.beedesk.com/the-pitfalls-of-html5-applicationcache
+ */
+function handleAppCache() {
+    if (applicationCache === undefined) {
+        return;
+    }
+  
+    if (applicationCache.status == applicationCache.UPDATEREADY) {
+        applicationCache.swapCache();
+        location.reload();
+        return;
+    }
+  
+    applicationCache.addEventListener('updateready', handleAppCache, false);
+}
+
 /* New modernizr test for all touch devices */
 Modernizr.addTest('touchcapable', function () {
     var bool;
@@ -121,6 +141,17 @@ ArtX.setupBackButton = function() {
         $backButton.click(function() {
             location.href=document.referrer;
         });
+    }
+};
+
+/* Set up toggle switches
+   ========================================================================== */
+ArtX.setupToggleSwitches = function() {
+    $toggleBoxes = $(".onoffswitch").find("input[type='checkbox']");
+
+    if ($toggleBoxes.length > 0) {
+        console.log("Initializing toggle switches");
+        $toggleBoxes.onoff();
     }
 };
 
@@ -267,7 +298,7 @@ ArtX.setupSignupModal = function() {
 /* Set up custom checkboxes 
    ========================================================================== */
 ArtX.setupCustomCheckboxes = function() {
-    var $checkboxes = $("input[type=checkbox]");
+    var $checkboxes = $(".custom-checkbox").find("input[type=checkbox]");
 
     if ($checkboxes.length > 0) {
         console.log("Setting up custom checkboxes");
@@ -282,22 +313,9 @@ ArtX.startup = {
     init : function () {
         //console.log("Initial load: scripting initializing");
 
-        function testCache(document,navigator,standalone) {
-            if ((standalone in navigator) && navigator[standalone]) {
-                if (window.applicationCache) {
-                    console.log("Standalone app with cache, set up listener for cache updates");
-                    applicationCache.addEventListener('updateready', function() {
-                        if (confirm('An update is available. Reload now?')) {
-                            window.location.reload();
-                        }
-                    });
-                }
-            }
-        }
-        testCache(document,window.navigator,'standalone');
-
         $('a[href="#"]').click(function(e){e.preventDefault();});
         picturefill();
+
         ArtX.setupSkipLinks();
         ArtX.setupSignupModal();
         ArtX.setupBackButton();
@@ -308,17 +326,20 @@ ArtX.startup = {
         ArtX.setupFavoriteSlider();
         ArtX.setupFavoriteStars();
         ArtX.setupCustomCheckboxes();
+        ArtX.setupToggleSwitches();
 
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
     },
     finalize : function() {
-        //console.log("Initial load: scripting finalized");
+        
     }
 };
 
 
 $(document).ready(function() {
+
+    handleAppCache();
 
     Modernizr.load([
         
