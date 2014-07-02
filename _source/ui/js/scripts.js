@@ -293,6 +293,11 @@ ArtX.setupSignupModal = function() {
         //console.log("Modal closed");
     });
 
+    // Set up modal trigger link
+    $(document).on("click", ".open-signup", function() {
+        $signupModalObj.foundation('reveal', 'open');
+    });
+
 };
 
 /* Set up custom checkboxes 
