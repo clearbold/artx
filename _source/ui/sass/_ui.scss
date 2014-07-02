@@ -1020,6 +1020,16 @@ button {
         width:70%;
         padding-right:$spacing-unit;
         font-weight:normal;
+        
+        
+    }
+
+    .item-block & {
+        margin-top:7px;
+
+        > label {
+            width:50%;
+        } 
     }
 }
 
