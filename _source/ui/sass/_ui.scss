@@ -1063,3 +1063,82 @@ button {
     margin: 2px;
     right: 45px;
 }
+
+/* Calendar styles */
+.calendar {
+    max-width:640px;
+    margin:0 auto;
+}
+.calendar .clndr-controls {
+  display: block;
+  display: inline-block;
+  width: 100%;
+  margin-bottom: $spacing-unit;
+}
+.calendar .clndr-previous-button {
+  float: left;
+  width: 10%;
+  text-align: left;
+  cursor: pointer;
+}
+.calendar .month {
+  float: left;
+  width: 80%;
+  text-align: center;
+  font-weight:600;
+}
+.calendar .clndr-next-button {
+  float: left;
+  width: 10%;
+  text-align: right;
+  cursor: pointer;
+}
+.calendar .clndr-grid {
+  text-align: center;
+  position:relative;
+  margin-left:-1%;
+  margin-bottom:$spacing-unit;
+}
+.calendar .header-day {
+    float: left;
+    width:13.28571428571429%;
+    margin-left:1%;
+    margin-bottom:1%;
+    padding-top:.5em;
+    padding-bottom:.5em;
+    line-height:1;
+    background: $gray-darkest;
+}
+.calendar .day {
+    float: left;
+    //width: 2em;
+    width:13.28571428571429%;
+    margin-left:1%;
+    margin-bottom:1%;
+    padding-top:.5em;
+    padding-bottom:.5em;
+    line-height:1;
+    background: $gray-dark;
+    
+    &.event {
+        background-color: $main-color;
+        color:$gray-dark;
+        cursor: pointer;
+    }
+
+    &.today {
+        background-color: $accent-color;
+        color:$gray-dark;
+    }
+
+    &.adjacent-month {
+        color:$gray;
+    }
+}
+
+.calendar .empty {
+    float: left;
+    width: 2em;
+    height: 2em;
+    background: #ddd;
+}

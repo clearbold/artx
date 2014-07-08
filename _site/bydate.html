@@ -1,0 +1,206 @@
+<!--[if i]><![endif]-->
+<!doctype html>
+<html class="no-js modern" lang="en" manifest="cache.manifest">
+<head>
+    <meta charset="utf-8" />
+
+    <title>Events and Exhibitions by Date - ArtX</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <link rel="shortcut icon" sizes="16x16" href="/favicon.ico" />
+    <link rel="shortcut icon" sizes="32x32" href="/ui/img/favicon-32px.png" />
+    <!-- non-retina iPhone pre iOS 7 -->
+    <link rel="apple-touch-icon" href="/ui/img/favicon-57px.png" sizes="57x57">
+    <!-- non-retina iPad pre iOS 7 -->
+    <link rel="apple-touch-icon" href="/ui/img/favicon-72px.png" sizes="72x72">
+    <!-- non-retina iPad iOS 7 -->
+    <link rel="apple-touch-icon" href="/ui/img/favicon-76px.png" sizes="76x76">
+    <!-- retina iPhone pre iOS 7 -->
+    <link rel="apple-touch-icon" href="/ui/img/favicon-114px.png" sizes="114x114">
+    <!-- retina iPhone iOS 7 -->
+    <link rel="apple-touch-icon" href="/ui/img/favicon-120px.png" sizes="120x120">
+    <!-- retina iPad pre iOS 7 -->
+    <link rel="apple-touch-icon" href="/ui/img/favicon-144px.png" sizes="144x144">
+    <!-- retina iPad iOS 7 -->
+    <link rel="apple-touch-icon" href="/ui/img/favicon-152px.png" sizes="152x152">
+
+    <!-- Windows 8 / RT -->
+    <meta name="msapplication-TileImage" content="/ui/img/favicon-144px.png" />
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="ui/css/styles.css" />
+
+    <script src="ui/js/standalone/modernizr-2.7.1.min.js"></script>
+
+    <!-- JavaScript -->
+    <script type="text/javascript">
+        (function(document,navigator,standalone) {
+            // prevents links from apps from oppening in mobile safari
+            // this javascript must be the first script in your <head>
+            if ((standalone in navigator) && navigator[standalone]) {
+                var curnode, location=document.location, stop=/^(a|html)$/i;
+                document.addEventListener('click', function(e) {
+                    curnode=e.target;
+                    while (!(stop).test(curnode.nodeName)) {
+                        curnode=curnode.parentNode;
+                    }
+                    // Conditions to do this only on links to your own app
+                    // if you want all links, use if('href' in curnode) instead.
+                    console.log("Has class? " + $(curnode).hasClass("functionality-trigger"));
+
+                    if(
+                        'href' in curnode && // is a link
+                        (chref=curnode.href).replace(location.href,'').indexOf('#') && // is not an anchor
+                        (   !(/^[a-z\+\.\-]+:/i).test(chref) ||                       // either does not have a proper scheme (relative links)
+                            chref.indexOf(location.protocol+'//'+location.host)===0 ) // or is in the same protocol and domain
+                        && e.defaultPrevented !== true // and the default behavior of the link is not prevented already
+                        && (!$(curnode).hasClass("functionality-trigger")) // and it's not a link I've tagged as a functionality trigger
+                    ) {
+                        e.preventDefault();
+                        location.href = curnode.href;
+                    }
+                },false);
+            }
+        })(document,window.navigator,'standalone');
+    </script>
+
+    <!--[if (lt IE 9) & (!IEMobile)]>
+    <script src="/ui/js/standalone/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Detect IE10 and insert a CSS class in the HTML element -->
+    <!--[if !IE]><!--><script>
+    if (/*@cc_on!@*/false) {
+        document.documentElement.className+=' ie10';
+    }
+    </script><!--<![endif]-->
+
+    <!-- Responsive fix for certain Windows phones -->
+    <script>
+    (function() {
+        if ("-ms-user-select" in document.documentElement.style && navigator.userAgent.match(/IEMobile\/10\.0/)) {
+            var msViewportStyle = document.createElement("style");
+            msViewportStyle.appendChild(
+                document.createTextNode("@-ms-viewport{width:auto!important}")
+            );
+            document.getElementsByTagName("head")[0].appendChild(msViewportStyle);
+        }
+    })();
+    </script>
+
+</head>
+<body id="page--bydate" class="page--bydate">
+
+    <!-- Skip navigation link for screen reader and keyboard users -->
+    <div class="skiplinkholder"><p><a id="skiplink" href="#skiptarget">Skip to main content (Press Enter).</a></p></div>
+
+    <div class="wrapper">
+
+    <header class="masthead" role="banner">
+    <a href="#" class="btn btn-round btn-left btn-back functionality-trigger" title="Back"><i class="icon icon-arrow-left"></i><span class="visuallyhidden">Back</span></a>
+    <a href="#menu-panel" id="menu-trigger" class="btn btn-round btn-right functionality-trigger" title="Menu"><i class="icon icon-menu"></i><span class="visuallyhidden">Menu</span></a>
+    
+    <!-- Skip nav target -->
+    <p class="skiptargetholder"><a id="skiptarget" name="skiptarget" class="skip" tabindex="-1"></a></p>
+
+    <h1><a href="index.html">By Date</a></h1>
+</header> <!-- /header -->
+
+            <div class="content" role="main">
+
+            <div id="event-calendar" class="calendar">
+
+                <script type="text/template" id="template-calendar">
+                    <div class="clndr-controls">
+                        <div class="clndr-previous-button"><i class="icon icon-rewind"></i><span class="visuallyhidden">Previous month</span></div>
+                        <div class="month"><%= month %></div>
+                        <div class="clndr-next-button"><span class="visuallyhidden">Next month</span><i class="icon icon-fast-forward"></i></div>
+                    </div>
+                    <div class="clndr-grid">
+                        <div class="days-of-the-week cf">
+                            <% _.each(daysOfTheWeek, function(day) { %>
+                            <div class="header-day"><%= day %></div>
+                            <% }); %>
+                        </div>
+                        <div class="days cf">
+                            <% _.each(days, function(day) { %>
+                            <div class="<%= day.classes %>" id="<%= day.id %>">
+                                <span class="day-number"><%= day.day %></span>
+                            </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                    <div class="thumb-list">
+                        <% _.each(eventsThisMonth, function(event) { %>
+                        <div class="item-block cf">
+                            <div class="item-image">
+                                <a href="exhibition.html">
+                                    <img src="<%= event.image %>" alt="" />
+                                </a>
+                            </div>
+                            <div class="item-info">
+                                <h2 class="item-title">
+                                    <a href="exhibition.html" class="truncate"><%= event.name %></a>
+                                </h2>
+                                <p class="item-venue"><a href="venue.html"><%= event.location %></a></p>
+                                <p class="item-date"><%= event.start_date %></p>
+                                <a href="#" class="favorite-star item-symbol" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
+                            </div>
+                        </div>
+                        <% }); %>
+                    </div>
+                </script>
+
+            </div>
+        </div> <!-- /content -->
+
+    </div> <!-- /wrapper -->
+
+    <div id="menu-panel" class="menu-panel">
+  <ul>
+    <li><a href="home.html">Discover ArtsConnect</a></li>
+    <li class="active"><a href="#">By Date</a></li>
+    <li><a href="#">By Location</a></li>
+    <li><a href="favorites.html">Favorites</a></li>
+    <li><a href="history.html">History</a></li>
+    <li><a href="settings.html">Settings</a></li>
+    <li><a href="interests.html">My Interests</a></li>
+    <li><a href="sign-in.html">Log out</a></li>
+  </ul>
+</div>
+
+    <div id="signup-popup" class="modal reveal-modal">
+    <div id="signup-popup-target" class="modal-content">
+        <h2>Sign up</h2>
+                <p>Introductory copy lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus, architecto itaque mollitia saepe ab sint omnis quia temporibus officiis aperiam.</p>
+
+        <form id="signup-form" name="signup-form" method="post" action="">
+            <p>
+                <label for="signup-email">Email</label>
+                <input type="email" id="signup-email" name="signup-email" required="required" />
+            </p>
+
+            <p>
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" name="signup-password" required="required" />
+            </p>
+
+            <p>
+                <label for="signup-confirmpassword">Confirm Password</label>
+                <input type="password" id="signup-confirmpassword" name="signup-confirmpassword" required="required" />
+            </p>
+
+            <button type="submit">Submit</button>
+            <p><small>Already have an account? <a href="sign-in.html">Sign in</a></small></p>
+        </form>
+    </div>
+    <a href="#" class="btn btn-round close-reveal-modal close"><i class="icon icon-cross"></i><span class="visuallyhidden">Close</a>
+</div>
+
+    <!-- Javascript -->
+    <script src="ui/js/scripts-concat.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+---
+layout: subpage
+title: Events and Exhibitions by Date
+titlebar: By Date
+active: bydate
+---
+
+        <div class="content" role="main">
+
+            <div id="event-calendar" class="calendar">
+
+                <script type="text/template" id="template-calendar">
+                    <div class="clndr-controls">
+                        <div class="clndr-previous-button"><i class="icon icon-rewind"></i><span class="visuallyhidden">Previous month</span></div>
+                        <div class="month"><%= month %></div>
+                        <div class="clndr-next-button"><span class="visuallyhidden">Next month</span><i class="icon icon-fast-forward"></i></div>
+                    </div>
+                    <div class="clndr-grid">
+                        <div class="days-of-the-week cf">
+                            <% _.each(daysOfTheWeek, function(day) { %>
+                            <div class="header-day"><%= day %></div>
+                            <% }); %>
+                        </div>
+                        <div class="days cf">
+                            <% _.each(days, function(day) { %>
+                            <div class="<%= day.classes %>" id="<%= day.id %>">
+                                <span class="day-number"><%= day.day %></span>
+                            </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                    <div class="thumb-list">
+                        <% _.each(eventsThisMonth, function(event) { %>
+                        <div class="item-block cf">
+                            <div class="item-image">
+                                <a href="exhibition.html">
+                                    <img src="<%= event.image %>" alt="" />
+                                </a>
+                            </div>
+                            <div class="item-info">
+                                <h2 class="item-title">
+                                    <a href="exhibition.html" class="truncate"><%= event.name %></a>
+                                </h2>
+                                <p class="item-venue"><a href="venue.html"><%= event.location %></a></p>
+                                <p class="item-date"><%= event.start_date %></p>
+                                <a href="#" class="favorite-star item-symbol" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
+                            </div>
+                        </div>
+                        <% }); %>
+                    </div>
+                </script>
+
+            </div>
+        </div> <!-- /content -->

@@ -1,11 +1,12 @@
 CACHE MANIFEST
  
-# Version 0.77
+# Version 0.78
  
 NETWORK:
 *
  
 CACHE:
+bydate.html
 event.html
 exhibition.html
 favorites.html
