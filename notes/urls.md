@@ -12,7 +12,7 @@
 
 * **Format:** JSON
 
-#### GetEventsByMonth/*year (yyyy)*/*month (mm)*
+#### <strike>GetEventsByMonth/*year (yyyy)*/*month (mm)*</strike>
 
 * **Format:** JSON
 * **year/month** should sufficiently filter results to not require "Load More" functionality
