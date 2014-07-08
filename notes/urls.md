@@ -28,13 +28,18 @@
 
 * **Format:** JSON
 * **Page:** Accommodates "Load More" functionality
+* **Used on:** Locations/Map
 
 #### GetLocationById/*locationId*
+
+* **Format:** JSON
+* **Used on:** Locations/map
 
 #### CheckEmail/*emailAddress*
 
 * **Format:** Ajax/JSON
 * Returns success/failure based on existence of **emailAddress** in database
+* **Used on:** Signup
 
 #### /event/*eventId*
 
