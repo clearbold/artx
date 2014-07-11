@@ -30,6 +30,11 @@
 * **Page:** Accommodates "Load More" functionality
 * **Used on:** Locations/Map
 
+#### GetLocations
+
+* **Format:** JSON
+* **Used on:** Locations/map
+
 #### GetLocationById/*locationId*
 
 * **Format:** JSON
