@@ -19255,7 +19255,9 @@ ArtX.el = {
     doc             : $(document),
     body            : $('body'),
     calendarContainer: $("#event-calendar"),
-    eventListTarget : $("#event-list")
+    eventCalendar   : "",
+    eventListTarget : $("#event-list"),
+    eventListTemplate: $("#template-eventlist").html()
 };
 
 ArtX.util = {
@@ -19537,7 +19539,7 @@ ArtX.calendar = {
             eventArray = data;
 
             // Create a Clndr and save the instance as myCalendar
-            eventCalendar = ArtX.el.calendarContainer.clndr({
+            ArtX.el.eventCalendar = ArtX.el.calendarContainer.clndr({
                 template: $('#template-calendar').html(),
                 events: eventArray,
                 dateParameter: 'start_date',
@@ -19549,39 +19551,17 @@ ArtX.calendar = {
                     click: function(target) {
                         ArtX.calendar.displayEventList(target);
                     }
+                },
+                doneRendering: function(){ 
+                    $(".day.today").trigger("click");
                 }
             });
         });
     },
     displayEventList: function(target) {
         var eventArray = target.events;
-        //console.log(eventArray);
-        
-        //var tempString = "";
-        /*$.each(target.events, function(index, value) {
-            $.each(value, function(index2, value2) {
-                tempString += tempString + "Index: " + index2 + ", value: " + value2 + "<br />";
-            });
 
-            
-        });*/
-
-     /* eventArray.forEach( function (event) {
-            tempString += "Event name: " + event.name + "<br />";
-        }); 
-        ArtX.el.eventListTarget.html(tempString);*/
-
-        /* _.each(eventArray, function(eventObj, key){
-            _.each(eventObj, function(value, key){
-                console.log("Key: " + key + ", value: " + value);
-            });
-        }); */
-
-        var eventListTemplate = $("#template-eventlist").html();
-
-        ArtX.el.eventListTarget.html(_.template(eventListTemplate, {eventArray:eventArray}));
-
-        // Okay, so basically we're navigating an array of event objects.  Each event object has all the info for start date, end date, etc.
+        ArtX.el.eventListTarget.html(_.template(ArtX.el.eventListTemplate, {eventArray:eventArray}));
     },
     init: function() {
         if (ArtX.el.calendarContainer.length > 0) {
@@ -19605,18 +19585,7 @@ ArtX.calendar = {
                 thisMonthURL = augEventURL;
             }
 
-            // If we have a URL of events for this month, go get the JSON data
-            //if (!!thisMonthURL) {
-            //    $.getJSON( thisMonthURL, function( data ) {
-
-            //        eventArray = data;
-
-            //    });
-            //}
-
-            var eventCalendar;
-
-            ArtX.calendar.getEvents("/ui/js/json/test.json");
+            ArtX.calendar.getEvents("/ui/js/json/events-july.json");
         }
     }
 
