@@ -1118,12 +1118,10 @@ button {
     padding-top:.5em;
     padding-bottom:.5em;
     line-height:1;
-    background: $gray-dark;
+    background:$gray-dark;
     
     &.event {
-        background-color: $main-color;
-        color:$gray-dark;
-        cursor: pointer;
+        cursor:pointer;
     }
 
     &.today {
@@ -1133,6 +1131,11 @@ button {
 
     &.adjacent-month {
         color:$gray;
+    }
+
+    &.selected {
+        background-color: $main-color;
+        color:$gray-dark;
     }
 }
 

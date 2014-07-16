@@ -133,25 +133,34 @@
                             <% }); %>
                         </div>
                     </div>
-                    <div class="thumb-list">
-                        <% _.each(eventsThisMonth, function(event) { %>
-                        <div class="item-block cf">
-                            <div class="item-image">
-                                <a href="exhibition.html">
-                                    <img src="<%= event.image %>" alt="" />
-                                </a>
-                            </div>
-                            <div class="item-info">
-                                <h2 class="item-title">
-                                    <a href="exhibition.html" class="truncate"><%= event.name %></a>
-                                </h2>
-                                <p class="item-venue"><a href="venue.html"><%= event.location %></a></p>
-                                <p class="item-date"><%= event.start_date %></p>
-                                <a href="#" class="favorite-star item-symbol" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
-                            </div>
-                        </div>
-                        <% }); %>
+                    
+                </script>
+
+            </div>
+            <div id="event-list" class="thumb-list">
+
+                <script type="text/template" id="template-eventlist">
+                <% _.each(eventArray, function(eventObj, key){ %>
+                <% console.log(eventObj); %>
+                        
+                <div class="item-block cf">
+                    <div class="item-image">
+                        <a href="exhibition.html">
+                            <img src="<%= eventObj.image %>" alt="" />
+                        </a>
                     </div>
+                    <div class="item-info">
+                        <h2 class="item-title">
+                            <a href="exhibition.html" class="truncate"><%= eventObj.name %></a>
+                        </h2>
+                        <p class="item-venue"><a href="venue.html"><%= eventObj.location_name %></a></p>
+                        <p class="item-date"><%= eventObj.start_date %></p>
+                        <a href="#" class="favorite-star item-symbol" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
+                    </div>
+                </div>
+
+                <% }); %>
+                    
                 </script>
 
             </div>

@@ -38,7 +38,9 @@ ArtX.el = {
     html            : $('html'),
     win             : $(window),
     doc             : $(document),
-    body            : $('body')
+    body            : $('body'),
+    calendarContainer: $("#event-calendar"),
+    eventListTarget : $("#event-list")
 };
 
 ArtX.util = {
@@ -314,82 +316,96 @@ ArtX.setupCustomCheckboxes = function() {
 
 /* Set up By Date Event Calendar 
    ========================================================================== */
-ArtX.setupCalendar = function() {
-    var $calendarContainer = $("#event-calendar");
+ArtX.calendar = {
+    getEvents: function(jsonURL) {
+        $.getJSON(jsonURL, function(data) {
+            eventArray = data;
 
-    if ($calendarContainer.length > 0) {
-        console.log("Setting up event calendar");
-
-        var eventArray = [],
-            thisMonth,
-            thisMonthURL,
-            juneEventURL = "/ui/js/json/events-june.json",
-            julyEventURL = "/ui/js/json/events-july.json",
-            augEventURL = "/ui/js/json/events-aug.json";
-
-        thisMonth = moment().month(); // integer from 0 to 11
-
-        // This is for demo purposes only, this should be much more robust
-        if (thisMonth == 5) { // June
-            thisMonthURL = juneEventURL;
-        } else if (thisMonth == 6) { // July
-            thisMonthURL = julyEventURL;
-        } else if (thisMonth == 7) { // August
-            thisMonthURL = augEventURL;
-        }
-
-        // If we have a URL of events for this month, go get the JSON data
-        //if (!!thisMonthURL) {
-        //    $.getJSON( thisMonthURL, function( data ) {
-
-        //        eventArray = data;
-
-        //    });
-        //}
-
-        // Let's fake some data for now
-        // here's some magic to make sure the dates are happening this month.
-        var currMonth = moment().format('YYYY-MM');
-
-        eventArray = [
-            { 
-                start_date: currMonth + '-10', 
-                end_date: currMonth + '-14', 
-                name: 'Multi-Day Exhibition',
-                image: '/ui/img/square-bamboo.jpg',
-                location: 'Venue A'
-            },
-            { 
-                start_date: currMonth + '-21', 
-                end_date: currMonth + '-23', 
-                name: 'Another Multi-Day Exhibition',
-                image: '/ui/img/square-knights.jpg',
-                location: 'Venue B'
-            },
-            {
-                start_date: currMonth + '-08',
-                name: 'Single Day Event',
-                image: '/ui/img/square-quilts.jpg',
-                location: 'Venue C'
-            }
-        ];
-
-        // Create a Clndr and save the instance as myCalendar
-        var eventCalendar = $calendarContainer.clndr({
-            template: $('#template-calendar').html(),
-            events: eventArray,
-            dateParameter: 'start_date',
-            multiDayEvents: {
-                startDate: 'start_date',
-                endDate: 'end_date'
-            },
-            clickEvents: {
-                click: function(target) {
-                    console.log(target);
+            // Create a Clndr and save the instance as myCalendar
+            eventCalendar = ArtX.el.calendarContainer.clndr({
+                template: $('#template-calendar').html(),
+                events: eventArray,
+                dateParameter: 'start_date',
+                multiDayEvents: {
+                    startDate: 'start_date',
+                    endDate: 'end_date'
+                },
+                clickEvents: {
+                    click: function(target) {
+                        ArtX.calendar.displayEventList(target);
+                    }
                 }
-            }
+            });
         });
+    },
+    displayEventList: function(target) {
+        var eventArray = target.events;
+        //console.log(eventArray);
+        
+        //var tempString = "";
+        /*$.each(target.events, function(index, value) {
+            $.each(value, function(index2, value2) {
+                tempString += tempString + "Index: " + index2 + ", value: " + value2 + "<br />";
+            });
+
+            
+        });*/
+
+     /* eventArray.forEach( function (event) {
+            tempString += "Event name: " + event.name + "<br />";
+        }); 
+        ArtX.el.eventListTarget.html(tempString);*/
+
+        /* _.each(eventArray, function(eventObj, key){
+            _.each(eventObj, function(value, key){
+                console.log("Key: " + key + ", value: " + value);
+            });
+        }); */
+
+        var eventListTemplate = $("#template-eventlist").html();
+
+        ArtX.el.eventListTarget.html(_.template(eventListTemplate, {eventArray:eventArray}));
+
+        // Okay, so basically we're navigating an array of event objects.  Each event object has all the info for start date, end date, etc.
+    },
+    init: function() {
+        if (ArtX.el.calendarContainer.length > 0) {
+            console.log("Setting up event calendar");
+
+            var eventArray = [],
+                thisMonth,
+                thisMonthURL,
+                juneEventURL = "/ui/js/json/events-june.json",
+                julyEventURL = "/ui/js/json/events-july.json",
+                augEventURL = "/ui/js/json/events-aug.json";
+
+            thisMonth = moment().month(); // integer from 0 to 11
+
+            // This is for demo purposes only, this should be much more robust
+            if (thisMonth == 5) { // June
+                thisMonthURL = juneEventURL;
+            } else if (thisMonth == 6) { // July
+                thisMonthURL = julyEventURL;
+            } else if (thisMonth == 7) { // August
+                thisMonthURL = augEventURL;
+            }
+
+            // If we have a URL of events for this month, go get the JSON data
+            //if (!!thisMonthURL) {
+            //    $.getJSON( thisMonthURL, function( data ) {
+
+            //        eventArray = data;
+
+            //    });
+            //}
+
+            var eventCalendar;
+
+            ArtX.calendar.getEvents("/ui/js/json/test.json");
+        }
     }
+
+    
 };
 
 /* Initialize/Fire
@@ -406,7 +422,7 @@ ArtX.startup = {
         ArtX.setupBackButton();
         ArtX.setupTextTruncation();
 
-        ArtX.setupCalendar();
+        ArtX.calendar.init();
         ArtX.setupSlidingPanels();
         ArtX.setupPeekSlider();
         ArtX.setupFavoriteSlider();
