@@ -141,6 +141,9 @@
 
                 <script type="text/template" id="template-eventlist">
                 <% _.each(eventArray, function(eventObj, key){ %>
+
+                <% var eventStartDate = moment(eventObj.start_date).format("dddd, MMM Do YYYY"); // "Sun, February 14th 2010" %>
+                <% var eventEndDate = moment(eventObj.end_date).format("MMMM Do"); // "February 14" %>
                         
                 <div class="item-block cf">
                     <div class="item-image">
@@ -153,7 +156,15 @@
                             <a href="exhibition.html" class="truncate"><%= eventObj.name %></a>
                         </h2>
                         <p class="item-venue"><a href="venue.html"><%= eventObj.location_name %></a></p>
-                        <p class="item-date"><%= eventObj.start_date %></p>
+                        <p class="item-date">
+                        
+                        <% if (eventObj.start_date != eventObj.end_date) { %>
+                            Through <%= eventEndDate %>
+                        <% } else { %>
+                            <%= eventStartDate %>
+                        <% } %>
+
+                        </p>
                         <a href="#" class="favorite-star item-symbol" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
                     </div>
                 </div>
