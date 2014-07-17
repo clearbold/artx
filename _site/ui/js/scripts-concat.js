@@ -19572,7 +19572,7 @@ ArtX.calendar = {
                 thisMonthURL,
                 juneEventURL = "/ui/js/json/events-june.json",
                 julyEventURL = "/ui/js/json/events-july.json",
-                augEventURL = "/ui/js/json/events-aug.json";
+                augEventURL = "/ui/js/json/events-august.json";
 
             thisMonth = moment().month(); // integer from 0 to 11
 

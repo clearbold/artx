@@ -664,7 +664,7 @@ button {
 
     .item-block {
         clear:left;
-        margin-bottom:$spacing-unit;
+        margin-bottom:$spacing-unit * 2;
     }
     .item-image {
         width:30%;
@@ -680,7 +680,7 @@ button {
         padding-bottom:0;
     }
     .item-info {
-        @include font-size(14px, false);
+        @include font-size(13px, false);
         
         @include mq($lap-start) {
             @include font-size(16px, false);
@@ -1073,7 +1073,7 @@ button {
   display: block;
   display: inline-block;
   width: 100%;
-  margin-bottom: $spacing-unit;
+  margin-bottom: $spacing-unit / 2;
 }
 .calendar .clndr-previous-button {
   float: left;
@@ -1097,7 +1097,7 @@ button {
   text-align: center;
   position:relative;
   margin-left:-1%;
-  margin-bottom:$spacing-unit;
+  margin-bottom:$spacing-unit * 2;
 }
 .calendar .header-day {
     float: left;

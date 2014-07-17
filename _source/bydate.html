@@ -38,8 +38,14 @@ active: bydate
                 <script type="text/template" id="template-eventlist">
                 <% _.each(eventArray, function(eventObj, key){ %>
 
-                <% var eventStartDate = moment(eventObj.start_date).format("dddd, MMM Do YYYY"); // "Sun, February 14th 2010" %>
-                <% var eventEndDate = moment(eventObj.end_date).format("MMMM Do"); // "February 14" %>
+                <% var eventStartDate = moment(eventObj.start_date).format("ddd, MMM Do YYYY"); // "Sun, Feb 14th 2010" %>
+                <% var eventStartTime = moment(eventObj.start_date).format("h:mm a"); // "10:15 am" %>
+
+                <% var eventEndDate = moment(eventObj.end_date).format("MMM Do, YYYY"); // "Feb 14th, 2010" %>
+                <% var eventEndTime = moment(eventObj.end_date).format("h:mm a"); // "10:15 am" %>
+
+                <% var compareStartDate = moment(eventObj.start_date).format("M/D/YYYY"); // "2/14/2010" %>
+                <% var compareEndDate = moment(eventObj.end_date).format("M/D/YYYY"); // "2/14/2010" %>
                         
                 <div class="item-block cf">
                     <div class="item-image">
@@ -51,16 +57,15 @@ active: bydate
                         <h2 class="item-title">
                             <a href="exhibition.html" class="truncate"><%= eventObj.name %></a>
                         </h2>
-                        <p class="item-venue"><a href="venue.html"><%= eventObj.location_name %></a></p>
                         <p class="item-date">
-                        
-                        <% if (eventObj.start_date != eventObj.end_date) { %>
+                        <% if (compareStartDate != compareEndDate) { %>
                             Through <%= eventEndDate %>
                         <% } else { %>
-                            <%= eventStartDate %>
+                            <%= eventStartDate %><br />
+                            <%= eventStartTime %> - <%= eventEndTime %>
                         <% } %>
-
                         </p>
+
                         <a href="#" class="favorite-star item-symbol" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
                     </div>
                 </div>
