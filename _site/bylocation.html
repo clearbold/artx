@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
 
-    <title>Settings - ArtX</title>
+    <title>Events and Exhibitions by Location - ArtX</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -92,7 +92,7 @@
     </script>
 
 </head>
-<body id="page--settings" class="page--settings">
+<body id="page--bylocation" class="page--bylocation">
 
     <!-- Skip navigation link for screen reader and keyboard users -->
     <div class="skiplinkholder"><p><a id="skiplink" href="#skiptarget">Skip to main content (Press Enter).</a></p></div>
@@ -105,67 +105,57 @@
     <!-- Skip nav target -->
     <p class="skiptargetholder"><a id="skiptarget" name="skiptarget" class="skip" tabindex="-1"></a></p>
 
-    <h1><a href="index.html">Settings</a></h1>
+    <h1><a href="index.html">By Location</a></h1>
 </header> <!-- /header -->
 
             <div class="content" role="main">
-            <form id="settings-form" name="settings-form" method="post" action="">
-                <p>
-                    <label for="settings-email">Email</label>
-                    <input type="email" id="settings-email" name="settings-email" value="you@example.com" required="required" />
-                </p>
 
-                <p>
-                    <label for="settings-password">Password</label>
-                    <input type="password" id="settings-password" name="settings-password" value="password" required="required" />
-                </p>
+            <div id="event-map" class="map">
+                <p>Map will go here.</p>
+            </div>
 
-                <button type="submit">Save</button>
-
-                <hr />
-
-                <h2 class="label">Notifications</h2>
-                <div class="toggle-list">
-                    <div class="toggle-item">
-                        <label>Send me weekly emails</label>
-                        <div class="onoffswitch">
-                            <input type="checkbox" name="settings-weeklyemail" class="onoffswitch-checkbox" id="settings-weeklyemail">
-                            <label class="onoffswitch-label" for="settings-weeklyemail">
-                                <span class="onoffswitch-inner"></span>
-                                <span class="onoffswitch-switch"></span>
-                            </label>
-                        </div>
+            <div id="event-list" class="thumb-list">
+                <div class="item-block cf">
+                    <div class="item-image">
+                        <a href="exhibition.html">
+                            <img src="/ui/img/square-quilts.jpg" alt="" />
+                        </a>
                     </div>
-                    <div class="toggle-item">
-                        <label>Send me a reminder the day before a saved event</label>
-                        <div class="onoffswitch">
-                            <input type="checkbox" name="settings-reminder-event" class="onoffswitch-checkbox" id="settings-reminder-event">
-                            <label class="onoffswitch-label" for="settings-reminder-event">
-                                <span class="onoffswitch-inner"></span>
-                                <span class="onoffswitch-switch"></span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="toggle-item">
-                        <label>Send me a reminder the week before an exhibition closes</label>
-                        <div class="onoffswitch">
-                            <input type="checkbox" name="settings-reminder-exhibition" class="onoffswitch-checkbox" id="settings-reminder-exhibition">
-                            <label class="onoffswitch-label" for="settings-reminder-exhibition">
-                                <span class="onoffswitch-inner"></span>
-                                <span class="onoffswitch-switch"></span>
-                            </label>
-                        </div>
+                    <div class="item-info">
+                        <h2 class="item-title">
+                            <a href="exhibition.html" class="truncate">Quilts and Color: The Roy Pilgrim Collection</a>
+                        </h2>
+                        <p class="item-venue">Museum of Fine Arts</p>
+                        <p class="item-date">May 3 (closing soon)</p>
+                        <a href="#" class="favorite-star item-symbol" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
                     </div>
                 </div>
+            </div>
+        </div> <!-- /content -->
 
-                <hr />
+        <footer class="footer">
+            <div class="footer-header cf">
+                <h2 class="h3 related">Near you</h2>
+            </div>
+            <div class="favorite-slider">
 
-                <ul class="listview">
-                    <li><a href="interests.html">Manage My Interests</a></li>
+                <ul id="favorite-slider" class="bxslider cf">
+                    <li><a href="event.html"><img src="/ui/img/square-middlebrook.jpg" alt="Workshop with artist Jason Middlebrook, ICA Boston" /></a></li><!--
+                    --><li><a href="exhibition.html"><img src="/ui/img/square-quilts.jpg" alt="Quilts and Color: The Roy Pilgrim Collection, Museum of Fine Arts" /></a></li><!--
+                    --><li><a href="#"><img src="/ui/img/square-knights.jpg" alt="Knights: Arms and Armor Throughout History, Worcester Art Museum" /></a></li><!--
+                    --><li><a href="#"><img src="http://lorempixel.com/400/400/abstract/1" alt="Event Title, Event Venue" /></a></li><!--
+                    --><li><a href="#"><img src="http://lorempixel.com/400/400/abstract/2" alt="Exhibition Title, Exhibition Venue" /></a></li><!--
+                    --><li><a href="#"><img src="http://lorempixel.com/400/400/abstract/3" alt="Event Title, Event Venue" /></a></li><!--
+                    --><li><a href="#"><img src="http://lorempixel.com/400/400/abstract/4" alt="Event Title, Event Venue" /></a></li><!--
+                    --><li><a href="#"><img src="http://lorempixel.com/400/400/abstract/5" alt="Event Title, Event Venue" /></a></li><!--
+                    --><li><a href="#"><img src="http://lorempixel.com/400/400/abstract/6" alt="Event Title, Event Venue" /></a></li>
                 </ul>
 
-            </form>         
-        </div> <!-- /content -->
+                <a href="#" id="favorite-slider-previous" class="btn btn-round favorite-slider-previous" title="Previous"><i class="icon icon-rewind"></i><span class="visuallyhidden">Previous</span></a>
+                <a href="#" id="favorite-slider-next" class="btn btn-round favorite-slider-next" title="Next"><i class="icon icon-fast-forward"></i><span class="visuallyhidden">Next</span></a>
+               
+            </div> <!-- /favorite-slider -->
+        </footer> <!-- /footer -->
 
     </div> <!-- /wrapper -->
 
@@ -173,10 +163,10 @@
   <ul>
     <li><a href="home.html">Discover ArtsConnect</a></li>
     <li><a href="bydate.html">By Date</a></li>
-    <li><a href="#">By Location</a></li>
+    <li class="active"><a href="#">By Location</a></li>
     <li><a href="favorites.html">Favorites</a></li>
     <li><a href="history.html">History</a></li>
-    <li class="active"><a href="settings.html">Settings</a></li>
+    <li><a href="settings.html">Settings</a></li>
     <li><a href="interests.html">My Interests</a></li>
     <li><a href="sign-in.html">Log out</a></li>
   </ul>
