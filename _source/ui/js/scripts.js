@@ -334,6 +334,9 @@ ArtX.calendar = {
                 },
                 clickEvents: {
                     click: function(target) {
+                        // clear any existing selection states
+                        $(".day").removeClass("day-selected");
+                        $(target.element).addClass("day-selected");
                         ArtX.calendar.displayEventList(target);
                     }
                 },

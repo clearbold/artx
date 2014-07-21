@@ -19549,6 +19549,9 @@ ArtX.calendar = {
                 },
                 clickEvents: {
                     click: function(target) {
+                        // clear any existing selection states
+                        $(".day").removeClass("day-selected");
+                        $(target.element).addClass("day-selected");
                         ArtX.calendar.displayEventList(target);
                     }
                 },
@@ -19625,7 +19628,7 @@ ArtX.startup = {
 
 $(document).ready(function() {
 
-    handleAppCache();
+    //handleAppCache();
 
     Modernizr.load([
         

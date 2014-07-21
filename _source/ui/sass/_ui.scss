@@ -1124,6 +1124,11 @@ button {
         cursor:pointer;
     }
 
+    &.day-selected {
+        background-color: $main-color;
+        color:$gray-dark;
+    }
+
     &.today {
         background-color: $accent-color;
         color:$gray-dark;
@@ -1131,11 +1136,6 @@ button {
 
     &.adjacent-month {
         color:$gray;
-    }
-
-    &.selected {
-        background-color: $main-color;
-        color:$gray-dark;
     }
 }
 
