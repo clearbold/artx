@@ -2,6 +2,8 @@
 
 #### Stubbed in Ajax functions
 
+Review [the URL list](https://github.com/clearbold/artx/blob/master/notes/urls.md).
+
 - [ ] Adding a favorite - Should the star not fill in until there's a success response from the server?
 - [ ] Adding a favorite - Triggering a refresh of the My Favorites bar at the bottom *after* the new favorite has been added
 - [ ] Validation on Sign up - Check that email address isn't in use (Display an error based on server response)
