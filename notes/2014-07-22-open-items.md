@@ -2,7 +2,7 @@
 
 #### Stubbed in Ajax functions
 
-Review [the URL list](https://github.com/clearbold/artx/blob/master/notes/urls.md).
+Review [the URL list](https://github.com/clearbold/artx/blob/master/notes/urls.md). All of these should rely on a static JSON file to trigger a response or update in the screen, which will be spec for the backend team.
 
 - [ ] Adding a favorite - Should the star not fill in until there's a success response from the server?
 - [ ] Adding a favorite - Triggering a refresh of the My Favorites bar at the bottom *after* the new favorite has been added
