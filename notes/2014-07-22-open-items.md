@@ -4,6 +4,8 @@
 
 Review [the URL list](https://github.com/clearbold/artx/blob/master/notes/urls.md). All of these should rely on a static JSON file to trigger a response or update in the screen, which will be spec for the backend team.
 
+I would emphasize a sampling of different functions here that we can copy and paste and fill in. I.e., 1 load more function should be a priority, such that we can copy and paste it to other contexts. Let's focus on hitting examples of unique function roles.
+
 - [ ] Adding a favorite - Should the star not fill in until there's a success response from the server?
 - [ ] Adding a favorite - Triggering a refresh of the My Favorites bar at the bottom *after* the new favorite has been added
 - [ ] Validation on Sign up - Check that email address isn't in use (Display an error based on server response)
