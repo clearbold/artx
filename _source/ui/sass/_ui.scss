@@ -336,49 +336,62 @@ button {
 }
 
 // Custom checkboxes
-.js .custom-checkbox {
-    position:relative;
-    
-    input {
-        position: absolute;
-        right: $spacing-unit+2;
-        top: 10px;
-        margin: 0;
-        z-index: 0;
-    }
-
-    label {
-        font-weight:normal;
-        background-color:lighten($page-bg, 5);
-        display: block;
-        position: relative;
-        z-index: 1;
-        line-height: 1;
-        padding:10px 30px 10px $spacing-unit;
-        margin: 0;
-        cursor: pointer;
-        background-image:url("/ui/img/sprite-checkboxes.png");
-        background-repeat:no-repeat;
-        background-position: 95% 10px;
+.js {
+    .custom-checkbox {
+        position:relative;
         
-        &.hover,
-        &.focus {
-            background-position: 95% -90px;
+        input {
+            position: absolute;
+            right: $spacing-unit+2;
+            top: 10px;
+            margin: 0;
+            z-index: 0;
         }
 
-        &.checked {
-            background-position: 95% -190px;
-        }
+        label {
+            font-weight:normal;
+            display: block;
+            position: relative;
+            z-index: 1;
+            line-height: 1;
+            padding:10px 10px 10px $spacing-unit;
+            margin: 0;
+            cursor: pointer;
+            background-color:$page-bg;
+            background-image:url("/ui/img/sprite-checkboxes.png");
+            background-repeat:no-repeat;
+            background-position: 95% 10px;
+            
+            &.hover,
+            &.focus {
+                background-position: 95% -90px;
+            }
 
-        &.checkedHover,
-        &.checkedFocus {
-            background-position: 95% -290px;
-        }
+            &.checked {
+                background-position: 95% -190px;
+            }
 
-        &.focus {
-            background-color:lighten($page-bg, 2);
-            outline:none;
+            &.checkedHover,
+            &.checkedFocus {
+                background-position: 95% -290px;
+            }
+
+            &.focus {
+                background-color:lighten($page-bg, 2);
+                outline:none;
+            }
         }
+    }
+    .thumb-list .custom-checkbox {
+        display:inline-block;
+
+        label {
+            padding:10px 30px 10px 0;
+        }
+    }
+    .custom-checkbox-list .custom-checkbox label {
+        background-color:lighten($page-bg, 5);
+        padding:10px 30px 10px $spacing-unit;
     }
 }
 

@@ -20878,7 +20878,7 @@ ArtX.setupSignupModal = function() {
 /* Set up custom checkboxes 
    ========================================================================== */
 ArtX.setupCustomCheckboxes = function() {
-    var $checkboxes = $(".custom-checkbox").find("input[type=checkbox]");
+    var $checkboxes = $(".customize-checkbox");
 
     if ($checkboxes.length > 0) {
         console.log("Setting up custom checkboxes");

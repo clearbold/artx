@@ -25,7 +25,7 @@ I would emphasize a sampling of different functions here that we can copy and pa
 #### Tweaks
 
 - [x] Calendar is off-center on iPhone screen (SMA: Mitigated the effect, caused by Safari rounding)
-- [ ] History should be a checkbox with a "Yes" label for "Did you attend?"
+- [x] History should be a checkbox with a "Yes" label for "Did you attend?"
 
 #### Low priority
 
