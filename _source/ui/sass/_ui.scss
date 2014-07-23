@@ -280,6 +280,10 @@ label {
     display:block;
     @include font-size(14px, false);
     margin-bottom:.25em;
+    
+    &.error {
+        margin-top:.5em;
+    }
 }
 
 input[type=text],
@@ -295,6 +299,10 @@ input[type=password] {
     display:block;
     width:100%;
     max-width:240px;
+    
+    &.error {
+        outline:2px solid red;
+    }
 }
 button {
     white-space:nowrap;
@@ -1100,21 +1108,26 @@ button {
   margin-bottom:$spacing-unit * 2;
 }
 .calendar .header-day {
-    float: left;
+    float: none;
+    display:inline-block;
     width:13.28571428571429%;
     margin-left:1%;
     margin-bottom:1%;
+    margin-right:-.3em;
     padding-top:.5em;
     padding-bottom:.5em;
     line-height:1;
     background: $gray-darkest;
 }
 .calendar .day {
-    float: left;
+    float: none;
+    display:inline-block;
+    vertical-align:top;
     //width: 2em;
     width:13.28571428571429%;
     margin-left:1%;
     margin-bottom:1%;
+    margin-right:-.3em;
     padding-top:.5em;
     padding-bottom:.5em;
     line-height:1;

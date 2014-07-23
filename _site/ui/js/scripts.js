@@ -348,8 +348,10 @@ ArtX.calendar = {
     },
     displayEventList: function(target) {
         var eventArray = target.events;
-
-        ArtX.el.eventListTarget.html(_.template(ArtX.el.eventListTemplate, {eventArray:eventArray}));
+        ArtX.el.eventListTarget.fadeOut("slow", function() {
+            ArtX.el.eventListTarget.html(_.template(ArtX.el.eventListTemplate, {eventArray:eventArray}));
+            ArtX.el.eventListTarget.fadeIn("slow");
+        });
     },
     init: function() {
         if (ArtX.el.calendarContainer.length > 0) {
@@ -380,6 +382,25 @@ ArtX.calendar = {
     
 };
 
+/* Set up form validation for passwords 
+   ========================================================================== */
+ArtX.setupFormValidation = function() {
+    var $formToValidate = $("form.validate");
+
+    if ($formToValidate.length > 0) {
+       console.log("Setting up form validation");
+       $formToValidate.validate({
+            rules: {
+                "signup-password": "required",
+                "signup-confirmpassword": {
+                    equalTo: "#signup-password"
+                }
+            }
+       });
+    }
+};
+
+
 /* Initialize/Fire
    ========================================================================== */
 ArtX.startup = {
@@ -401,6 +422,7 @@ ArtX.startup = {
         ArtX.setupFavoriteStars();
         ArtX.setupCustomCheckboxes();
         ArtX.setupToggleSwitches();
+        ArtX.setupFormValidation();
 
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
@@ -413,7 +435,7 @@ ArtX.startup = {
 
 $(document).ready(function() {
 
-    //handleAppCache();
+    handleAppCache();
 
     Modernizr.load([
         
