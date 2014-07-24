@@ -1,6 +1,6 @@
 CACHE MANIFEST
  
-# Version .24
+# Version .89
  
 NETWORK:
 *
@@ -40,4 +40,3 @@ ui/js/scripts-concat.min.js
 ui/js/json/events-august.json
 ui/js/json/events-all.json
 ui/js/json/events-july.json
-ui/js/json/events-june.json

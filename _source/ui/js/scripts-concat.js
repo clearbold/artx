@@ -20644,7 +20644,24 @@ ArtX.util = {
     },
     isOldIE: function() {
         return (($.browser.msie) && ($.browser.version <= 8))? true : false;
+    },
+    getNumberOfChildItems: function(container) {
+        var $containerObj = $(container);
+        var childItemCount = 0;
+
+        if ($containerObj.length > 0) {
+            var $childrenOfContainer = $containerObj.children();
+            if ($childrenOfContainer.length > 0) {
+                childItemCount = $childrenOfContainer.length;
+            }
+        }
+        return childItemCount;
     }
+};
+
+// Variables that can be used throughout
+ArtX.var = {
+    itemsPerPage : 5
 };
 
 /* Set up Accessible Skiplinks
@@ -20822,23 +20839,20 @@ ArtX.setupFavoriteStars = function() {
 /* Set up Text Truncation 
    ========================================================================== */
 ArtX.setupTextTruncation = function() {
-    
-    var textToTruncate = $(".truncate");
-    if(textToTruncate.length > 0) {
-        console.log("Initializing text truncation");
-        textToTruncate.trunk8({
+    console.log("Initializing text truncation");
+
+    $(".truncate").trunk8({
+        lines: 2,
+        tooltip: false
+    });
+
+    // Set up a resize event for truncated text
+    ArtX.el.win.resize(function() {
+        $(".truncate").trunk8({
             lines: 2,
             tooltip: false
         });
-
-        // Set up a resize event for truncated text
-        ArtX.el.win.resize(function() {
-            textToTruncate.trunk8({
-                lines: 2,
-                tooltip: false
-            });
-        });  
-    }
+    });  
 };
 
 /* Set up Signup Modal 
@@ -20919,15 +20933,19 @@ ArtX.calendar = {
     },
     displayEventList: function(target) {
         var eventArray = target.events;
-        ArtX.el.eventListTarget.fadeOut("slow", function() {
+        ArtX.el.eventListTarget.fadeOut(400, function() {
             ArtX.el.eventListTarget.html(_.template(ArtX.el.eventListTemplate, {eventArray:eventArray}));
-            ArtX.el.eventListTarget.fadeIn("slow");
+            ArtX.el.eventListTarget.fadeIn(400, function() {
+                // Re-do truncation once fade is complete
+                ArtX.setupTextTruncation();
+            }); 
         });
     },
     init: function() {
         if (ArtX.el.calendarContainer.length > 0) {
             console.log("Setting up event calendar");
 
+            // This is for demo purposes only, this should be much more robust
             var eventArray = [],
                 thisMonth,
                 thisMonthURL,
@@ -20936,8 +20954,7 @@ ArtX.calendar = {
                 augEventURL = "/ui/js/json/events-august.json";
 
             thisMonth = moment().month(); // integer from 0 to 11
-
-            // This is for demo purposes only, this should be much more robust
+            
             if (thisMonth == 5) { // June
                 thisMonthURL = juneEventURL;
             } else if (thisMonth == 6) { // July
@@ -20948,9 +20965,7 @@ ArtX.calendar = {
 
             ArtX.calendar.getEvents("/ui/js/json/events-july.json");
         }
-    }
-
-    
+    }  
 };
 
 /* Set up form validation for passwords 
@@ -20970,6 +20985,167 @@ ArtX.setupFormValidation = function() {
        });
     }
 };
+
+
+/* Set up Load More functionality 
+   ========================================================================== */
+ArtX.loadMore = {
+    vars: {
+        loadMoreLink : $("#load-more"),
+        nextPageJsonURL : "",
+        itemContainer : "",
+        itemTemplate : $("#item-template").html(),
+        currentPage : 1,
+        nextPage : 2
+    },
+    setupLoadMoreLink: function() {
+        console.log("Setting up the Load More link click events");
+
+        ArtX.loadMore.vars.loadMoreLink
+            .removeClass("btn-hidden") // Show the Load More link
+            .click(function() {
+                // Fade out the button, so that we don't get into a situation where a slow Ajax load
+                // leaves the button there, and a frustrated user clicks a million times and you
+                // get lots of multiple entries
+
+                ArtX.loadMore.vars.loadMoreLink.fadeOut();
+
+                var jsonArray;
+                var $newResults;
+
+                // Get the results from an Ajax call to the JSON data
+
+                // Figure out which page to fetch
+
+                /*  DEV NOTE: When this is hooked up to a real JSON feed,
+                    we'll feed it the next page URL from the Load More link's data-feed attribute like this: 
+
+                    ArtX.loadMore.vars.nextPageJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
+                    ArtX.loadMore.vars.nextPageJsonURL += ArtX.loadMore.vars.nextPage;
+
+                    But since this is a demo with static JSON files, we're putting in a temporary switch statement for it here: */
+
+                var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
+                
+                switch(temporaryJsonURL) {
+                    case "/LoadFavorites/" :
+                        ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + ArtX.loadMore.vars.nextPage + ".json";
+                        break;
+                    default:
+                        ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + ArtX.loadMore.vars.nextPage + ".json";
+                }
+
+                $.getJSON(ArtX.loadMore.vars.nextPageJsonURL, function(data) {
+                    jsonArray = data;
+                    
+                    // Format results with underscore.js template
+                    // Assign those results to a variable and chain .hide()
+                    $newResults = $(_.template(ArtX.loadMore.vars.itemTemplate, {jsonArray:jsonArray})).hide();
+
+                    // Append newResults to the list 
+                    $newResults.appendTo(ArtX.loadMore.vars.itemContainer);
+
+                    // Fade in the new results
+                    $newResults.fadeIn();
+
+                    // Re-do truncation
+                    ArtX.setupTextTruncation();
+
+                    // Update the variables
+                    ArtX.loadMore.vars.currentPage = ArtX.loadMore.vars.nextPage;
+                    ArtX.loadMore.vars.nextPage = ArtX.loadMore.vars.nextPage + 1;
+
+                    // Check to see if we still need to show the Load More link
+                    // Hide if not needed anymore
+                    
+                    var currentItemsCount = ArtX.util.getNumberOfChildItems(ArtX.loadMore.vars.itemContainer);
+
+                    /*  DEV NOTE: When this is hooked up to a real JSON feed,
+                        we'll feed it the next page URL from the Load More link's data-feed attribute like this: 
+
+                        ArtX.loadMore.vars.nextPageJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
+                        ArtX.loadMore.vars.nextPageJsonURL += ArtX.loadMore.vars.nextPage;
+
+                        But since this is a demo with static JSON files, we're putting in a temporary switch statement for it here: */
+
+                    var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
+                    
+                    switch(temporaryJsonURL) {
+                        case "/LoadFavorites/" :
+                            ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + ArtX.loadMore.vars.nextPage + ".json";
+                            break;
+                        default:
+                            ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + ArtX.loadMore.vars.nextPage + ".json";
+                    }
+
+                    // Check to see if there are more results to show
+                    $.getJSON(ArtX.loadMore.vars.nextPageJsonURL, function(nextdata) {
+                        var nextjsonArray = nextdata;
+                        console.log("Array length of " + ArtX.loadMore.vars.nextPageJsonURL + ": " + nextjsonArray.length);
+                        if (nextjsonArray.length !== 0) {
+                            // More results; we need to show the "Load More" link again
+                            ArtX.loadMore.vars.loadMoreLink.fadeIn();
+                        } else {
+                            // No more results; we need to hide the "Load More" link
+                            console.log("Checking...There are no more results to show");
+                        }
+                    });
+                });
+            });
+    },
+    init: function() {
+        if (ArtX.loadMore.vars.loadMoreLink.length > 0) {
+            console.log("Initializing Load More functionality");
+
+            // We need to check to see how many items are currently being shown.
+            // If the number of items equals our number-per-page variable, 
+            // check to see if there are more results to show.
+
+            // First, let's get the item container and assign it to a variable
+            // Assumption: the load more link is always directly preceded by the item container
+            ArtX.loadMore.vars.itemContainer = ArtX.loadMore.vars.loadMoreLink.prev();
+
+            var currentItemsCount = ArtX.util.getNumberOfChildItems(ArtX.loadMore.vars.itemContainer);
+
+            if (currentItemsCount == ArtX.var.itemsPerPage) { 
+                // There's the same amount as our items per page,
+                // so there might be more to pull down
+
+                /*  DEV NOTE: When this is hooked up to a real JSON feed,
+                    we'll feed it the page 2 URL from the Load More link's data-feed attribute like this: 
+
+                    ArtX.loadMore.vars.nextPageJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
+                    ArtX.loadMore.vars.nextPageJsonURL += "2";
+
+                    But since this is a demo with static JSON files, we're putting in a temporary switch statement for it here: */
+
+                var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
+                
+                switch(temporaryJsonURL) {
+                    case "/LoadFavorites/" :
+                        ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page2.json";
+                        break;
+                    default:
+                        ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page2.json";
+                }
+
+                // Check to see if there are more results to show, and set up the Load More link if so
+                $.getJSON(ArtX.loadMore.vars.nextPageJsonURL, function(data) {
+                    jsonArray = data;
+                    if (jsonArray.length > 0) {
+                        // There are more, so we need to show the "Load More" link
+                        console.log("Checking...There are at least " + jsonArray.length + " more results to show");
+
+                        ArtX.loadMore.setupLoadMoreLink();
+                    } else {
+                        console.log("Checking...There are no more results to show");
+                    }
+                });
+            }
+        } 
+    }
+};
+
 
 
 /* Initialize/Fire
@@ -20994,6 +21170,8 @@ ArtX.startup = {
         ArtX.setupCustomCheckboxes();
         ArtX.setupToggleSwitches();
         ArtX.setupFormValidation();
+
+        ArtX.loadMore.init();
 
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);

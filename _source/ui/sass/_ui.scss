@@ -15,13 +15,14 @@ html {
     background-color:$page-bg;
     color:$text-color;
     @include font-smoothing(on);
+    overflow-y: scroll;
 }
 
 /* This triggers a redraw in IE to Fix IE8's :before content rendering. */
 html:hover [class^="icon-"]{-ms-zoom: 1;}
 
 body {
-    font-family:"Lato", "sans-serif";
+    font-family:"Lato", Arial, sans-serif;
     font-weight:300;
     letter-spacing:1px;
 }
@@ -102,6 +103,15 @@ a {
     padding:.5em;
     line-height:1;
     border:none;
+    
+    &.btn-block {
+        display:block;
+        text-align:center;
+    }
+
+    &.btn-hidden {
+        display:none;
+    }
     
     &.btn-round {
         border-radius:50%;
