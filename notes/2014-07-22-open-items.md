@@ -11,7 +11,8 @@ I would emphasize a sampling of different functions here that we can copy and pa
 - [ ] Validation on Sign up - Check that email address isn't in use (Display an error based on server response)
 - [ ] My Interests - SetInterest - Update based on server response? (Use a static JSON response to trigger checkmark)
 - [ ] Settings = SetPreference (Use a static JSON response)
-- [ ] Load More on My Favorites, My Interests, By Date, By Location
+- [x] Load More on My Favorites
+- [ ] Load More on My Interests, By Date, By Location
 - [ ] History - Set attendance
 
 #### Other Sign Up Validation
