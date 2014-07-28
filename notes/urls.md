@@ -1,3 +1,10 @@
+### Conventions:
+
+* Get for a single item, usually by ID
+* Set to POST data to the server to set a value
+* Load for "Load More" methods
+* Delete to remove value or relation
+
 #### SetEventFavorite/*eventId*
 
 * **Format:** JSON
@@ -8,7 +15,7 @@
 * **Format:** JSON
 * **Used on:** History
 
-#### GetEventById/*eventId*
+#### GetEvent/*eventId*
 
 * **Format:** JSON
 
@@ -35,7 +42,7 @@
 * **Format:** JSON
 * **Used on:** Locations/map
 
-#### GetLocationById/*locationId*
+#### GetLocation/*locationId*
 
 * **Format:** JSON
 * **Used on:** Locations/map
