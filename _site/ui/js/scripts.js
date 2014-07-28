@@ -597,7 +597,35 @@ ArtX.loadMore = {
     }
 };
 
+/* Setting up My Settings Ajax functionality
+   ========================================================================== */
+ArtX.setupMySettings = function() {
+    var $mySettingsForm = $("#settings-form");
 
+    if ($mySettingsForm.length > 0) {
+        console.log("Initializing Ajax for My Settings");
+
+        var $ajaxInputs = $mySettingsForm.find("input[type=checkbox]");
+        var isCheckboxChecked = false;
+        var checkboxID;
+
+        $ajaxInputs.click(function() {
+            isCheckboxChecked = $(this).prop("checked");
+            checkboxID = $(this).prop("id");
+
+            /* This stub Ajax call sends the checkbox ID and whether it's checked to the /settings URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc */
+            
+            $.ajax({
+                type: "POST",
+                url: "/settings/",
+                data: {
+                    settingCheckbox: checkboxID,
+                    settingSelected: isCheckboxChecked
+                }
+            });
+        });
+    }
+};
 
 /* Initialize/Fire
    ========================================================================== */
@@ -612,7 +640,6 @@ ArtX.startup = {
         ArtX.setupSignupModal();
         ArtX.setupBackButton();
         ArtX.setupTextTruncation();
-
         ArtX.calendar.init();
         ArtX.setupSlidingPanels();
         ArtX.setupPeekSlider();
@@ -621,7 +648,7 @@ ArtX.startup = {
         ArtX.setupCustomCheckboxes();
         ArtX.setupToggleSwitches();
         ArtX.setupFormValidation();
-
+        ArtX.setupMySettings();
         ArtX.loadMore.init();
 
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
