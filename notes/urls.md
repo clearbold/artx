@@ -1,3 +1,10 @@
+### Conventions:
+
+* Get for a single item, usually by ID
+* Set to POST data to the server to set a value
+* Load for "Load More" methods
+* Delete to remove value or relation
+
 #### SetEventFavorite/*eventId*
 
 * **Format:** JSON
@@ -13,7 +20,7 @@
 * **Format:** JSON
 * **Used on:** History
 
-#### GetEventById/*eventId*
+#### GetEvent/*eventId*
 
 * **Format:** JSON
 
@@ -40,7 +47,7 @@
 * **Format:** JSON
 * **Used on:** Locations/map
 
-#### GetLocationById/*locationId*
+#### GetLocation/*locationId*
 
 * **Format:** JSON
 * **Used on:** Locations/map
@@ -66,10 +73,12 @@
 * **Format:** HTML
 * Dynamic page with session user's favorites generated server-side
 
-#### /LoadFavorites/*page*
+#### /LoadFavorites/*page*/*count*
 
 * **Format:** JSON
-* Do we need to limit favorites and support "load more"
+* We'll be using this in multiple spots
+* In the Favorites bar, we may ask for p1 with a count
+* In "Load More" we'll dicate the number per "page" and we'll keep asking for pages. When the server runs out (results<count), we'll stop showing the link
 
 #### /history
 
