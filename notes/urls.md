@@ -68,10 +68,12 @@
 * **Format:** HTML
 * Dynamic page with session user's favorites generated server-side
 
-#### /LoadFavorites/*page*
+#### /LoadFavorites/*page*/*count*
 
 * **Format:** JSON
-* Do we need to limit favorites and support "load more"
+* We'll be using this in multiple spots
+* In the Favorites bar, we may ask for p1 with a count
+* In "Load More" we'll dicate the number per "page" and we'll keep asking for pages. When the server runs out (results<count), we'll stop showing the link
 
 #### /history
 
