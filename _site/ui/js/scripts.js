@@ -627,6 +627,36 @@ ArtX.setupMySettings = function() {
     }
 };
 
+/* Setting up History Ajax functionality
+   ========================================================================== */
+ArtX.setupHistory = function() {
+    var $myHistoryForm = $("#history-form");
+
+    if ($myHistoryForm.length > 0) {
+        console.log("Initializing Ajax for History");
+
+        var $ajaxInputs = $myHistoryForm.find("input[type=checkbox]");
+        var isCheckboxChecked = false;
+        var checkboxID;
+
+        $ajaxInputs.click(function() {
+            isCheckboxChecked = $(this).prop("checked");
+            checkboxID = $(this).prop("id");
+
+            /* This stub Ajax call sends the checkbox ID and whether it's checked to the /history/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc */
+            
+            $.ajax({
+                type: "POST",
+                url: "/history/",
+                data: {
+                    eventCheckbox: checkboxID,
+                    eventAttended: isCheckboxChecked
+                }
+            });
+        });
+    }
+};
+
 /* Setting up My Interests functionality
    ========================================================================== */
 ArtX.setupMyInterests = function() {
@@ -650,8 +680,8 @@ ArtX.setupMyInterests = function() {
                 type: "POST",
                 url: "/interests/",
                 data: {
-                    settingCheckbox: checkboxID,
-                    settingSelected: isCheckboxChecked
+                    interestCheckbox: checkboxID,
+                    interestSelected: isCheckboxChecked
                 }
             });
         });
@@ -681,6 +711,7 @@ ArtX.startup = {
         ArtX.setupFormValidation();
         ArtX.setupMySettings();
         ArtX.setupMyInterests();
+        ArtX.setupHistory();
         ArtX.loadMore.init();
 
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events

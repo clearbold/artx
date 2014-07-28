@@ -9,11 +9,11 @@ I would emphasize a sampling of different functions here that we can copy and pa
 - [ ] Adding a favorite - Should the star not fill in until there's a success response from the server?
 - [ ] Adding a favorite - Triggering a refresh of the My Favorites bar at the bottom *after* the new favorite has been added
 - [x] Validation on Sign up - Check that email address isn't in use (Display an error based on server response)
-- [x] My Interests - SetInterest - Update based on server response? (Use a static JSON response to trigger checkmark)
-- [x] Settings = SetPreference (Use a static JSON response)
+- [x] My Interests - SetInterest - Update based on server response?
+- [x] Settings = SetPreference
 - [x] Load More on My Favorites
 - [ ] Load More on My Interests, By Date, By Location
-- [ ] History - Set attendance
+- [x] History - Set attendance
 
 #### Other Sign Up Validation
 
