@@ -1,0 +1,14 @@
+[
+    {
+      "id": 1,
+      "name": "Turner & the Sea",
+      "image": "http:\/\/www.pem.org\/writable\/resources\/image\/feature\/turner-venice_nga_1942-9-85.jpg",
+      "start_date": "2014-05-31T12:00:00.000Z",
+      "end_date": "2014-09-01T12:00:00.000Z",
+      "event_type": "exhibition",
+      "location": {
+        "id": 2,
+        "name": "Peabody Essex Museum"
+      }
+    }
+]

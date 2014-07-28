@@ -3,6 +3,11 @@
 * **Format:** JSON
 * **Used on:** Discover, My Favorites, anywhere else Events appear
 
+#### DeleteFavorite/*eventId*
+
+* **Format:** JSON
+* **Used on:** Discover, My Favorites, anywhere else Events appear
+
 #### SetAttendance/*eventId*
 
 * **Format:** JSON

@@ -20683,7 +20683,6 @@ ArtX.setupSkipLinks = function() {
 
 /* Set up slide-in menu panels
    ========================================================================== */
-
 ArtX.setupSlidingPanels = function() {
 
     var $masthead = $(".masthead"),
@@ -20749,7 +20748,6 @@ ArtX.setupToggleSwitches = function() {
 
 /* Set up Peeking slider
    ========================================================================== */
-
 ArtX.setupPeekSlider = function() {
     // Assumption -- there will only ever be one peek-style slider per page/screen
     var $peekSlider = $(".slider-style-peek").find("ul");
@@ -20789,50 +20787,142 @@ ArtX.setupPeekSlider = function() {
 
 /* Set up Favorites slider in footer
    ========================================================================== */
-ArtX.setupFavoriteSlider = function() {
-    var $favoriteSlider = $("#favorite-slider");
-    if ($favoriteSlider.length > 0) {
-        console.log("Initializing favorites slider");
-
-        var favSlideInstance = $favoriteSlider.bxSlider({
+ArtX.favoriteSlider = {
+    vars: {
+        favSlideContainer: $("#favorite-slider"),
+        favSlideInstance: "",
+        favSlideOptions: {
             minSlides:3,
             maxSlides:4,
             slideWidth:300,
             slideMargin:5,
             oneToOneTouch:false,
             pager:false
-        });
+        },
+        itemTemplate : $("#item-template").html()
+    },
+    init: function() {
 
-        $('#favorite-slider-next').click(function(){
-          favSlideInstance.goToNextSlide();
-          return false;
-        });
+        if (ArtX.favoriteSlider.vars.favSlideContainer.length > 0) {
+            console.log("Initializing favorites slider");
 
-        $('#favorite-slider-previous').click(function(){
-          favSlideInstance.goToPrevSlide();
-          return false;
-        });
+            ArtX.favoriteSlider.vars.favSlideInstance = ArtX.favoriteSlider.vars.favSlideContainer.bxSlider(ArtX.favoriteSlider.vars.favSlideOptions);
+
+            $('#favorite-slider-next').click(function(){
+              ArtX.favoriteSlider.vars.favSlideInstance.goToNextSlide();
+              return false;
+            });
+
+            $('#favorite-slider-previous').click(function(){
+              ArtX.favoriteSlider.vars.favSlideInstance.goToPrevSlide();
+              return false;
+            });
+        }
     }
 };
 
 /* Set up Favorite stars
    ========================================================================== */
 
-ArtX.setupFavoriteStars = function() {
-    var $favoriteStars = $(".favorite-star");
-    if ($favoriteStars.length > 0) {
-        console.log("Initializing favorite stars");
+ArtX.favoriteStars = {
+    vars: {
+        favoriteStars: $(".favorite-star")
+    },
+    init: function() {
+        if (ArtX.favoriteStars.vars.favoriteStars.length > 0) {
+            console.log("Initializing favorite stars");
+            
+            var selectedEventID;
 
-        $favoriteStars.click(function() {
-            var $thisStarIcon = $(this).find(".icon");
-            if ($thisStarIcon.hasClass("icon-star")) {
-                $thisStarIcon.removeClass("icon-star").addClass("icon-star2");
-            } else {
-                $thisStarIcon.removeClass("icon-star2").addClass("icon-star");
-            }
-            return false;
-        });
-       
+            ArtX.favoriteStars.vars.favoriteStars.click(function() {
+                
+                // Capture the Event ID from the data-attribute on the clicked link
+                selectedEventID = $(this).data("eventID");
+
+                // Is the click to set a favorite, or unset a favorite?
+                var $thisStarIcon = $(this).find(".icon");
+                var setterJsonUrl;
+                var getterJsonUrl;
+                
+                if ($thisStarIcon.hasClass("icon-star")) {
+                    // The user wishes to make this event a favorite
+
+                    /* We need to query a backend script -- we send it an eventID to tell it which event should be favorited. */
+
+                    /*  DEV NOTE: When this is hooked up to a real JSON feed,
+                        we'll feed it the URL including the eventID like this: 
+
+                        jsonUrl = "/SetEventFavorite/" + selectedEventID;
+
+                        But since this is currently a demo with static files, we're putting in a temporary file for it here: */
+
+                    setterJsonUrl = "/SetEventFavorite/";
+
+                    $.ajax({
+                        type: "POST",
+                        url: setterJsonUrl,
+                        success: function(data) {
+                            // If it exists on the page, reload the favorites slider after the new item has been added
+
+                            if (ArtX.favoriteSlider.vars.favSlideContainer.length > 0) {
+                                console.log("Reloading slider");
+
+                                ArtX.favoriteSlider.vars.favSlideContainer.fadeOut(400, function() {
+                                    
+                                    /*  DEV NOTE: When this is hooked up to a real JSON feed,
+                                        we'll feed it the URL including the eventID like this: 
+
+                                        getterJsonUrl = "/GetEventById/" + selectedEventID;
+
+                                        But since this is a demo with static JSON files, we're putting in a temporary file for it here: */
+
+                                    getterJsonUrl = "/GetEventById/";
+
+                                    $.getJSON(getterJsonUrl, function(data) {
+                                        var jsonArray = data;
+                                        
+                                        // Format results with underscore.js template
+                                        var eventHtml = _.template(ArtX.favoriteSlider.vars.itemTemplate, {jsonArray:jsonArray});
+
+                                        $(eventHtml).prependTo(ArtX.favoriteSlider.vars.favSlideContainer);
+
+                                        ArtX.favoriteSlider.vars.favSlideInstance.reloadSlider(ArtX.favoriteSlider.vars.favSlideOptions);
+
+                                    });
+                                });
+                            }
+
+                            // Swap the star icon
+                            $thisStarIcon.removeClass("icon-star").addClass("icon-star2");
+                        }
+                    });
+
+                } else {
+                    // The user wishes to remove favorite status
+
+                    /*  DEV NOTE: When this is hooked up to a real JSON feed,
+                        we'll feed it the URL including the eventID like this: 
+
+                        jsonUrl = "/DeleteFavorite/" + selectedEventID;
+
+                        But since this is a demo with static JSON files, we're putting in a temporary file for it here: */
+
+                    jsonUrl = "/DeleteFavorite/";
+
+                    $.ajax({
+                        type: "POST",
+                        url: jsonUrl,
+                        success: function() {
+                            // Swap the star
+                            $thisStarIcon.removeClass("icon-star2").addClass("icon-star");
+                        }
+                    }); 
+                }
+
+                return false;
+            });
+           
+        }
     }
 };
 
@@ -21043,7 +21133,7 @@ ArtX.loadMore = {
                     we'll feed it the next page URL from the Load More link's data-feed attribute like this: 
 
                     ArtX.loadMore.vars.nextPageJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
-                    ArtX.loadMore.vars.nextPageJsonURL += ArtX.loadMore.vars.nextPage;
+                    ArtX.loadMore.vars.nextPageJsonURL += "/" + ArtX.loadMore.vars.nextPage + "/" + ArtX.var.itemsPerPage;
 
                     But since this is a demo with static JSON files, we're putting in a temporary switch statement for it here: */
 
@@ -21275,8 +21365,8 @@ ArtX.startup = {
         ArtX.calendar.init();
         ArtX.setupSlidingPanels();
         ArtX.setupPeekSlider();
-        ArtX.setupFavoriteSlider();
-        ArtX.setupFavoriteStars();
+        ArtX.favoriteSlider.init();
+        ArtX.favoriteStars.init();
         ArtX.setupCustomCheckboxes();
         ArtX.setupToggleSwitches();
         ArtX.setupFormValidation();

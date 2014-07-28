@@ -121,7 +121,7 @@
                 <div class="item-info">
                     <h2 class="item-title">
                         Quilts and Color: The Roy Pilgrim Collection
-                        <a href="#" class="favorite-star item-symbol" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
+                        <a href="#" class="favorite-star item-symbol" data-eventID="1" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
                     </h2>
                     <p class="item-venue"><a href="#"><span class="item-symbol"><i class="icon icon-location"></i></span>Museum of Fine Arts</a></p>
                     <p class="item-date"><span class="item-symbol"><i class="icon icon-calendar"></i></span>Through July 27</p>
@@ -161,6 +161,16 @@
     <a href="#" id="favorite-slider-next" class="btn btn-round favorite-slider-next" title="Next"><i class="icon icon-fast-forward"></i><span class="visuallyhidden">Next</span></a>
    
 </div> <!-- /favorite-slider -->
+
+<script type="text/template" id="item-template">
+
+    <% _.each(jsonArray, function(eventObj, key){ %>
+
+    <li><a href="event.html"><img src="<%= eventObj.image %>" alt="<%= eventObj.name %>" /></a></li><!--
+        -->
+        
+    <% }); %>
+</script>
         </footer> <!-- /footer -->
 
     </div> <!-- /wrapper -->
