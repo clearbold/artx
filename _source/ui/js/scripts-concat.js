@@ -21184,11 +21184,42 @@ ArtX.setupMySettings = function() {
             isCheckboxChecked = $(this).prop("checked");
             checkboxID = $(this).prop("id");
 
-            /* This stub Ajax call sends the checkbox ID and whether it's checked to the /settings URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc */
+            /* This stub Ajax call sends the checkbox ID and whether it's checked to the /settings/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc */
             
             $.ajax({
                 type: "POST",
                 url: "/settings/",
+                data: {
+                    settingCheckbox: checkboxID,
+                    settingSelected: isCheckboxChecked
+                }
+            });
+        });
+    }
+};
+
+/* Setting up My Interests functionality
+   ========================================================================== */
+ArtX.setupMyInterests = function() {
+    var $myInterestsForm = $("#interest-form");
+
+    if ($myInterestsForm.length > 0) {
+        console.log("Initializing functionality for My Interests");
+
+        var $ajaxInputs = $myInterestsForm.find("input[type=checkbox]");
+        var isCheckboxChecked = false;
+        var checkboxID;
+
+        $ajaxInputs.click(function() {
+            isCheckboxChecked = $(this).prop("checked");
+            checkboxID = $(this).prop("id");
+
+            /* This stub Ajax call sends the checkbox ID and whether it's checked to the /interests/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc.
+            The "success" call could also be used to display more interests -- see the Load More scripting for examples of how that can be done. */
+            
+            $.ajax({
+                type: "POST",
+                url: "/interests/",
                 data: {
                     settingCheckbox: checkboxID,
                     settingSelected: isCheckboxChecked
@@ -21220,6 +21251,7 @@ ArtX.startup = {
         ArtX.setupToggleSwitches();
         ArtX.setupFormValidation();
         ArtX.setupMySettings();
+        ArtX.setupMyInterests();
         ArtX.loadMore.init();
 
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
