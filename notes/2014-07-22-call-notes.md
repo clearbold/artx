@@ -1,6 +1,6 @@
 * Do we need a visual transition when refreshing the event list for a date?
 * Calendar is off-center on iPhone screen
-* Chrome ~emulator~ / iPhone 5?
+* Chrome ~emulator~ / iPhone 5? -- the Chrome emulator is broken for me, on other sites too (JF)
 * Events first, exhibitions second (backend logic for sort)
 * Look at making History checkbox with a "Yes" label - "Did you attend?"
 * Back button on My Interests from Settings (backend logic)
