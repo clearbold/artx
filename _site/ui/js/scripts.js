@@ -397,7 +397,7 @@ ArtX.calendar = {
     }  
 };
 
-/* Set up form validation for passwords 
+/* Set up form validation for email, passwords, etc.
    ========================================================================== */
 ArtX.setupFormValidation = function() {
     var $formToValidate = $("form.validate");
@@ -409,6 +409,28 @@ ArtX.setupFormValidation = function() {
                 "signup-password": "required",
                 "signup-confirmpassword": {
                     equalTo: "#signup-password"
+                },
+                "signup-email": {
+                    required: true,
+                    email: true,
+                    remote: {
+                        url: "/CheckEmail",
+                        type: "post"
+                    }
+                }
+            },
+            messages: {
+                "signup-email": {
+                    required: "This field is required.",
+                    email: "Please enter a valid email address.",
+                    remote: "This email address is already taken."
+                },
+                "signup-password": {
+                    required: "This field is required."
+                },
+                "signup-confirmpassword": {
+                    required: "This field is required.",
+                    equalTo: "Passwords must match."
                 }
             }
        });
