@@ -1081,6 +1081,7 @@ button {
     -moz-box-sizing: border-box; 
     -webkit-box-sizing: border-box; 
     box-sizing: border-box;
+    content: "";
 }
 .onoffswitch-inner:before {
     color:$gray-darker;
