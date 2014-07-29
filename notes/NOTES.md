@@ -12,7 +12,7 @@ The "Load More" functionality requires 2 things in order to work:
 
 2. An underscore.js template script must be placed after the Load More link.  Here is a complex example, which displays a thumbnail list item as seen on the Favorites page:
 
-    `<script type="text/template" id="item-template">
+    <script type="text/template" id="item-template">
 
         <% _.each(jsonArray, function(eventObj, key){ %>
 
@@ -54,7 +54,7 @@ The "Load More" functionality requires 2 things in order to work:
         </div>
 
         <% }); %>
-    </script>`
+    </script>
 
 
 Notes
