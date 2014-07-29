@@ -21091,11 +21091,11 @@ ArtX.setupFormValidation = function() {
        console.log("Setting up form validation");
        $formToValidate.validate({
             rules: {
-                "signup-password": "required",
-                "signup-confirmpassword": {
+                "password": "required",
+                "confirmpassword": {
                     equalTo: "#signup-password"
                 },
-                "signup-email": {
+                "email": {
                     required: true,
                     email: true,
                     remote: {
@@ -21105,15 +21105,15 @@ ArtX.setupFormValidation = function() {
                 }
             },
             messages: {
-                "signup-email": {
+                "email": {
                     required: "This field is required.",
                     email: "Please enter a valid email address.",
                     remote: "This email address is already taken."
                 },
-                "signup-password": {
+                "password": {
                     required: "This field is required."
                 },
-                "signup-confirmpassword": {
+                "confirmpassword": {
                     required: "This field is required.",
                     equalTo: "Passwords must match."
                 }
@@ -21293,11 +21293,11 @@ ArtX.setupMySettings = function() {
             isCheckboxChecked = $(this).prop("checked");
             checkboxID = $(this).prop("id");
 
-            /* This stub Ajax call sends the checkbox ID and whether it's checked to the /settings/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc */
+            /* This stub Ajax call sends the checkbox ID and whether it's checked to the /SetOption/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc */
             
             $.ajax({
                 type: "POST",
-                url: "/settings/",
+                url: "/SetOption/",
                 data: {
                     settingCheckbox: checkboxID,
                     settingSelected: isCheckboxChecked
@@ -21323,11 +21323,11 @@ ArtX.setupHistory = function() {
             isCheckboxChecked = $(this).prop("checked");
             checkboxID = $(this).prop("id");
 
-            /* This stub Ajax call sends the checkbox ID and whether it's checked to the /history/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc */
+            /* This stub Ajax call sends the checkbox ID and whether it's checked to the /SetAttendance/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc */
             
             $.ajax({
                 type: "POST",
-                url: "/history/",
+                url: "/SetAttendance/",
                 data: {
                     eventCheckbox: checkboxID,
                     eventAttended: isCheckboxChecked
@@ -21353,12 +21353,12 @@ ArtX.setupMyInterests = function() {
             isCheckboxChecked = $(this).prop("checked");
             checkboxID = $(this).prop("id");
 
-            /* This stub Ajax call sends the checkbox ID and whether it's checked to the /interests/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc.
+            /* This stub Ajax call sends the checkbox ID and whether it's checked to the /SetInterest/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc.
             The "success" call could also be used to display more interests -- see the Load More scripting for examples of how that can be done. */
             
             $.ajax({
                 type: "POST",
-                url: "/interests/",
+                url: "/SetInterest/",
                 data: {
                     interestCheckbox: checkboxID,
                     interestSelected: isCheckboxChecked

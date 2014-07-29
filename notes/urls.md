@@ -100,7 +100,21 @@
 * **Format:** JSON
 * Do we need to limit interests and support "load more"
 
+#### /SetInterest/
+
+* **Format:** 
+* interestCheckbox: checkboxID,
+  interestSelected: isCheckboxChecked
+* **Used on:** My Interests (Ajax when checkbox is checked or unchecked)
+
 #### /settings
 
 * **Format:** HTML
 * Supports a POST to update settings based on field values submitted/saved
+
+#### /SetOption/
+
+* **Format:** 
+* settingCheckbox: checkboxID,
+  settingSelected: isCheckboxChecked
+* **Used on:** Settings page (Ajax when on/off toggle is changed)

@@ -141,6 +141,8 @@
             </div>
             <div id="event-list" class="thumb-list">
 
+                <!-- Dev Note - Optimal image size for thumb-list: 400px by 400px square images -->
+
                 <script type="text/template" id="template-eventlist">
                 <% _.each(eventArray, function(eventObj, key){ %>
 
@@ -205,18 +207,18 @@
 
         <form id="signup-form" name="signup-form" method="post" action="" class="validate">
             <p>
-                <label for="signup-email">Email</label>
-                <input type="email" id="signup-email" name="signup-email" required="required" />
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required="required" />
             </p>
 
             <p>
-                <label for="signup-password">Password</label>
-                <input type="password" id="signup-password" name="signup-password" required="required" />
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required="required" />
             </p>
 
             <p>
-                <label for="signup-confirmpassword">Confirm Password</label>
-                <input type="password" id="signup-confirmpassword" name="signup-confirmpassword" required="required" />
+                <label for="confirmpassword">Confirm Password</label>
+                <input type="password" id="confirmpassword" name="confirmpassword" required="required" />
             </p>
 
             <button type="submit">Submit</button>
