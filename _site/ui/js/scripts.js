@@ -205,46 +205,49 @@ ArtX.setupPeekSlider = function() {
     // Assumption -- there will only ever be one peek-style slider per page/screen
     var $peekSlider = $(".slider-style-peek").find("ul");
     if ($peekSlider.length > 0) {
-        console.log("Initializing peeking slider");
+        
+        if ($peekSlider.children().length > 1) { // there's more than one slide to show
+            console.log("Initializing peeking slider");
 
-        var peekSlideInstance = $peekSlider.bxSlider({
-            oneToOneTouch:false,
-            pager:false,
-            auto:false,
-            onSliderLoad: function(currentIndex) {
-                //console.log("currentIndex: " + currentIndex);
-                $peekSlider.find("li").eq(currentIndex).addClass("slide-prev");
-                $peekSlider.find("li").eq(currentIndex+2).addClass("slide-next");
-            },
-            onSlideBefore: function($slideElement, oldIndex, newIndex) {
-                //console.log("oldIndex: " + oldIndex);
-                //console.log("newIndex: " + newIndex);
-                $(".slide-prev").removeClass("slide-prev");
-                $(".slide-next").removeClass("slide-next");
-                $peekSlider.find("li").eq(newIndex).addClass("slide-prev");
-                $peekSlider.find("li").eq(newIndex+2).addClass("slide-next");
-            }
-        });
+            var peekSlideInstance = $peekSlider.bxSlider({
+                oneToOneTouch:false,
+                pager:false,
+                auto:false,
+                onSliderLoad: function(currentIndex) {
+                    //console.log("currentIndex: " + currentIndex);
+                    $peekSlider.find("li").eq(currentIndex).addClass("slide-prev");
+                    $peekSlider.find("li").eq(currentIndex+2).addClass("slide-next");
+                },
+                onSlideBefore: function($slideElement, oldIndex, newIndex) {
+                    //console.log("oldIndex: " + oldIndex);
+                    //console.log("newIndex: " + newIndex);
+                    $(".slide-prev").removeClass("slide-prev");
+                    $(".slide-next").removeClass("slide-next");
+                    $peekSlider.find("li").eq(newIndex).addClass("slide-prev");
+                    $peekSlider.find("li").eq(newIndex+2).addClass("slide-next");
+                }
+            });
 
-        $('#peek-slider-next').click(function(){
-          peekSlideInstance.goToNextSlide();
-          return false;
-        });
+            $('#peek-slider-next').click(function(){
+              peekSlideInstance.goToNextSlide();
+              return false;
+            });
 
-        $('#peek-slider-previous').click(function(){
-          peekSlideInstance.goToPrevSlide();
-          return false;
-        });
+            $('#peek-slider-previous').click(function(){
+              peekSlideInstance.goToPrevSlide();
+              return false;
+            });
+        }
     }
 };
 
-/* Set up Favorites slider in footer
+/* Set up Favorites-style slider in footer
    ========================================================================== */
-ArtX.favoriteSlider = {
+ArtX.footerSlider = {
     vars: {
-        favSlideContainer: $("#favorite-slider"),
-        favSlideInstance: "",
-        favSlideOptions: {
+        footSlideContainer: $("#footer-slider"),
+        footSlideInstance: "",
+        footSlideOptions: {
             minSlides:3,
             maxSlides:4,
             slideWidth:300,
@@ -256,20 +259,27 @@ ArtX.favoriteSlider = {
     },
     init: function() {
 
-        if (ArtX.favoriteSlider.vars.favSlideContainer.length > 0) {
-            console.log("Initializing favorites slider");
+        if (ArtX.footerSlider.vars.footSlideContainer.length > 0) {
 
-            ArtX.favoriteSlider.vars.favSlideInstance = ArtX.favoriteSlider.vars.favSlideContainer.bxSlider(ArtX.favoriteSlider.vars.favSlideOptions);
+            console.log("Initializing footer slider");
 
-            $('#favorite-slider-next').click(function(){
-              ArtX.favoriteSlider.vars.favSlideInstance.goToNextSlide();
-              return false;
-            });
+            var numberOfSlides = ArtX.footerSlider.vars.footSlideContainer.children();
 
-            $('#favorite-slider-previous').click(function(){
-              ArtX.favoriteSlider.vars.favSlideInstance.goToPrevSlide();
-              return false;
-            });
+            ArtX.footerSlider.vars.footSlideInstance = ArtX.footerSlider.vars.footSlideContainer.bxSlider(ArtX.footerSlider.vars.footSlideOptions);
+
+            if (numberOfSlides.children().length > 3) {
+                $('#footer-slider-next').click(function(){
+                  ArtX.footerSlider.vars.footSlideInstance.goToNextSlide();
+                  return false;
+                });
+
+                $('#footer-slider-previous').click(function(){
+                  ArtX.footerSlider.vars.footSlideInstance.goToPrevSlide();
+                  return false;
+                });
+            } else {
+                $(".footer-slider").addClass("not-enough-slides");
+            }
         }
     }
 };
@@ -317,10 +327,10 @@ ArtX.favoriteStars = {
                         success: function(data) {
                             // If it exists on the page, reload the favorites slider after the new item has been added
 
-                            if (ArtX.favoriteSlider.vars.favSlideContainer.length > 0) {
+                            if (ArtX.footerSlider.vars.footSlideContainer.length > 0) {
                                 console.log("Reloading slider");
 
-                                ArtX.favoriteSlider.vars.favSlideContainer.fadeOut(400, function() {
+                                ArtX.footerSlider.vars.footSlideContainer.fadeOut(400, function() {
                                     
                                     /*  DEV NOTE: When this is hooked up to a real JSON feed,
                                         we'll feed it the URL including the eventID like this: 
@@ -335,11 +345,11 @@ ArtX.favoriteStars = {
                                         var jsonArray = data;
                                         
                                         // Format results with underscore.js template
-                                        var eventHtml = _.template(ArtX.favoriteSlider.vars.itemTemplate, {jsonArray:jsonArray});
+                                        var eventHtml = _.template(ArtX.footerSlider.vars.itemTemplate, {jsonArray:jsonArray});
 
-                                        $(eventHtml).prependTo(ArtX.favoriteSlider.vars.favSlideContainer);
+                                        $(eventHtml).prependTo(ArtX.footerSlider.vars.footSlideContainer);
 
-                                        ArtX.favoriteSlider.vars.favSlideInstance.reloadSlider(ArtX.favoriteSlider.vars.favSlideOptions);
+                                        ArtX.footerSlider.vars.footSlideInstance.reloadSlider(ArtX.footerSlider.vars.footSlideOptions);
 
                                     });
                                 });
@@ -813,7 +823,7 @@ ArtX.startup = {
         ArtX.calendar.init();
         ArtX.setupSlidingPanels();
         ArtX.setupPeekSlider();
-        ArtX.favoriteSlider.init();
+        ArtX.footerSlider.init();
         ArtX.favoriteStars.init();
         ArtX.setupCustomCheckboxes();
         ArtX.setupToggleSwitches();
