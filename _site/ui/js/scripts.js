@@ -85,8 +85,32 @@ ArtX.util = {
             }
         }
         return childItemCount;
+    },
+    isThereMore: function(data) {
+        // Check to see if there are more results to show
+        jsonArray = data;
+        console.log(jsonArray);
+        if (jsonArray.length > 0) {
+            // More results to be fetched
+            console.log("There are at least " + jsonArray.length + " results to be fetched");
+            return true;
+        } else {
+            // No more results
+            console.log("No more results");
+            return false;
+        }
     }
 };
+
+/* Setting up a dataService function that can handle different Ajax requests */
+ArtX.dataService = {
+    getJsonFeed: function(jsonUrl, callback) {
+        $.getJSON(jsonUrl, function (data) {
+            callback(data);
+        });
+    }
+};
+
 
 // Variables that can be used throughout
 ArtX.var = {
@@ -562,7 +586,7 @@ ArtX.loadMore = {
                     we'll feed it the next page URL from the Load More link's data-feed attribute like this: 
 
                     ArtX.loadMore.vars.nextPageJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
-                    ArtX.loadMore.vars.nextPageJsonURL += ArtX.loadMore.vars.nextPage;
+                    ArtX.loadMore.vars.nextPageJsonURL += "/" + ArtX.loadMore.vars.nextPage + "/" + ArtX.var.itemsPerPage;
 
                     But since this is a demo with static JSON files, we're putting in a temporary switch statement for it here: */
 
@@ -620,17 +644,15 @@ ArtX.loadMore = {
                     }
 
                     // Check to see if there are more results to show
-                    $.getJSON(ArtX.loadMore.vars.nextPageJsonURL, function(nextdata) {
-                        var nextjsonArray = nextdata;
-                        console.log("Array length of " + ArtX.loadMore.vars.nextPageJsonURL + ": " + nextjsonArray.length);
-                        if (nextjsonArray.length !== 0) {
-                            // More results; we need to show the "Load More" link again
-                            ArtX.loadMore.vars.loadMoreLink.fadeIn();
-                        } else {
-                            // No more results; we need to hide the "Load More" link
-                            console.log("Checking...There are no more results to show");
+                    ArtX.dataService.getJsonFeed(ArtX.loadMore.vars.nextPageJsonURL, function(data) {
+                            var isMoreResults = ArtX.util.isThereMore(data);
+                            if (isMoreResults) {
+                                // More results; we need to show the "Load More" link again
+                                ArtX.loadMore.vars.loadMoreLink.fadeIn();
+                            }
                         }
-                    });
+                    );
+
                 });
             });
     },
@@ -671,17 +693,14 @@ ArtX.loadMore = {
                 }
 
                 // Check to see if there are more results to show, and set up the Load More link if so
-                $.getJSON(ArtX.loadMore.vars.nextPageJsonURL, function(data) {
-                    jsonArray = data;
-                    if (jsonArray.length > 0) {
-                        // There are more, so we need to show the "Load More" link
-                        console.log("Checking...There are at least " + jsonArray.length + " more results to show");
-
-                        ArtX.loadMore.setupLoadMoreLink();
-                    } else {
-                        console.log("Checking...There are no more results to show");
+                ArtX.dataService.getJsonFeed(ArtX.loadMore.vars.nextPageJsonURL, function(data) {
+                        var isMoreResults = ArtX.util.isThereMore(data);
+                        if (isMoreResults) {
+                            // More results; we need to show the "Load More" link again
+                            ArtX.loadMore.setupLoadMoreLink();
+                        }
                     }
-                });
+                );
             }
         } 
     }
