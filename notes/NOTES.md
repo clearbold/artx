@@ -1,6 +1,23 @@
 ArtX Notes and Questions
 ========================
 
+Application Cache
+-----------------
+Since this web application may be saved to a device's home screen for use as an app, we must use application caching in order to control when the site is updated.  Without the application cache, occasionally Mobile Safari will cache a web app's data, and then refuse to ever update it, even when the page is changed!
+
+In order for the application cache to be processed properly, the server must be configured with the correct MIME type.  In our case, an `.htaccess` file is included in the `_source` directory, with the following directive:
+
+```
+AddType text/cache-manifest .appcache
+```
+
+The application cache itself is located in the `_source` directory, in the file named `cache.appcache`.
+
+When a new file is added to the site, it must be added to the application cache's list of files under the "CACHE:" heading.
+
+Whenever any files on the site are changed, the `# Version: ` line must be changed in order to trigger a cache refresh in the browser.  This is easily done by iterating the version number.
+
+
 Load More
 ---------
 The "Load More" functionality requires 2 things in order to work:
@@ -10,7 +27,7 @@ The "Load More" functionality requires 2 things in order to work:
 
  The `data-feed` attribute should point to the appropriate JSON URL for the items to be fetched.
 
-2. An underscore.js template script must be placed after the Load More link.  Here is a complex example, which displays a thumbnail list item as seen on the Favorites page:
+2. An underscore.js template script must be placed after the Load More link, to define how the returned JSON data will be displayed.  Here is a complex example, which displays a thumbnail list item as seen on the Favorites page:
 
 ```
 <script type="text/template" id="item-template">
