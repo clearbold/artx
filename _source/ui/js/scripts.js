@@ -472,14 +472,53 @@ ArtX.calendar = {
                 },
                 clickEvents: {
                     click: function(target) {
-                        // clear any existing selection states
-                        $(".day").removeClass("day-selected");
-                        $(target.element).addClass("day-selected");
-                        ArtX.calendar.displayEventList(target);
+                        // if we click on a day
+                        if ($(target.element).hasClass("day")) {
+                            // clear any existing selection states
+                            $(".day").removeClass("day-selected");
+                            // select the new day
+                            $(target.element).addClass("day-selected");
+                            // and display events for that day
+                            ArtX.calendar.displayEventList(target);
+                        }
+                    },
+                    onMonthChange: function(month) {
+                        var chosenMonth = month.format("MM");
+                        var chosenYear = month.format("YYYY");
+                        
+                        // DEV NOTE: When the GetEventsByMonth URL is in place, comment out the temporary URL
+                        // and uncomment the following line:
+
+                        //var jsonURL = "/GetEventsByMonth/" + chosenYear + "/" + chosenMonth;
+                        //console.log("New month JSON URL: " + jsonURL);
+                        
+                        jsonURL = "/ui/js/json/events-august.json"; // temporary URL for testing
+                        
+                        var newEventArray = [];
+                        $.getJSON(jsonURL, function(data) {
+                            newEventArray = data;
+                            ArtX.el.eventCalendar.setEvents(newEventArray);
+                        });
+                        
                     }
                 },
                 doneRendering: function(){ 
-                    $(".day.today").trigger("click");
+                    var thisMonth = moment().format("MMMM");
+                    var displayedMonth = $(".clndr-controls").find(".month").html();
+                    if (thisMonth == displayedMonth) {
+                        // It's this month
+                        // Show the events for today
+                        $(".day.today").trigger("click");
+                    } else {
+                        // It's a month in the past or future
+                        // Show the events for the first day of the month
+                        if ($(".last-month").last().next().length > 0) {
+                            $(".last-month").last().next().trigger("click");
+                        } else {
+                            $(".day").first().trigger("click");
+                        }
+                        
+                    }
                 }
             });
         });
@@ -498,25 +537,28 @@ ArtX.calendar = {
         if (ArtX.el.calendarContainer.length > 0) {
             console.log("Setting up event calendar");
 
-            // This is for demo purposes only, this should be much more robust
             var eventArray = [],
                 thisMonth,
                 thisMonthURL,
-                juneEventURL = "/ui/js/json/events-june.json",
                 julyEventURL = "/ui/js/json/events-july.json",
                 augEventURL = "/ui/js/json/events-august.json";
 
             thisMonth = moment().month(); // integer from 0 to 11
+            thisYear = moment().year(); // 4-digit year, ex. 2014
             
-            if (thisMonth == 5) { // June
-                thisMonthURL = juneEventURL;
-            } else if (thisMonth == 6) { // July
+            // DEV NOTE: When the GetEventsByMonth URL is in place, comment out the temporary URL
+            // if statement and uncomment the following line:
+            
+            //thisMonthURL = "/GetEventsByMonth/" + thisYear + "/" + thisMonth;
+
+            // Temporary static month URLs, until GetEventsByMonth is in place
+            if (thisMonth == 6) { // July
                 thisMonthURL = julyEventURL;
-            } else if (thisMonth == 7) { // August
+            } else { // August and onward
                 thisMonthURL = augEventURL;
             }
 
-            ArtX.calendar.getEvents("/ui/js/json/events-july.json");
+            ArtX.calendar.getEvents(thisMonthURL);
         }
     }  
 };
