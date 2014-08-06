@@ -1,10 +1,10 @@
 CACHE MANIFEST
- 
-# Version .178
- 
+
+# Version .179
+
 NETWORK:
 *
- 
+
 CACHE:
 bydate.html
 bylocation.html
