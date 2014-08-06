@@ -1,20 +1,20 @@
 /**
  * App Cache Handling
  * Here is the simplified version. Courtesy of Mike Koss.
- * 
+ *
  * See, http://labnote.beedesk.com/the-pitfalls-of-html5-applicationcache
  */
 function handleAppCache() {
     if (applicationCache === undefined) {
         return;
     }
-  
+
     if (applicationCache.status == applicationCache.UPDATEREADY) {
         applicationCache.swapCache();
         location.reload();
         return;
     }
-  
+
     applicationCache.addEventListener('updateready', handleAppCache, false);
 }
 
@@ -172,7 +172,7 @@ ArtX.setupSlidingPanels = function() {
                 });
         }
     }
-   
+
 };
 
 /* Set up Back button
@@ -205,7 +205,7 @@ ArtX.setupPeekSlider = function() {
     // Assumption -- there will only ever be one peek-style slider per page/screen
     var $peekSlider = $(".slider-style-peek").find("ul");
     if ($peekSlider.length > 0) {
-        
+
         if ($peekSlider.children().length > 1) { // there's more than one slide to show
             console.log("Initializing peeking slider");
 
@@ -294,11 +294,11 @@ ArtX.favoriteStars = {
     init: function() {
         if (ArtX.favoriteStars.vars.favoriteStars.length > 0) {
             console.log("Initializing favorite stars");
-            
+
             var selectedEventID;
 
             ArtX.favoriteStars.vars.favoriteStars.click(function() {
-                
+
                 // Capture the Event ID from the data-attribute on the clicked link
                 selectedEventID = $(this).data("eventID");
 
@@ -306,14 +306,14 @@ ArtX.favoriteStars = {
                 var $thisStarIcon = $(this).find(".icon");
                 var setterJsonUrl;
                 var getterJsonUrl;
-                
+
                 if ($thisStarIcon.hasClass("icon-star")) {
                     // The user wishes to make this event a favorite
 
                     /* We need to query a backend script -- we send it an eventID to tell it which event should be favorited. */
 
                     /*  DEV NOTE: When this is hooked up to a real JSON feed,
-                        we'll feed it the URL including the eventID like this: 
+                        we'll feed it the URL including the eventID like this:
 
                         jsonUrl = "/SetEventFavorite/" + selectedEventID;
 
@@ -331,9 +331,9 @@ ArtX.favoriteStars = {
                                 console.log("Reloading slider");
 
                                 ArtX.footerSlider.vars.footSlideContainer.fadeOut(400, function() {
-                                    
+
                                     /*  DEV NOTE: When this is hooked up to a real JSON feed,
-                                        we'll feed it the URL including the eventID like this: 
+                                        we'll feed it the URL including the eventID like this:
 
                                         getterJsonUrl = "/GetEventById/" + selectedEventID;
 
@@ -343,7 +343,7 @@ ArtX.favoriteStars = {
 
                                     $.getJSON(getterJsonUrl, function(data) {
                                         var jsonArray = data;
-                                        
+
                                         // Format results with underscore.js template
                                         var eventHtml = _.template(ArtX.footerSlider.vars.itemTemplate, {jsonArray:jsonArray});
 
@@ -364,7 +364,7 @@ ArtX.favoriteStars = {
                     // The user wishes to remove favorite status
 
                     /*  DEV NOTE: When this is hooked up to a real JSON feed,
-                        we'll feed it the URL including the eventID like this: 
+                        we'll feed it the URL including the eventID like this:
 
                         jsonUrl = "/DeleteFavorite/" + selectedEventID;
 
@@ -379,17 +379,17 @@ ArtX.favoriteStars = {
                             // Swap the star
                             $thisStarIcon.removeClass("icon-star2").addClass("icon-star");
                         }
-                    }); 
+                    });
                 }
 
                 return false;
             });
-           
+
         }
     }
 };
 
-/* Set up Text Truncation 
+/* Set up Text Truncation
    ========================================================================== */
 ArtX.setupTextTruncation = function() {
     console.log("Initializing text truncation");
@@ -405,10 +405,10 @@ ArtX.setupTextTruncation = function() {
             lines: 2,
             tooltip: false
         });
-    });  
+    });
 };
 
-/* Set up Signup Modal 
+/* Set up Signup Modal
    ========================================================================== */
 ArtX.setupSignupModal = function() {
     console.log("Setting up Signup Modal window");
@@ -442,7 +442,7 @@ ArtX.setupSignupModal = function() {
 
 };
 
-/* Set up custom checkboxes 
+/* Set up custom checkboxes
    ========================================================================== */
 ArtX.setupCustomCheckboxes = function() {
     var $checkboxes = $(".customize-checkbox");
@@ -454,7 +454,7 @@ ArtX.setupCustomCheckboxes = function() {
     }
 };
 
-/* Set up By Date Event Calendar 
+/* Set up By Date Event Calendar
    ========================================================================== */
 ArtX.calendar = {
     getEvents: function(jsonURL) {
@@ -485,24 +485,24 @@ ArtX.calendar = {
                     onMonthChange: function(month) {
                         var chosenMonth = month.format("MM");
                         var chosenYear = month.format("YYYY");
-                        
+
                         // DEV NOTE: When the GetEventsByMonth URL is in place, comment out the temporary URL
                         // and uncomment the following line:
 
                         //var jsonURL = "/GetEventsByMonth/" + chosenYear + "/" + chosenMonth;
                         //console.log("New month JSON URL: " + jsonURL);
-                        
+
                         jsonURL = "/ui/js/json/events-august.json"; // temporary URL for testing
-                        
+
                         var newEventArray = [];
                         $.getJSON(jsonURL, function(data) {
                             newEventArray = data;
                             ArtX.el.eventCalendar.setEvents(newEventArray);
                         });
-                        
+
                     }
                 },
-                doneRendering: function(){ 
+                doneRendering: function(){
                     var thisMonth = moment().format("MMMM");
                     var displayedMonth = $(".clndr-controls").find(".month").html();
                     if (thisMonth == displayedMonth) {
@@ -517,7 +517,7 @@ ArtX.calendar = {
                         } else {
                             $(".day").first().trigger("click");
                         }
-                        
+
                     }
                 }
             });
@@ -530,7 +530,7 @@ ArtX.calendar = {
             ArtX.el.eventListTarget.fadeIn(400, function() {
                 // Re-do truncation once fade is complete
                 ArtX.setupTextTruncation();
-            }); 
+            });
         });
     },
     init: function() {
@@ -545,10 +545,10 @@ ArtX.calendar = {
 
             thisMonth = moment().month(); // integer from 0 to 11
             thisYear = moment().year(); // 4-digit year, ex. 2014
-            
+
             // DEV NOTE: When the GetEventsByMonth URL is in place, comment out the temporary URL
             // if statement and uncomment the following line:
-            
+
             //thisMonthURL = "/GetEventsByMonth/" + thisYear + "/" + thisMonth;
 
             // Temporary static month URLs, until GetEventsByMonth is in place
@@ -560,7 +560,7 @@ ArtX.calendar = {
 
             ArtX.calendar.getEvents(thisMonthURL);
         }
-    }  
+    }
 };
 
 /* Set up form validation for email, passwords, etc.
@@ -604,7 +604,7 @@ ArtX.setupFormValidation = function() {
 };
 
 
-/* Set up Load More functionality 
+/* Set up Load More functionality
    ========================================================================== */
 ArtX.loadMore = {
     vars: {
@@ -635,7 +635,7 @@ ArtX.loadMore = {
                 // Figure out which page to fetch
 
                 /*  DEV NOTE: When this is hooked up to a real JSON feed,
-                    we'll feed it the next page URL from the Load More link's data-feed attribute like this: 
+                    we'll feed it the next page URL from the Load More link's data-feed attribute like this:
 
                     ArtX.loadMore.vars.nextPageJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
                     ArtX.loadMore.vars.nextPageJsonURL += "/" + ArtX.loadMore.vars.nextPage + "/" + ArtX.var.itemsPerPage;
@@ -643,7 +643,7 @@ ArtX.loadMore = {
                     But since this is a demo with static JSON files, we're putting in a temporary switch statement for it here: */
 
                 var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
-                
+
                 switch(temporaryJsonURL) {
                     case "/LoadFavorites/" :
                         ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + ArtX.loadMore.vars.nextPage + ".json";
@@ -654,12 +654,12 @@ ArtX.loadMore = {
 
                 $.getJSON(ArtX.loadMore.vars.nextPageJsonURL, function(data) {
                     jsonArray = data;
-                    
+
                     // Format results with underscore.js template
                     // Assign those results to a variable and chain .hide()
                     $newResults = $(_.template(ArtX.loadMore.vars.itemTemplate, {jsonArray:jsonArray})).hide();
 
-                    // Append newResults to the list 
+                    // Append newResults to the list
                     $newResults.appendTo(ArtX.loadMore.vars.itemContainer);
 
                     // Fade in the new results
@@ -674,11 +674,11 @@ ArtX.loadMore = {
 
                     // Check to see if we still need to show the Load More link
                     // Hide if not needed anymore
-                    
+
                     var currentItemsCount = ArtX.util.getNumberOfChildItems(ArtX.loadMore.vars.itemContainer);
 
                     /*  DEV NOTE: When this is hooked up to a real JSON feed,
-                        we'll feed it the next page URL from the Load More link's data-feed attribute like this: 
+                        we'll feed it the next page URL from the Load More link's data-feed attribute like this:
 
                         ArtX.loadMore.vars.nextPageJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
                         ArtX.loadMore.vars.nextPageJsonURL += ArtX.loadMore.vars.nextPage;
@@ -686,7 +686,7 @@ ArtX.loadMore = {
                         But since this is a demo with static JSON files, we're putting in a temporary switch statement for it here: */
 
                     var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
-                    
+
                     switch(temporaryJsonURL) {
                         case "/LoadFavorites/" :
                             ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + ArtX.loadMore.vars.nextPage + ".json";
@@ -713,7 +713,7 @@ ArtX.loadMore = {
             console.log("Initializing Load More functionality");
 
             // We need to check to see how many items are currently being shown.
-            // If the number of items equals our number-per-page variable, 
+            // If the number of items equals our number-per-page variable,
             // check to see if there are more results to show.
 
             // First, let's get the item container and assign it to a variable
@@ -722,12 +722,12 @@ ArtX.loadMore = {
 
             var currentItemsCount = ArtX.util.getNumberOfChildItems(ArtX.loadMore.vars.itemContainer);
 
-            if (currentItemsCount == ArtX.var.itemsPerPage) { 
+            if (currentItemsCount == ArtX.var.itemsPerPage) {
                 // There's the same amount as our items per page,
                 // so there might be more to pull down
 
                 /*  DEV NOTE: When this is hooked up to a real JSON feed,
-                    we'll feed it the page 2 URL from the Load More link's data-feed attribute like this: 
+                    we'll feed it the page 2 URL from the Load More link's data-feed attribute like this:
 
                     ArtX.loadMore.vars.nextPageJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
                     ArtX.loadMore.vars.nextPageJsonURL += "2";
@@ -735,7 +735,7 @@ ArtX.loadMore = {
                     But since this is a demo with static JSON files, we're putting in a temporary switch statement for it here: */
 
                 var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
-                
+
                 switch(temporaryJsonURL) {
                     case "/LoadFavorites/" :
                         ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page2.json";
@@ -754,7 +754,7 @@ ArtX.loadMore = {
                     }
                 );
             }
-        } 
+        }
     }
 };
 
@@ -775,7 +775,7 @@ ArtX.setupMySettings = function() {
             checkboxID = $(this).prop("id");
 
             /* This stub Ajax call sends the checkbox ID and whether it's checked to the /SetOption/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc */
-            
+
             $.ajax({
                 type: "POST",
                 url: "/SetOption/",
@@ -805,7 +805,7 @@ ArtX.setupHistory = function() {
             checkboxID = $(this).prop("id");
 
             /* This stub Ajax call sends the checkbox ID and whether it's checked to the /SetAttendance/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc */
-            
+
             $.ajax({
                 type: "POST",
                 url: "/SetAttendance/",
@@ -836,7 +836,7 @@ ArtX.setupMyInterests = function() {
 
             /* This stub Ajax call sends the checkbox ID and whether it's checked to the /SetInterest/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc.
             The "success" call could also be used to display more interests -- see the Load More scripting for examples of how that can be done. */
-            
+
             $.ajax({
                 type: "POST",
                 url: "/SetInterest/",
@@ -852,25 +852,25 @@ ArtX.setupMyInterests = function() {
 ArtX.map = {
 
     init : function() {
-    
+
         console.log( "initializing Map" );
-        
+
         // Set up map
         L.mapbox.accessToken = 'atosca.j55ofa87';
         var map = L.mapbox.map( 'event-map', 'examples.map-i86nkdio' )
         .setView([42.3581, 71.0636], 9);
-        
+
         locationUrl = 'artx.herokuapp.com/locations.json';
         eventUrl = 'artx.herokuapp.com/events.json';
-        
+
         //Fetch all locations
-        var $locations = $.getJSON( locationUrl, function(){ 
-        
+        var $locations = $.getJSON( locationUrl, function(){
+
             // Create a feature layer with marker for each entry
-            $.each( data, function(){ 
-                
-                newLayer = L.mapbox.featureLayer.addTo( map ); 
-                
+            $.each( data, function(){
+
+                newLayer = L.mapbox.featureLayer.addTo( map );
+
                 var geoJson = {
                     type: 'Feature',
                     geometry: {
@@ -881,12 +881,12 @@ ArtX.map = {
                             ]
                     },
                     properties: {
-                    
+
                         // TODO: customize properties when content is determined
                         name: data.name,
                         url: data.url,
                         description: data.description,
-                        
+
                         // Markers from docs example.  TODO: customize appearance
                         'marker-size': 'large',
                         'marker-color': '#BE9A6B',
@@ -898,17 +898,17 @@ ArtX.map = {
 
                 // Fetch location on click
                 newLayer.on( "click", function( e ){
-                
-                    $.getJSON( eventJSON, function(){ 
-                    
+
+                    $.getJSON( eventJSON, function(){
+
                         //TODO: add event to DOM
-                    
+
                     });
                 });
             });
-        
+
         });
-    
+
     }
 };
 
@@ -936,14 +936,14 @@ ArtX.startup = {
         ArtX.setupMySettings();
         ArtX.setupMyInterests();
         ArtX.setupHistory();
-        ArtX.map.init();
         ArtX.loadMore.init();
+        ArtX.map.init();
 
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
     },
     finalize : function() {
-        
+
     }
 };
 
@@ -953,7 +953,7 @@ $(document).ready(function() {
     handleAppCache();
 
     Modernizr.load([
-        
+
         // Test need for matchMedia polyfill
         {
             test: window.matchMedia,
@@ -961,7 +961,7 @@ $(document).ready(function() {
             load: ['/ui/js/standalone/enquire.min.js','/ui/js/standalone/picturefill.min.js'],
             complete: function() {
 
-                /* Fire based on document context 
+                /* Fire based on document context
                 ========================================================================== */
 
                 var namespace  = ArtX.startup, context = document.body.id;
@@ -975,7 +975,7 @@ $(document).ready(function() {
                     namespace.finalize();
                 }
 
-                
+
             }
         }
     ]);
