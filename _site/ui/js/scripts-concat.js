@@ -21420,6 +21420,69 @@ ArtX.setupMyInterests = function() {
     }
 };
 
+ArtX.map = {
+
+    init : function() {
+    
+        console.log( "initializing Map" );
+        
+        // Set up map
+        L.mapbox.accessToken = 'atosca.j55ofa87';
+        var map = L.mapbox.map( 'event-map', 'examples.map-i86nkdio' )
+        .setView([42.3581, 71.0636], 9);
+        
+        locationUrl = 'artx.herokuapp.com/locations.json';
+        eventUrl = 'artx.herokuapp.com/events.json';
+        
+        //Fetch all locations
+        var $locations = $.getJSON( locationUrl, function(){ 
+        
+            // Create a feature layer with marker for each entry
+            $.each( data, function(){ 
+                
+                newLayer = L.mapbox.featureLayer.addTo( map ); 
+                
+                var geoJson = {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                            coordinates: [
+                                data.latitude,
+                                data.longitude
+                            ]
+                    },
+                    properties: {
+                    
+                        // TODO: customize properties when content is determined
+                        name: data.name,
+                        url: data.url,
+                        description: data.description,
+                        
+                        // Markers from docs example.  TODO: customize appearance
+                        'marker-size': 'large',
+                        'marker-color': '#BE9A6B',
+                        'marker-symbol': 'cafe'
+                    }
+                };
+
+                newLayer.setGeoJSON( geoJson );
+
+                // Fetch location on click
+                newLayer.on( "click", function( e ){
+                
+                    $.getJSON( eventJSON, function(){ 
+                    
+                        //TODO: add event to DOM
+                    
+                    });
+                });
+            });
+        
+        });
+    
+    }
+};
+
 /* Initialize/Fire
    ========================================================================== */
 ArtX.startup = {
@@ -21444,6 +21507,7 @@ ArtX.startup = {
         ArtX.setupMySettings();
         ArtX.setupMyInterests();
         ArtX.setupHistory();
+        ArtX.map.init();
         ArtX.loadMore.init();
 
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
