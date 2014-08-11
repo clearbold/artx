@@ -563,6 +563,30 @@ ArtX.calendar = {
     }
 };
 
+ArtX.setupFavoritesPage = {
+  vars: {
+    mainTemplate: $('#favorites-list-template'),
+    favoriteItemTemplate: $('#item-template'),
+    panelMenuItem: $('#menu-panel #favorites'),
+    favoritesEndPoint: '/ui/js/json/loadFavorites-subset.json'
+  },
+  init: function () {
+    ArtX.setupFavoritesPage.vars.panelMenuItem.click(function(e){
+      e.preventDefault();
+
+      $.getJSON(ArtX.setupFavoritesPage.vars.favoritesEndPoint, function(data) {
+        var itemContent = _.template(
+          ArtX.setupFavoritesPage.vars.favoriteItemTemplate.html(),{ jsonArray: data }
+        );
+        var favoritesHtml = _.template(ArtX.setupFavoritesPage.vars.mainTemplate.html(), {content: itemContent});
+       /*  $(favoritesHtml).find('#load-more').removeClass('btn-hidden'); */
+
+        $('.content[role="main"]').html(favoritesHtml);
+      });
+    });
+  }
+};
+
 /* Set up form validation for email, passwords, etc.
    ========================================================================== */
 ArtX.setupFormValidation = function() {
@@ -940,6 +964,7 @@ ArtX.startup = {
         ArtX.setupSlidingPanels();
         ArtX.setupPeekSlider();
         ArtX.footerSlider.init();
+        ArtX.setupFavoritesPage.init();
         ArtX.favoriteStars.init();
         ArtX.setupCustomCheckboxes();
         ArtX.setupToggleSwitches();

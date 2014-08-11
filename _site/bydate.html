@@ -98,7 +98,54 @@
     <script src='https://api.tiles.mapbox.com/mapbox.js/v2.0.0/mapbox.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox.js/v2.0.0/mapbox.css' rel='stylesheet' />
 
+<script type="text/template" id="item-template">
+  <% _.each(jsonArray, function(eventObj, key){ %>
+    <% var eventStartDate = moment(eventObj.start_date).format("ddd, MMM Do YYYY"); // "Sun, Feb 14th 2010" %>
+    <% var eventStartTime = moment(eventObj.start_date).format("h:mm a"); // "10:15 am" %>
+    <% var eventEndDate = moment(eventObj.end_date).format("MMM Do, YYYY"); // "Feb 14th, 2010" %>
+    <% var eventEndTime = moment(eventObj.end_date).format("h:mm a"); // "10:15 am" %>
+    <% var compareStartDate = moment(eventObj.start_date).format("M/D/YYYY"); // "2/14/2010" %>
+    <% var compareEndDate = moment(eventObj.end_date).format("M/D/YYYY"); // "2/14/2010" %>
+    <div class="item-block cf">
+        <div class="item-image">
+            <a href="exhibition.html">
+                <img src="<%= eventObj.image %>" alt="" />
+            </a>
+        </div>
+        <div class="item-info">
+            <h2 class="item-title">
+                <% if (eventObj.event_type == "exhibition") { %>
+                <a href="exhibition.html" class="truncate"><%= eventObj.name %></a>
+                <% } else { %>
+                <a href="event.html" class="truncate"><%= eventObj.name %></a>
+                <% } %>
+            </h2>
+            <p class="item-venue"><%= eventObj.location.name %></p>
+            <p class="item-date">
+            <% if (compareStartDate != compareEndDate) { %>
+                Through <%= eventEndDate %>
+            <% } else { %>
+                <%= eventStartDate %><br />
+                <%= eventStartTime %> - <%= eventEndTime %>
+            <% } %>
+            </p>
+            <a href="#" class="favorite-star item-symbol" data-eventID="1" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
+        </div>
+    </div>
+  <% }); %>
+</script>
+
+<script type="text/template" id="favorites-list-template">
+  <p>Introductory text lorem ipsum dolor sit amet, consectetur adipisicing elit. Molestias, quisquam obcaecati eum maxime voluptatem quos praesentium esse saepe sunt officiis.</p>
+    <div class="thumb-list">
+    <%= content %>
+    </div>
+  <a href="#" id="load-more" class="btn btn-block btn-hidden" data-feed="/LoadFavorites/">Load more</a>
+</script>
+
+
 </head>
+
 <body id="page--bydate" class="page--bydate">
 
     <!-- Skip navigation link for screen reader and keyboard users -->
@@ -197,13 +244,14 @@
     <li><a href="home.html">Discover ArtsConnect</a></li>
     <li class="active"><a href="bydate.html">By Date</a></li>
     <li><a href="#">By Location</a></li>
-    <li><a href="favorites.html">Favorites</a></li>
+    <li><a id="favorites" href="favorites.html">Favorites</a></li>
     <li><a href="history.html">History</a></li>
     <li><a href="settings.html">Settings</a></li>
     <li><a href="interests.html">My Interests</a></li>
     <li><a href="sign-in.html">Log out</a></li>
   </ul>
 </div>
+
 
     <div id="signup-popup" class="modal reveal-modal">
     <div id="signup-popup-target" class="modal-content">
