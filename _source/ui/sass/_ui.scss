@@ -40,7 +40,7 @@ body {
         top:0;
         left:-400%;
         z-index:2;
-        
+
         /* Visual styling. Change this as desired */
         color:$white;
         background:#000;
@@ -65,7 +65,7 @@ body {
 */
 
 /* Picturefill overrides (we assume images to be block elements by default) */
-span[data-picture], 
+span[data-picture],
 span[data-picture] span,
 img {
     display:block;
@@ -80,8 +80,8 @@ a {
     //display:inline-block;
     text-decoration:none;
     color:$link-color;
-    @include transition(color .1s linear, background-color .1s linear);    
-    
+    @include transition(color .1s linear, background-color .1s linear);
+
     &:focus {
         outline:none;
     }
@@ -103,7 +103,7 @@ a {
     padding:.5em;
     line-height:1;
     border:none;
-    
+
     &.btn-block {
         display:block;
         text-align:center;
@@ -112,13 +112,13 @@ a {
     &.btn-hidden {
         display:none;
     }
-    
+
     &.btn-round {
         border-radius:50%;
         @include transition(box-shadow .2s linear);
         background-color:rgba(0,0,0,.01);
         z-index:1;
-        
+
         &:after {
             -webkit-transition: -webkit-transform 0.2s, opacity 0.2s;
             -moz-transition: -moz-transform 0.2s, opacity 0.2s;
@@ -172,7 +172,7 @@ h1, h2, h3, h4, h5, h6,
 p,
 ul,
 ol {
-   margin:0 0 ($spacing-unit*1.5); 
+   margin:0 0 ($spacing-unit*1.5);
 }
 
 h1, h2, h3, h4, h5, h6,
@@ -217,7 +217,7 @@ ul.listview {
     margin-left:-($spacing-unit);
     margin-right:-($spacing-unit);
     background-color:lighten($page-bg, 5);
-    
+
     li {
         border-bottom:1px solid $gray-dark;
     }
@@ -230,7 +230,7 @@ ul.listview {
         line-height:1;
         color:$white;
         border:none;
-        
+
         &:after {
             content:"\e055";
             font-family: 'artx';
@@ -264,7 +264,7 @@ ul {
 
 dl {
     overflow:hidden;
-    
+
     dt {
         float:left;
     }
@@ -290,7 +290,7 @@ label {
     display:block;
     @include font-size(14px, false);
     margin-bottom:.25em;
-    
+
     &.error {
         margin-top:.5em;
     }
@@ -309,7 +309,7 @@ input[type=password] {
     display:block;
     width:100%;
     max-width:240px;
-    
+
     &.error {
         outline:2px solid red;
     }
@@ -321,7 +321,7 @@ button {
     @include font-size(16px, false);
     font-weight:400;
     text-align:center;
-    margin:0 0 $spacing-unit; 
+    margin:0 0 $spacing-unit;
     padding-top:   0 !important;
     padding-bottom:0 !important;
     overflow:hidden !important;
@@ -330,26 +330,26 @@ button {
     padding-right:1em;
     padding-left: 1em;
     line-height:2;
-    
+
     @include transition(color .1s linear, background-color .1s linear);
 
     background-color:$main-color-dark;
     color:$white;
-    
+
     &:hover {
         background-color:darken($main-color-dark, 10);
         color:$white;
     }
 }
 .modal form > *:last-child {
-    margin-bottom:0;   
+    margin-bottom:0;
 }
 
 // Custom checkboxes
 .js {
     .custom-checkbox {
         position:relative;
-        
+
         input {
             position: absolute;
             right: $spacing-unit+2;
@@ -371,7 +371,7 @@ button {
             background-image:url("/ui/img/sprite-checkboxes.png");
             background-repeat:no-repeat;
             background-position: 95% 10px;
-            
+
             &.hover,
             &.focus {
                 background-position: 95% -90px;
@@ -429,11 +429,11 @@ button {
     background:$masthead-bg;
     text-align:center;
     padding:11px $spacing-unit;
-    
+
     h1, .h1 {
         margin:0;
         @include font-size(17px);
-        
+
         a {
             display:inline-block;
             color:$white;
@@ -469,7 +469,7 @@ button {
         line-height:33px;
         text-align:left;
         margin-bottom:0;
-        
+
         a {
             display:block;
             padding:7px $spacing-unit;
@@ -485,7 +485,7 @@ button {
     h2.related {
         float:left;
         padding:7px $spacing-unit;
-        
+
         a {
             display:inline;
             padding:0;
@@ -591,7 +591,7 @@ button {
 }
 .favorite-star {
     background-color:rgba(0,0,0,.01);
-    
+
     .no-touchcapable & {
         &:focus,
         &:hover {
@@ -605,7 +605,7 @@ button {
         @include transition(box-shadow .2s linear);
         background-color:transparent;
         z-index:1;
-        
+
         &:after {
             -webkit-transition: -webkit-transform 0.2s, opacity 0.2s;
             -moz-transition: -moz-transform 0.2s, opacity 0.2s;
@@ -629,9 +629,10 @@ button {
 //Temp modification from Angela to make the map display
 div#event-map {
     display: block;
-    float: left;
+    //float: left;
     height: 300px;
-    width: 300px;
+    margin-bottom: 10px;
+    width: 100%;
 }
 
 .item-image {
@@ -639,12 +640,12 @@ div#event-map {
     border-bottom:none;
     background:$black-20pct;
     text-align:center;
-    
+
     a {
         display:inline-block;
         cursor:pointer;
     }
-    
+
     img {
         margin:0 auto;
     }
@@ -671,7 +672,7 @@ div#event-map {
 .item-detail { // not in a slider
     position:relative;
     margin:(-$spacing-unit) (-$spacing-unit) 0;
-    
+
     .item-title,
     .item-venue,
     .item-date,
@@ -703,11 +704,11 @@ div#event-map {
     margin:0 auto;
 
     .item-block {
-    
+
     // Temp modifications from Angela to make the map display
-    
-        float: right;
-        //clear:left;
+
+        //float: right;
+        clear:left;
         margin-bottom:$spacing-unit * 2;
     }
     .item-image {
@@ -725,14 +726,14 @@ div#event-map {
     }
     .item-info {
         @include font-size(13px, false);
-        
+
         @include mq($lap-start) {
             @include font-size(16px, false);
         }
     }
     .item-venue {
         @include font-size(12px, false);
-        
+
         @include mq($lap-start) {
             @include font-size(14px, false);
         }
@@ -740,7 +741,7 @@ div#event-map {
     .item-title {
         padding-right:$spacing-unit;
         @include font-size(16px, false);
-        
+
         @include mq($lap-start) {
             @include font-size(18px, false);
         }
@@ -762,12 +763,12 @@ div#event-map {
 /* bxSlider overrides */
 .bx-wrapper {
     margin: 0 auto;
-    
+
     .bx-controls-direction,
     .bx-pager {
         display:none;
     }
-    
+
     .bx-viewport {
        -moz-box-shadow: none;
        -webkit-box-shadow: none;
@@ -790,14 +791,14 @@ div#event-map {
 .discover-slider {
     position:relative;
     margin:(-$spacing-unit) (-$spacing-unit) 0;
-    
+
     ul {
         margin:0;
-    } 
+    }
 
     .item-info {
         padding-left:($spacing-unit*3);
-        
+
         .item-symbol {
             position:absolute;
             top:$spacing-unit/2;
@@ -815,11 +816,11 @@ div#event-map {
         li {
             z-index:1;
         }
-        
+
         .item-image {
             position:relative;
             @include transition(left .5s linear);
-            
+
             left:0;
         }
 
@@ -850,7 +851,7 @@ div#event-map {
         background-color:transparent;
         z-index:5;
         top:0;
-        
+
         //TODO: figure out a good hover/focus solution for accessibility
         &:focus,
         &:hover {
@@ -872,13 +873,13 @@ div#event-map {
     padding-bottom:0;
     clear:both;
     background: darken($footer-bg, 5);
-    
+
     p {
         min-height:100px;
         max-width:640px;
         margin:0 auto;
         padding:$spacing-unit;
-        
+
         .lt-ie9 & {
             min-height:(100px - ($spacing-unit*2));
         }
@@ -888,7 +889,7 @@ div#event-map {
         list-style:none;
         margin:0;
         padding:0;
-        
+
         .no-js & {
             text-align:center;
         }
@@ -898,7 +899,7 @@ div#event-map {
         height:100px;
         overflow:hidden;
         float:left;
-        
+
         .no-js & {
             margin-left:5px;
             margin-bottom:5px;
@@ -909,13 +910,13 @@ div#event-map {
     }
     a {
         border:none;
-        
+
         .no-touchcapable & {
             img {
                 -webkit-transition: -webkit-transform 0.2s, opacity 0.2s;
                 -moz-transition: -moz-transform 0.2s, opacity 0.2s;
                 transition: transform 0.2s, opacity 0.2s;
-                
+
                 -webkit-transform: translatez(0);
                 -moz-transform: translatez(0);
                     -ms-transform: translatez(0);
@@ -930,7 +931,7 @@ div#event-map {
                     -moz-transform: scale(1.2);
                     -ms-transform: scale(1.2);
                     transform: scale(1.2);
-                } 
+                }
             }
         }
     }
@@ -1027,11 +1028,11 @@ div#event-map {
     width: 90%;
     background-color:$main-color-dark;
     padding:$spacing-unit;
-    
+
     @include mq($lap-start) {
         padding:$spacing-desktop;
     }
-    
+
     .close-reveal-modal {
         font-size:inherit;
     }
@@ -1039,7 +1040,7 @@ div#event-map {
 .modal-content {
     a {
         color:$accent-color;
-        
+
         &:hover {
             color:$white;
         }
@@ -1047,7 +1048,7 @@ div#event-map {
     button {
         background-color:$main-color-darker;
         color:$white;
-        
+
         &:hover {
             background-color:$main-color-darkest;
             color:$white;
@@ -1060,7 +1061,7 @@ div#event-map {
     margin-bottom:$spacing-unit;
     position:relative;
     min-height:35px;
-    
+
     > label,
     .onoffswitch {
         display:inline-block;
@@ -1071,8 +1072,8 @@ div#event-map {
         width:70%;
         padding-right:$spacing-unit;
         font-weight:normal;
-        
-        
+
+
     }
 
     .item-block & {
@@ -1080,7 +1081,7 @@ div#event-map {
 
         > label {
             width:50%;
-        } 
+        }
     }
 }
 
@@ -1089,10 +1090,10 @@ div#event-map {
     -webkit-box-sizing:content-box;
     box-sizing:content-box;
 }
-.onoffswitch .onoffswitch-inner:before, 
+.onoffswitch .onoffswitch-inner:before,
 .onoffswitch .onoffswitch-inner:after {
-    -moz-box-sizing: border-box; 
-    -webkit-box-sizing: border-box; 
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
     box-sizing: border-box;
     content: "";
 }
@@ -1101,7 +1102,7 @@ div#event-map {
 }
 
 .onoffswitch-inner:after {
-    background-color: $gray-light; 
+    background-color: $gray-light;
     color:$gray-mediumdark;
 }
 .onoffswitch-label {
@@ -1111,7 +1112,7 @@ div#event-map {
 .onoffswitch-switch {
     border:none;
     box-shadow:0 0 5px rgba(0,0,0,.2);
-    width: 31px; 
+    width: 31px;
     margin: 2px;
     right: 45px;
 }
@@ -1176,7 +1177,7 @@ div#event-map {
     padding-bottom:.5em;
     line-height:1;
     background:$gray-dark;
-    
+
     &.event {
         cursor:pointer;
     }
