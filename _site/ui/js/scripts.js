@@ -800,7 +800,7 @@ ArtX.setupHistory = function() {
         var isCheckboxChecked = false;
         var checkboxID;
 
-        $ajaxInputs.click(function() {
+        $ajaxInputs.click( function() {
             isCheckboxChecked = $(this).prop("checked");
             checkboxID = $(this).prop("id");
 
@@ -853,7 +853,6 @@ ArtX.map = {
 
     vars : {
    
-        mapId : 'atosca.j55ofa87',
         mapContainer : "event-map",
         locationUrl : "/ui/js/json/locations_temp.json",
         eventUrl : "/ui/js/json/events-all.json"
@@ -867,58 +866,57 @@ ArtX.map = {
         // Set up map
         // TODO: displays error when map container not on page
         L.mapbox.accessToken = 'pk.eyJ1IjoiYXRvc2NhIiwiYSI6IlFSSDhOU0EifQ.8j2CBSsaQQmn-Ic7Vjx1bw';
-        var map = L.mapbox.map( ArtX.map.vars.mapContainer, ArtX.map.vars.mapId )
+        var map = L.mapbox.map( ArtX.map.vars.mapContainer, 'atosca.j55ofa87' )
         .setView([42.3581, -71.0636], 12);
-
 
         // Fetch location feed
         var $locations = $.getJSON( ArtX.map.vars.locationUrl, function( data ){
         
             $.each( data, function(){
+                
+		
+		//Create a marker for each location
+               
+		var name = this.name;
 
-                //Create a marker for each location
-                var marker = L.marker( [ this.latitude, this.longitude ], { 
+		var marker = L.marker( [ this.latitude, this.longitude ], { 
                     icon : L.mapbox.marker.icon({ 
-                        'marker-color': '#f86767'
+                        'marker-color': '#f86767',
                     })
                 });
-                marker.addTo( map );
-                
-                //Location name
-                var name = this.name;
+
+		marker.on('mouseover', function(e) {
+		    console.log(name);
+		    marker.bindPopup(name).openPopup();
+		});
+
+		marker.on('mouseout', function(e){ 
+		    marker.closePopup();
+		});
 
                 //Fetch event feed when marker is clicked
                 marker.on( "click", function( e ){
-                
                     var eventArray = [];
-                    
                     $.getJSON( ArtX.map.vars.eventUrl, function( data ) {
-
                         $.each( data, function(){ 
-                        
                            //Save events with matching location name
                            if ( this.location.name === name ) {
-                            
                                 eventArray.push( this );
-                              
                            } 
-                       
                        }); //End each
-                           
-                           
-                           //Refresh event list
-                            ArtX.el.eventListTarget.fadeOut(400, function() {
-                                   
-                                ArtX.el.eventListTarget.html(_.template(ArtX.el.eventListTemplate, {eventArray:eventArray}));
-                                   
-                                ArtX.el.eventListTarget.fadeIn(400);
-                                   
-                            }); //End fade out
+                                
+			//Refresh event list
+			ArtX.el.eventListTarget.fadeOut( 400, function() {   
+			    ArtX.el.eventListTarget.html(_.template(ArtX.el.eventListTemplate, {eventArray:eventArray}));
+			    ArtX.el.eventListTarget.fadeIn(400);            
+                        }); //End fade out
                             
                     }); //End events getJON
                     
                 }); //End click handler
                 
+		marker.addTo( map );
+
             }); //End each location
             
         }); //End locations getJSON
