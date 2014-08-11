@@ -851,64 +851,76 @@ ArtX.setupMyInterests = function() {
 
 ArtX.map = {
 
+    vars : {
+   
+        mapContainer : "event-map",
+        locationUrl : "/ui/js/json/locations_temp.json",
+        eventUrl : "/ui/js/json/events-all.json"
+    
+    },
+
     init : function() {
 
-        console.log( "initializing Map" );
+        console.log( "Initializing Map" );
 
         // Set up map
-        L.mapbox.accessToken = 'atosca.j55ofa87';
-        var map = L.mapbox.map( 'event-map', 'examples.map-i86nkdio' )
-        .setView([42.3581, 71.0636], 9);
+        // TODO: displays error when map container not on page
+        L.mapbox.accessToken = 'pk.eyJ1IjoiYXRvc2NhIiwiYSI6IlFSSDhOU0EifQ.8j2CBSsaQQmn-Ic7Vjx1bw';
+        var map = L.mapbox.map( ArtX.map.vars.mapContainer, 'atosca.j55ofa87' )
+        .setView([42.3581, -71.0636], 12);
 
-        locationUrl = 'artx.herokuapp.com/locations.json';
-        eventUrl = 'artx.herokuapp.com/events.json';
 
-        //Fetch all locations
-        var $locations = $.getJSON( locationUrl, function(){
-
-            // Create a feature layer with marker for each entry
+        // Fetch location feed
+        var $locations = $.getJSON( ArtX.map.vars.locationUrl, function( data ){
+        
             $.each( data, function(){
 
-                newLayer = L.mapbox.featureLayer.addTo( map );
-
-                var geoJson = {
-                    type: 'Feature',
-                    geometry: {
-                        type: 'Point',
-                            coordinates: [
-                                data.latitude,
-                                data.longitude
-                            ]
-                    },
-                    properties: {
-
-                        // TODO: customize properties when content is determined
-                        name: data.name,
-                        url: data.url,
-                        description: data.description,
-
-                        // Markers from docs example.  TODO: customize appearance
-                        'marker-size': 'large',
-                        'marker-color': '#BE9A6B',
-                        'marker-symbol': 'cafe'
-                    }
-                };
-
-                newLayer.setGeoJSON( geoJson );
-
-                // Fetch location on click
-                newLayer.on( "click", function( e ){
-
-                    $.getJSON( eventJSON, function(){
-
-                        //TODO: add event to DOM
-
-                    });
+                //Create a marker for each location
+                var marker = L.marker( [ this.latitude, this.longitude ], { 
+                    icon : L.mapbox.marker.icon({ 
+                        'marker-color': '#f86767'
+                    })
                 });
-            });
+                marker.addTo( map );
+                
+                //Location name
+                var name = this.name;
 
-        });
+                //Fetch event feed when marker is clicked
+                marker.on( "click", function( e ){
+                
+                    var eventArray = [];
+                    
+                    $.getJSON( ArtX.map.vars.eventUrl, function( data ) {
 
+                        $.each( data, function(){ 
+                        
+                           //Save events with matching location name
+                           if ( this.location.name === name ) {
+                            
+                                eventArray.push( this );
+                              
+                           } 
+                       
+                       }); //End each
+                           
+                           
+                           //Refresh event list
+                            ArtX.el.eventListTarget.fadeOut(400, function() {
+                                   
+                                ArtX.el.eventListTarget.html(_.template(ArtX.el.eventListTemplate, {eventArray:eventArray}));
+                                   
+                                ArtX.el.eventListTarget.fadeIn(400);
+                                   
+                            }); //End fade out
+                            
+                    }); //End events getJON
+                    
+                }); //End click handler
+                
+            }); //End each location
+            
+        }); //End locations getJSON
     }
 };
 

@@ -625,6 +625,15 @@ button {
 
 /* Event blocks */
 
+
+//Temp modification from Angela to make the map display
+div#event-map {
+    display: block;
+    float: left;
+    height: 300px;
+    width: 300px;
+}
+
 .item-image {
     display:block;
     border-bottom:none;
@@ -694,7 +703,11 @@ button {
     margin:0 auto;
 
     .item-block {
-        clear:left;
+    
+    // Temp modifications from Angela to make the map display
+    
+        float: right;
+        //clear:left;
         margin-bottom:$spacing-unit * 2;
     }
     .item-image {

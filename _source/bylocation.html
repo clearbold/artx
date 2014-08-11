@@ -8,12 +8,54 @@ active: bylocation
         <div class="content" role="main">
 
             <div id="event-map" class="map">
-                <p>Map will go here!</p>
+                   
             </div>
 
             <div id="event-list" class="thumb-list">
+            </div>
+            
+            <script type="text/template" id="template-eventlist">
+            <% _.each(eventArray, function(eventObj, key){ %>
+
+            <% var eventStartDate = moment(eventObj.start_date).format("ddd, MMM Do YYYY"); // "Sun, Feb 14th 2010" %>
+            <% var eventStartTime = moment(eventObj.start_date).format("h:mm a"); // "10:15 am" %>
+
+            <% var eventEndDate = moment(eventObj.end_date).format("MMM Do, YYYY"); // "Feb 14th, 2010" %>
+            <% var eventEndTime = moment(eventObj.end_date).format("h:mm a"); // "10:15 am" %>
+
+            <% var compareStartDate = moment(eventObj.start_date).format("M/D/YYYY"); // "2/14/2010" %>
+            <% var compareEndDate = moment(eventObj.end_date).format("M/D/YYYY"); // "2/14/2010" %>
+                    
+            <div class="item-block cf">
+                <div class="item-image">
+                    <a href="exhibition.html">
+                        <img src="<%= eventObj.image %>" alt="" />
+                    </a>
+                </div>
+                <div class="item-info">
+                    <h2 class="item-title">
+                        <a href="exhibition.html" class="truncate"><%= eventObj.name %></a>
+                    </h2>
+                    <p class="item-date">
+                    <% if (compareStartDate != compareEndDate) { %>
+                        Through <%= eventEndDate %>
+                    <% } else { %>
+                        <%= eventStartDate %><br />
+                        <%= eventStartTime %> - <%= eventEndTime %>
+                    <% } %>
+                    </p>
+
+                    <a href="#" class="favorite-star item-symbol" data-eventID="1" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
+                </div>
+            </div>
+
+            <% }); %>
+                
+            </script>
+            
+            <!--
                 <div class="item-block cf">
-                    <div class="item-image">
+                   <div class="item-image">
                         <a href="exhibition.html">
                             <img src="/ui/img/square-quilts.jpg" alt="" />
                         </a>
@@ -27,7 +69,8 @@ active: bylocation
                         <a href="#" class="favorite-star item-symbol" data-eventID="1" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
                     </div>
                 </div>
-            </div>
+                -->
+                
         </div> <!-- /content -->
 
         <footer class="footer">
@@ -39,6 +82,7 @@ active: bylocation
                 <!-- Dev Note - Optimal image size for thumb-list: 400px by 400px square images -->
 
                 <ul id="footer-slider" class="bxslider cf">
+         
                     <li><a href="event.html"><img src="/ui/img/square-middlebrook.jpg" alt="Workshop with artist Jason Middlebrook, ICA Boston" /></a></li>
                     <li><a href="exhibition.html"><img src="/ui/img/square-quilts.jpg" alt="Quilts and Color: The Roy Pilgrim Collection, Museum of Fine Arts" /></a></li>
                     <li><a href="#"><img src="/ui/img/square-knights.jpg" alt="Knights: Arms and Armor Throughout History, Worcester Art Museum" /></a></li>
