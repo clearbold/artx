@@ -71,24 +71,24 @@
   - authentication_token: authentication_token
   - setting: value
 
-## HTML (Not changed)
+## HTML (Changed)
 #### /settings
-- Supports a POST to update settings based on field values submitted/saved
+- shows current users' current settings, with toggles to update settings (via PATCH request to JSON API). 
 
 #### /history
-- Dynamic page with session user's history generated server-side
+- user's past favorites, with checkboxes for creation/deletion (via POSTs/DELETE requests to JSON API) of attendance resources.
 
 #### /interests
-- Dynamic page with session user's interests generated server-side
+- current user's interests, with checkboxes for creation/deletion (via POSTs to JSON API) of interest resources.
 
-#### /event/*eventId*
-- Dynamic page with event data generated server-side
+#### /event/:event_id
+- single event show view; data loaded via GET request to JSON endpoint.
 
-#### /location/*locationId*
-- Dynamic page with location data generated server-side
+#### /location/:location_id
+- single location show view; data loaded via GET request to JSON endpoint.
 
 #### /favorites
-- Dynamic page with session user's favorites generated server-side
+- current user's favorited events, with star control for deletion of favorite available (via POST/DELETE to JSON API).
 
 ## AUTH (Will change)
 #### WAS 
