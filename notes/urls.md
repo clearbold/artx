@@ -13,7 +13,7 @@
 * **Used on:** Locations/Map
 
 #### NOW 
-##### GET /locations/:location_id/events.json
+##### GET /locations/:location_id/events.json?page=1&per_page=10
 
 #### WAS 
 ##### /LoadFavorites/*page*/*count*
