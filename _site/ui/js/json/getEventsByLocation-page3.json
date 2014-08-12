@@ -1,0 +1,26 @@
+[
+    {
+      "id": 11,
+      "name": "The Copeland Collection, Chinese and Japanese Ceramic Figures",
+      "image": "http:\/\/www.pem.org\/writable\/resources\/image\/feature\/dancer-full-front.jpg",
+      "start_date": "2003-06-18T12:00:00.000Z",
+      "end_date": "2014-11-22T12:00:00.000Z",
+      "event_type": "exhibition",
+      "location": {
+        "id": 2,
+        "name": "Peabody Essex Museum"
+      }
+    },
+    {
+      "id": 10,
+      "name": "Fish, Silk, Tea, Bamboo: Cultivating an Image of China",
+      "image": "http:\/\/www.pem.org\/writable\/resources\/image\/feature\/tea-production---watering.jpg",
+      "start_date": "2009-03-14T12:00:00.000Z",
+      "end_date": "2014-11-22T12:00:00.000Z",
+      "event_type": "exhibition",
+      "location": {
+        "id": 2,
+        "name": "Peabody Essex Museum"
+      }
+    }
+]

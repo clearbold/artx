@@ -645,6 +645,10 @@ ArtX.loadMore = {
                 var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
 
                 switch(temporaryJsonURL) {
+                
+                    case "/GetEventsByLocation/":
+                        ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/getEventsByLocation-page" + ArtX.loadMore.vars.nextPage + ".json";
+                        break;
                     case "/LoadFavorites/" :
                         ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + ArtX.loadMore.vars.nextPage + ".json";
                         break;
@@ -688,6 +692,9 @@ ArtX.loadMore = {
                     var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
 
                     switch(temporaryJsonURL) {
+                        case "/GetEventsByLocation/" :
+                            ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/getEventsByLocation-page" + ArtX.vars.nextPageJsonURL + ".json";
+                            break;
                         case "/LoadFavorites/" :
                             ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + ArtX.loadMore.vars.nextPage + ".json";
                             break;
@@ -719,6 +726,8 @@ ArtX.loadMore = {
             // First, let's get the item container and assign it to a variable
             // Assumption: the load more link is always directly preceded by the item container
             ArtX.loadMore.vars.itemContainer = ArtX.loadMore.vars.loadMoreLink.prev();
+            
+            console.log("item container: " + ArtX.loadMore.vars.itemContainer.prop('outerHTML'));
 
             var currentItemsCount = ArtX.util.getNumberOfChildItems(ArtX.loadMore.vars.itemContainer);
 
@@ -737,6 +746,9 @@ ArtX.loadMore = {
                 var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
 
                 switch(temporaryJsonURL) {
+                    case "/GetEventsByLocation/" :
+                        ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/getEventsByLocation-page2.json";
+                        break;
                     case "/LoadFavorites/" :
                         ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page2.json";
                         break;
@@ -874,48 +886,42 @@ ArtX.map = {
         
             $.each( data, function(){
                 
-		
-		//Create a marker for each location
+        
+        //Create a marker for each location
                
-		var name = this.name;
+        var name = this.name;
 
-		var marker = L.marker( [ this.latitude, this.longitude ], { 
+        var marker = L.marker( [ this.latitude, this.longitude ], { 
                     icon : L.mapbox.marker.icon({ 
                         'marker-color': '#f86767',
                     })
                 });
 
-		marker.on('mouseover', function(e) {
-		    console.log(name);
-		    marker.bindPopup(name).openPopup();
-		});
+        marker.bindPopup( name ).openPopup();
 
-		marker.on('mouseout', function(e){ 
-		    marker.closePopup();
-		});
-
-                //Fetch event feed when marker is clicked
-                marker.on( "click", function( e ){
-                    var eventArray = [];
-                    $.getJSON( ArtX.map.vars.eventUrl, function( data ) {
-                        $.each( data, function(){ 
-                           //Save events with matching location name
-                           if ( this.location.name === name ) {
-                                eventArray.push( this );
-                           } 
-                       }); //End each
+        //Fetch event feed when marker is clicked
+        marker.on( "click", function( e ){
+        var eventArray = [];
+        $.getJSON( ArtX.map.vars.eventUrl, function( data ) {
+        $.each( data, function(){ 
+             //Save events with matching location name
+             if ( this.location.name === name ) {
+                  eventArray.push( this );
+                } 
+        }); //End each
                                 
-			//Refresh event list
-			ArtX.el.eventListTarget.fadeOut( 400, function() {   
-			    ArtX.el.eventListTarget.html(_.template(ArtX.el.eventListTemplate, {eventArray:eventArray}));
-			    ArtX.el.eventListTarget.fadeIn(400);            
+        //Refresh event list
+        ArtX.el.eventListTarget.fadeOut( 400, function() {   
+        ArtX.el.eventListTarget.html(_.template(ArtX.el.eventListTemplate, {eventArray:eventArray}));
+            ArtX.loadMore.init();
+        ArtX.el.eventListTarget.fadeIn(400);            
                         }); //End fade out
                             
                     }); //End events getJON
                     
                 }); //End click handler
                 
-		marker.addTo( map );
+        marker.addTo( map );
 
             }); //End each location
             
