@@ -23,6 +23,8 @@
 
 #### NOW 
 ##### GET /favorites.json
+###### takes
+* authentication_token: authentication_token
 
 #### WAS 
 ##### /LoadHistory/*page*
@@ -30,6 +32,8 @@
 
 #### NOW 
 ##### GET /history.json?page=1&per_page=10
+###### takes
+* authentication_token: authentication_token
 
 #### WAS 
 ##### /LoadInterests/*page*
@@ -37,6 +41,8 @@
 
 #### NOW 
 ##### GET /interests.json?page=1&per_page=10
+###### takes
+* authentication_token: authentication_token
 
 #### WAS 
 ##### /SetInterest/
@@ -46,6 +52,9 @@
 
 #### NOW 
 ##### POST /interests.json
+###### takes
+* authentication_token: authentication_token
+* interest_id: interest_id,
 
 #### WAS 
 ##### /SetOption/
@@ -55,6 +64,9 @@
 
 #### NOW 
 ##### PATCH /users.json
+###### takes
+* authentication_token: authentication_token
+* <setting>: <value>
 
 ## HTML (Not changed)
 #### /settings
