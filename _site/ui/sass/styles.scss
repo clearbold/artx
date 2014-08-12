@@ -1,0 +1,21 @@
+@charset "UTF-8";
+
+/**
+ * Webfonts first
+ */
+@import "webfonts";
+
+@import "vars";
+@import "mixins";
+
+@import "normalize";
+@import "plugins/bxslider.scss";
+@import "plugins/jquery.sidr.dark.scss";
+@import "plugins/reveal.scss";
+@import "plugins/onoff.scss";
+@import "ui";
+
+// Force SASS to include the UTF-8 charset notice
+.force-UTF-8 {
+    content: "¡";
+}
