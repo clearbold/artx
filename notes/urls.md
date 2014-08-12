@@ -90,18 +90,6 @@ PATCH /users.json
   - setting: value
 
 ## HTML Pages (Updated)
-#### /settings
-- shows all of the current users' current settings, with toggles to update settings (via PATCH request to JSON API). 
-
-#### /history
-- shows all of the user's past favorites, with checkboxes for creation/deletion (via POSTs/DELETE requests to JSON API) of attendance resources.
-
-#### /interests
-- shows all of the current user's interests, with checkboxes for creation/deletion (via POSTs to JSON API) of interest resources.
-
-#### /favorites
-- shows all of the current user's favorited events, with star control for deletion of favorite available (via POST/DELETE to JSON API).
-
 #### /event/:event_id
 - shows a single event show view; data loaded via GET request to JSON endpoint.
 
@@ -113,6 +101,18 @@ PATCH /users.json
 
 #### /bylocation
 - shows events at a location given in the query parameters; data loaded via GET request to JSON endpoint.
+
+#### /settings
+- shows all of the current users' current settings, with toggles to update settings (via PATCH request to JSON API). 
+
+#### /history
+- shows all of the user's past favorites, with checkboxes for creation/deletion (via POSTs/DELETE requests to JSON API) of attendance resources.
+
+#### /interests
+- shows all of the current user's interests, with checkboxes for creation/deletion (via POSTs to JSON API) of interest resources.
+
+#### /favorites
+- shows all of the current user's favorited events, with star control for deletion of favorite available (via POST/DELETE to JSON API).
 
 ## AUTH (Will change)
 ##### Previously 
