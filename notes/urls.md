@@ -13,7 +13,7 @@
 * **Used on:** Locations/Map
 
 #### NOW 
-##### GET /locations/:location_id/events(.:format)          events#index
+##### GET /locations/:location_id/events.json
 
 #### WAS 
 ##### /LoadFavorites/*page*/*count*
@@ -56,7 +56,7 @@
 #### NOW 
 ##### PATCH /users.json
 
-## HTML
+## HTML (Not changed)
 #### /settings
 * Supports a POST to update settings based on field values submitted/saved
 
@@ -75,7 +75,7 @@
 #### /favorites
 * Dynamic page with session user's favorites generated server-side
 
-## AUTH
+## AUTH (Will change)
 #### CheckEmail/*emailAddress*
 * Returns success/failure based on existence of **emailAddress** in database
 * **Used on:** Signup
