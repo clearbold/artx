@@ -30490,10 +30490,12 @@ ArtX.loadMore = {
             // First, let's get the item container and assign it to a variable
             // Assumption: the load more link is always directly preceded by the item container
             ArtX.loadMore.vars.itemContainer = ArtX.loadMore.vars.loadMoreLink.prev();
+        
+             console.log("item container: " + ArtX.loadMore.vars.itemContainer.prop('outerHTML'));
             
-            console.log("item container: " + ArtX.loadMore.vars.itemContainer.prop('outerHTML'));
-
             var currentItemsCount = ArtX.util.getNumberOfChildItems(ArtX.loadMore.vars.itemContainer);
+            
+            console.log( "number of items: " + currentItemsCount );
 
             if (currentItemsCount == ArtX.var.itemsPerPage) {
                 // There's the same amount as our items per page,
@@ -30637,7 +30639,7 @@ ArtX.map = {
 
     init : function() {
 
-        console.log( "Initializing Map" );
+        console.log( "Initializing map" );
 
         // Set up map
         // TODO: displays error when map container not on page
@@ -30670,7 +30672,9 @@ ArtX.map = {
         $.each( data, function(){ 
              //Save events with matching location name
              if ( this.location.name === name ) {
-                  eventArray.push( this );
+                if ( eventArray.length < ArtX.var.itemsPerPage ) {
+                    eventArray.push( this );
+                  }
                 } 
         }); //End each
                                 

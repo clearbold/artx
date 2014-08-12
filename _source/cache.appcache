@@ -1,13 +1,12 @@
 CACHE MANIFEST
 
-# Version .185
+# Version .190
 
 NETWORK:
 *
 
 CACHE:
 bydate.html
-bylocation.html
 event.html
 exhibition.html
 favorites.html
@@ -35,8 +34,6 @@ ui/img/square-bamboo.jpg
 ui/img/square-knights.jpg
 ui/img/square-middlebrook.jpg
 ui/img/square-quilts.jpg
-ui/js/scripts-concat.js
-ui/js/scripts-concat-min.js
 ui/js/json/events-august.json
 ui/js/json/events-all.json
 ui/js/json/events-july.json
