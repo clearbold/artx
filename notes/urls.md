@@ -5,7 +5,9 @@
   - **Used on:*  - Calendar
 
 #### New 
-- GET /events.json?year=2014&month=08&date=31
+```
+GET /events.json?year=2014&month=08&date=31
+```
 
 #### Previously 
 - GetEventsByLocation/*locationId*/*page*
@@ -13,7 +15,9 @@
   - **Used on:*  - Locations/Map
 
 #### New 
--  GET /locations/:location_id/events.json?page=1&per_page=10
+```
+GET /locations/:location_id/events.json?page=1&per_page=10
+```
 
 #### Previously 
 -  /LoadFavorites/*page*/*count*
@@ -22,7 +26,9 @@
   - In "Load More" we'll dicate the number per "page" and we'll keep asking for pages. When the server runs out (results<count), we'll stop showing the link
 
 #### New 
--  GET /favorites.json
+```
+GET /favorites.json
+```
 -  takes
   - authentication_token: authentication_token
 
@@ -31,7 +37,9 @@
   - Do we need to limit history and support "load more"
 
 #### New 
--  GET /favorites/history.json?page=1&per_page=10
+```
+GET /favorites/history.json?page=1&per_page=10
+```
 -  Notes: 
   - history is just favorite events that are in the past
   - will be viewed on a separate view, which will also present an attendance creation/deletion checkbox
@@ -43,7 +51,9 @@
   - Do we need to limit interests and support "load more"
 
 #### New 
--  GET /interests.json?page=1&per_page=10
+```
+GET /interests.json?page=1&per_page=10
+```
 -  takes
   - authentication_token: authentication_token
 
@@ -54,7 +64,9 @@
   - **Used on:*  - My Interests (Ajax when checkbox is checked or unchecked)
 
 #### New 
--  POST /interests.json
+```
+POST /interests.json
+```
 -  takes
   - authentication_token: authentication_token
   - interest_id: interest_id
@@ -66,7 +78,9 @@
   - **Used on:*  - Settings page (Ajax when on/off toggle is changed)
 
 #### New 
--  PATCH /users.json
+```
+PATCH /users.json
+```
 -  takes
   - authentication_token: authentication_token
   - setting: value
