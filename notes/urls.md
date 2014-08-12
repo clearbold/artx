@@ -1,32 +1,46 @@
 ## JSON
-#### GetEventsByDate/*year (yyyy)*/*month (mm)*/*date (dd)*
+#### WAS GetEventsByDate/*year (yyyy)*/*month (mm)*/*date (dd)*
 * **year/month/date** should sufficiently filter results to not require "Load More" functionality
 * **Used on:** Calendar
 
-#### GetEventsByLocation/*locationId*/*page*
+#### NOW GET /events.json?year=2014&month=08&Date=31
+
+#### WAS GetEventsByLocation/*locationId*/*page*
 * **Page:** Accommodates "Load More" functionality
 * **Used on:** Locations/Map
 
-#### /LoadFavorites/*page*/*count*
+#### NOW GET /locations/:location_id/events(.:format)          events#index
+
+#### WAS /LoadFavorites/*page*/*count*
 * We'll be using this in multiple spots
 * In the Favorites bar, we may ask for p1 with a count
 * In "Load More" we'll dicate the number per "page" and we'll keep asking for pages. When the server runs out (results<count), we'll stop showing the link
 
-#### /LoadHistory/*page*
+#### NOW GET /favorites.json
+
+#### WAS /LoadHistory/*page*
 * Do we need to limit history and support "load more"
 
-#### /LoadInterests/*page*
+#### NOW GET /history.json?page=1&per_page=10
+
+#### WAS /LoadInterests/*page*
 * Do we need to limit interests and support "load more"
 
-#### /SetInterest/
+#### NOW GET /interests.json?page=1&per_page=10
+
+#### WAS /SetInterest/
 * interestCheckbox: checkboxID,
   interestSelected: isCheckboxChecked
 * **Used on:** My Interests (Ajax when checkbox is checked or unchecked)
 
-#### /SetOption/
+#### NOW POST /interests.json
+
+#### WAS /SetOption/
 * settingCheckbox: checkboxID,
   settingSelected: isCheckboxChecked
 * **Used on:** Settings page (Ajax when on/off toggle is changed)
+
+#### NOW PATCH /users.json
 
 ## HTML
 #### /settings
