@@ -47,7 +47,7 @@
 #### /favorites
 * Dynamic page with session user's favorites generated server-side
 
-## ???
+## AUTH
 #### CheckEmail/*emailAddress*
 * Returns success/failure based on existence of **emailAddress** in database
 * **Used on:** Signup
