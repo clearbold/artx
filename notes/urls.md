@@ -1,46 +1,60 @@
 ## JSON
-#### WAS GetEventsByDate/*year (yyyy)*/*month (mm)*/*date (dd)*
+#### WAS 
+##### GetEventsByDate/*year (yyyy)*/*month (mm)*/*date (dd)*
 * **year/month/date** should sufficiently filter results to not require "Load More" functionality
 * **Used on:** Calendar
 
-#### NOW GET /events.json?year=2014&month=08&Date=31
+#### NOW 
+##### GET /events.json?year=2014&month=08&date=31
 
-#### WAS GetEventsByLocation/*locationId*/*page*
+#### WAS 
+##### GetEventsByLocation/*locationId*/*page*
 * **Page:** Accommodates "Load More" functionality
 * **Used on:** Locations/Map
 
-#### NOW GET /locations/:location_id/events(.:format)          events#index
+#### NOW 
+##### GET /locations/:location_id/events(.:format)          events#index
 
-#### WAS /LoadFavorites/*page*/*count*
+#### WAS 
+##### /LoadFavorites/*page*/*count*
 * We'll be using this in multiple spots
 * In the Favorites bar, we may ask for p1 with a count
 * In "Load More" we'll dicate the number per "page" and we'll keep asking for pages. When the server runs out (results<count), we'll stop showing the link
 
-#### NOW GET /favorites.json
+#### NOW 
+##### GET /favorites.json
 
-#### WAS /LoadHistory/*page*
+#### WAS 
+##### /LoadHistory/*page*
 * Do we need to limit history and support "load more"
 
-#### NOW GET /history.json?page=1&per_page=10
+#### NOW 
+##### GET /history.json?page=1&per_page=10
 
-#### WAS /LoadInterests/*page*
+#### WAS 
+##### /LoadInterests/*page*
 * Do we need to limit interests and support "load more"
 
-#### NOW GET /interests.json?page=1&per_page=10
+#### NOW 
+##### GET /interests.json?page=1&per_page=10
 
-#### WAS /SetInterest/
+#### WAS 
+##### /SetInterest/
 * interestCheckbox: checkboxID,
   interestSelected: isCheckboxChecked
 * **Used on:** My Interests (Ajax when checkbox is checked or unchecked)
 
-#### NOW POST /interests.json
+#### NOW 
+##### POST /interests.json
 
-#### WAS /SetOption/
+#### WAS 
+##### /SetOption/
 * settingCheckbox: checkboxID,
   settingSelected: isCheckboxChecked
 * **Used on:** Settings page (Ajax when on/off toggle is changed)
 
-#### NOW PATCH /users.json
+#### NOW 
+##### PATCH /users.json
 
 ## HTML
 #### /settings
