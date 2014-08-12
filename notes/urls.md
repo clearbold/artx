@@ -1,42 +1,44 @@
 ## JSON (Changed)
-#### Previously 
+### Events
+###### Previously 
 - GetEventsByDate/*year (yyyy)*/*month (mm)*/*date (dd)*
   - **year/month/date*  - should sufficiently filter results to not require "Load More" functionality
   - **Used on:*  - Calendar
 
-#### New 
+##### New 
 ```
 GET /events.json?year=2014&month=08&date=31
 ```
 
-#### Previously 
+##### Previously 
 - GetEventsByLocation/*locationId*/*page*
   - **Page:*  - Accommodates "Load More" functionality
   - **Used on:*  - Locations/Map
 
-#### New 
+##### New 
 ```
 GET /locations/:location_id/events.json?page=1&per_page=10
 ```
 
-#### Previously 
+### Favorites
+##### Previously 
 -  /LoadFavorites/*page*/*count*
   - We'll be using this in multiple spots
   - In the Favorites bar, we may ask for p1 with a count
   - In "Load More" we'll dicate the number per "page" and we'll keep asking for pages. When the server runs out (results<count), we'll stop showing the link
 
-#### New 
+##### New 
 ```
 GET /favorites.json
 ```
 -  takes
   - authentication_token: authentication_token
 
-#### Previously 
+##### Previously 
 -  /LoadHistory/*page*
   - Do we need to limit history and support "load more"
 
-#### New 
+##### New 
 ```
 GET /favorites/history.json?page=1&per_page=10
 ```
@@ -46,24 +48,25 @@ GET /favorites/history.json?page=1&per_page=10
 -  takes
   - authentication_token: authentication_token
 
-#### Previously 
+### Interests
+##### Previously 
 -  /LoadInterests/*page*
   - Do we need to limit interests and support "load more"
 
-#### New 
+##### New 
 ```
 GET /interests.json?page=1&per_page=10
 ```
 -  takes
   - authentication_token: authentication_token
 
-#### Previously 
+##### Previously 
 -  /SetInterest/
   - interestCheckbox: checkboxID,
   interestSelected: isCheckboxChecked
   - **Used on:*  - My Interests (Ajax when checkbox is checked or unchecked)
 
-#### New 
+##### New 
 ```
 POST /interests.json
 ```
@@ -71,13 +74,14 @@ POST /interests.json
   - authentication_token: authentication_token
   - interest_id: interest_id
 
-#### Previously 
+### Users
+##### Previously 
 -  /SetOption/
   - settingCheckbox: checkboxID,
   settingSelected: isCheckboxChecked
   - **Used on:*  - Settings page (Ajax when on/off toggle is changed)
 
-#### New 
+##### New 
 ```
 PATCH /users.json
 ```
@@ -111,7 +115,7 @@ PATCH /users.json
 - shows events at a location given in the query parameters; data loaded via GET request to JSON endpoint.
 
 ## AUTH (Will change)
-#### Previously 
+##### Previously 
 -  CheckEmail/*emailAddress*
   - Returns success/failure based on existence of **emailAddress*  - in database
   - **Used on:*  - Signup
