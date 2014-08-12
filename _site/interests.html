@@ -140,6 +140,8 @@
                         <label for="interest-painting">Painting</label>
                         <input type="checkbox" name="interest" id="interest-painting" value="Painting" class="customize-checkbox" />
                     </li>
+                    
+                    <!-- Commented out to trigger load more
                     <li>
                         <label for="interest-illustration">Illustration</label>
                         <input type="checkbox" name="interest" id="interest-illustration" value="Illustration" class="customize-checkbox" />
@@ -164,9 +166,25 @@
                         <label for="interest-video">Video</label>
                         <input type="checkbox" name="interest" id="interest-video" value="Video" class="customize-checkbox" />
                     </li>
+                    -->
                 </ul>
+            
+            
+           <a href="#" id="load-more" class="btn btn-block btn-hidden" data-feed="/LoadInterests/">Load more</a>
+           
+           <script type="text/template" id="interests-template">
+           <% _.each(jsonArray, function(interestObj, key){ %>
+           <% var id = "interest-" + interestObj.name %>
+           <li>
+            <label for="<%= id %>"> <%= interestObj.name %> </label>
+            <input type="checkbox" name="interest"
+                id="<%= id %>" value="<%= interestObj.name %>"
+                class="customize-checkbox" />
+           </li>
+           </script>
+
             </form>
-        </div>
+        </div> <!-- end content>
 
 
     </div> <!-- /wrapper -->

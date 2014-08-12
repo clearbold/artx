@@ -646,7 +646,10 @@ ArtX.loadMore = {
 
                 switch(temporaryJsonURL) {
                 
-                    case "/GetEventsByLocation/":
+                    //case "/LoadInterests/" :
+                    //    ArtX.loadMore.var.nextPageJsonURL = "/ui/js/json/loadInterests-page" + ".json";
+                    //    break;
+                    case "/GetEventsByLocation/" :
                         ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/getEventsByLocation-page" + ArtX.loadMore.vars.nextPage + ".json";
                         break;
                     case "/LoadFavorites/" :
@@ -692,6 +695,9 @@ ArtX.loadMore = {
                     var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
 
                     switch(temporaryJsonURL) {
+                        //case "/LoadInterests/" :
+                        //    ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/loadInterests-page" + ".json";
+                        //    break;
                         case "/GetEventsByLocation/" :
                             ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/getEventsByLocation-page" + ArtX.vars.nextPageJsonURL + ".json";
                             break;
@@ -726,12 +732,8 @@ ArtX.loadMore = {
             // First, let's get the item container and assign it to a variable
             // Assumption: the load more link is always directly preceded by the item container
             ArtX.loadMore.vars.itemContainer = ArtX.loadMore.vars.loadMoreLink.prev();
-        
-             console.log("item container: " + ArtX.loadMore.vars.itemContainer.prop('outerHTML'));
             
             var currentItemsCount = ArtX.util.getNumberOfChildItems(ArtX.loadMore.vars.itemContainer);
-            
-            console.log( "number of items: " + currentItemsCount );
 
             if (currentItemsCount == ArtX.var.itemsPerPage) {
                 // There's the same amount as our items per page,
@@ -748,6 +750,9 @@ ArtX.loadMore = {
                 var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
 
                 switch(temporaryJsonURL) {
+                    //case "/LoadInterests/":
+                    //    ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadInterests-page2.json";
+                    //     break;
                     case "/GetEventsByLocation/" :
                         ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/getEventsByLocation-page2.json";
                         break;
