@@ -66,7 +66,7 @@
 ##### PATCH /users.json
 ###### takes
 * authentication_token: authentication_token
-* <setting>: <value>
+* setting: value
 
 ## HTML (Not changed)
 #### /settings
