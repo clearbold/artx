@@ -71,24 +71,30 @@
   - authentication_token: authentication_token
   - setting: value
 
-## HTML (Changed)
+## HTML Pages (Updated)
 #### /settings
-- shows current users' current settings, with toggles to update settings (via PATCH request to JSON API). 
+- shows all of the current users' current settings, with toggles to update settings (via PATCH request to JSON API). 
 
 #### /history
-- user's past favorites, with checkboxes for creation/deletion (via POSTs/DELETE requests to JSON API) of attendance resources.
+- shows all of the user's past favorites, with checkboxes for creation/deletion (via POSTs/DELETE requests to JSON API) of attendance resources.
 
 #### /interests
-- current user's interests, with checkboxes for creation/deletion (via POSTs to JSON API) of interest resources.
-
-#### /event/:event_id
-- single event show view; data loaded via GET request to JSON endpoint.
-
-#### /location/:location_id
-- single location show view; data loaded via GET request to JSON endpoint.
+- shows all of the current user's interests, with checkboxes for creation/deletion (via POSTs to JSON API) of interest resources.
 
 #### /favorites
-- current user's favorited events, with star control for deletion of favorite available (via POST/DELETE to JSON API).
+- shows all of the current user's favorited events, with star control for deletion of favorite available (via POST/DELETE to JSON API).
+
+#### /event/:event_id
+- shows a single event show view; data loaded via GET request to JSON endpoint.
+
+#### /location/:location_id
+- shows a single location show view; data loaded via GET request to JSON endpoint.
+
+#### /bydate
+- shows events on a date given in the query parameters; data loaded via GET request to JSON endpoint.
+
+#### /bylocation
+- shows events at a location given in the query parameters; data loaded via GET request to JSON endpoint.
 
 ## AUTH (Will change)
 #### WAS 
