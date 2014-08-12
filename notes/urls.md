@@ -31,7 +31,10 @@
   - Do we need to limit history and support "load more"
 
 #### NOW 
--  GET /history.json?page=1&per_page=10
+-  GET /favorites/history.json?page=1&per_page=10
+-  Notes: 
+  - history is just favorite events that are in the past
+  - will be viewed on a separate view, which will also present an attendance creation/deletion checkbox
 -  takes
   - authentication_token: authentication_token
 
