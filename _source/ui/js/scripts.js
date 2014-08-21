@@ -838,7 +838,10 @@ ArtX.map = {
                             $("#event-list").fadeOut( 400, function() {   
                                 $("#event-list").html(_.template($('#template-eventlist').html(), {eventArray:eventArray}));
                                 ArtX.loadMore.init();
-                                $("#event-list").fadeIn(400);            
+                                $("#event-list").fadeIn(400, function() {
+                                    // Re-do truncation once fade is complete
+                                    ArtX.setupTextTruncation();
+                                });            
                             }); //End fade out
                                             
                         }); //End events getJON
