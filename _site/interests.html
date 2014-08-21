@@ -2,7 +2,7 @@
 <!doctype html>
 <!--[if lte IE 8]>     <html class="no-js lt-ie10 lt-ie9 " lang="en"> <![endif]-->
 <!--[if IE 9]>         <html class="no-js lt-ie10 modern" lang="en"> <![endif]-->
-<!--[if gt IE 9]><!--> <html class="no-js modern" lang="en" manifest="cache.appcache"> <!--<![endif]-->
+<!--[if gt IE 9]><!--> <html class="no-js modern" lang="en"> <!--<![endif]-->
 <head>
     <meta charset="utf-8" />
 
@@ -37,39 +37,7 @@
 
     <script src="ui/js/standalone/modernizr-2.7.1.min.js"></script>
 
-    <!-- JavaScript -->
-
-    <script type="text/javascript">
-        (function(document,navigator,standalone) {
-            // prevents links from apps from oppening in mobile safari
-            // this javascript must be the first script in your <head>
-            if ((standalone in navigator) && navigator[standalone]) {
-                var curnode, location=document.location, stop=/^(a|html)$/i;
-                document.addEventListener('click', function(e) {
-                    curnode=e.target;
-                    while (!(stop).test(curnode.nodeName)) {
-                        curnode=curnode.parentNode;
-                    }
-                    // Conditions to do this only on links to your own app
-                    // if you want all links, use if('href' in curnode) instead.
-                    console.log("Has class? " + $(curnode).hasClass("functionality-trigger"));
-
-                    if(
-                        'href' in curnode && // is a link
-                        (chref=curnode.href).replace(location.href,'').indexOf('#') && // is not an anchor
-                        (   !(/^[a-z\+\.\-]+:/i).test(chref) ||                       // either does not have a proper scheme (relative links)
-                            chref.indexOf(location.protocol+'//'+location.host)===0 ) // or is in the same protocol and domain
-                        && e.defaultPrevented !== true // and the default behavior of the link is not prevented already
-                        && (!$(curnode).hasClass("functionality-trigger")) // and it's not a link I've tagged as a functionality trigger
-                    ) {
-                        e.preventDefault();
-                        location.href = curnode.href;
-                    }
-                },false);
-            }
-        })(document,window.navigator,'standalone');
-    </script>
-
+    
     <!--[if (lt IE 9) & (!IEMobile)]>
     <script src="/ui/js/standalone/respond.min.js"></script>
     <![endif]-->
@@ -99,20 +67,14 @@
     <link href='https://api.tiles.mapbox.com/mapbox.js/v2.0.0/mapbox.css' rel='stylesheet' />
 
 </head>
-<body id="page--interests" class="page--interests">
+<body id="page--interests" class="page--interests ui-page-theme-a">
 
-    <!-- Skip navigation link for screen reader and keyboard users -->
-    <div class="skiplinkholder"><p><a id="skiplink" href="#skiptarget">Skip to main content (Press Enter).</a></p></div>
+    <div data-role="page" class="wrapper">
 
-    <div class="wrapper">
-
-    <header class="masthead" role="banner">
-    <a href="#menu-panel" id="menu-trigger" class="btn btn-round btn-right functionality-trigger" title="Menu"><i class="icon icon-menu"></i><span class="visuallyhidden">Menu</span></a>
-    
-    <!-- Skip nav target -->
-    <p class="skiptargetholder"><a id="skiptarget" name="skiptarget" class="skip" tabindex="-1"></a></p>
-
+    <header class="masthead" role="banner" data-role="header" data-position="fixed" data-tap-toggle="false">
     <h1><a href="index.html">My Interests</a></h1>
+
+    <a href="#menu-panel" id="menu-trigger" class="ui-btn-right ui-btn-noborder ui-btn-nopadding ui-btn-icon-notext btn btn-round" title="Menu"><i class="icon icon-menu"></i><span class="visuallyhidden">Menu</span></a>
 </header> <!-- /header -->
 
             <div class="content" role="main">
@@ -184,12 +146,10 @@
            </script>
 
             </form>
-        </div> <!-- end content>
+        </div> <!-- end content -->
 
 
-    </div> <!-- /wrapper -->
-
-    <div id="menu-panel" class="menu-panel">
+    <div id="menu-panel" data-role="panel" data-position="right" data-position-fixed="true" data-display="overlay" class="menu-panel">
   <ul>
     <li><a href="home.html">Discover ArtsConnect</a></li>
     <li><a href="bydate.html">By Date</a></li>
@@ -201,6 +161,8 @@
     <li><a href="sign-in.html">Log out</a></li>
   </ul>
 </div>
+
+    </div> <!-- /wrapper -->
 
     <div id="signup-popup" class="modal reveal-modal">
     <div id="signup-popup-target" class="modal-content">
@@ -231,6 +193,10 @@
 </div>
 
     <!-- Javascript -->
+    <script src="ui/js/jquery/jquery-1.10.2.min.js"></script>
+    <script src="ui/js/jquery/jquery.migrate.1.2.1.min.js"></script>
     <script src="ui/js/scripts-concat.min.js"></script>
+    <script src="ui/js/jquery/jquery.mobile-1.4.2.min.js"></script>
+    
 </body>
 </html>

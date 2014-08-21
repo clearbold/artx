@@ -114,117 +114,36 @@ ArtX.dataService = {
 
 // Variables that can be used throughout
 ArtX.var = {
-    itemsPerPage : 5
+    itemsPerPage : 5,
+    isInitialLoad: true
 };
 
-/* Set up Accessible Skiplinks
-   ========================================================================== */
-ArtX.setupSkipLinks = function() {
-    /* Skiplink Javascript for Safari and Chrome */
-    if ($("#skiptarget").length > 0) {
-        var is_webkit = navigator.userAgent.toLowerCase().indexOf('webkit') > -1;
-        var is_opera = navigator.userAgent.toLowerCase().indexOf('opera') > -1;
-        if( is_webkit || is_opera ) {
-            var target = document.getElementById('skiptarget');
-            target.href="#skiptarget";
-            target.innerText="Start of main content";
-            target.setAttribute("tabindex" , "0");
-            document.getElementById('skiplink').setAttribute("onclick" , "document.getElementById('skiptarget').focus();");
-        }
-    }
-};
-
-/* Set up slide-in menu panels
-   ========================================================================== */
-ArtX.setupSlidingPanels = function() {
-
-    var $masthead = $(".masthead"),
-        $footer = $(".footer"),
-        mastheadHeight = $masthead.outerHeight,
-        footerHeight = $footer.outerHeight,
-        $slidingMenuPanel = $("#menu-panel"),
-        menuSliderOptions;
-
-    if ($slidingMenuPanel.length > 0) {
-        if (ArtX.el.html.hasClass("positionfixed")) {
-            menuSliderOptions = {
-                name: 'menu-panel',
-                side: 'right',
-                displace: false
-            };
-        } else {
-            menuSliderOptions = {
-                name: 'menu-panel',
-                side: 'right'
-            };
-        }
-
-        // Initialize Menu panel
-        if ($slidingMenuPanel.length > 0) {
-            console.log("Initializing Menu sliding panel");
-
-            var $slidingMenuTrigger = $("#menu-trigger");
-
-            $slidingMenuTrigger
-                .sidr(menuSliderOptions)
-                .click(function(e) {
-                    e.preventDefault();
-                });
-        }
-    }
-
-};
-
-/* Set up Back button
-   ========================================================================== */
-ArtX.setupBackButton = function() {
-    var $backButton = $(".btn-back");
-    if ($backButton.length > 0) {
-        console.log("Initializing back button");
-
-        $backButton.click(function() {
-            location.href=document.referrer;
-        });
-    }
-};
-
-/* Set up toggle switches
-   ========================================================================== */
-ArtX.setupToggleSwitches = function() {
-    $toggleBoxes = $(".onoffswitch").find("input[type='checkbox']");
-
-    if ($toggleBoxes.length > 0) {
-        console.log("Initializing toggle switches");
-        $toggleBoxes.onoff();
-    }
-};
 
 /* Set up Peeking slider
    ========================================================================== */
 ArtX.setupPeekSlider = function() {
     // Assumption -- there will only ever be one peek-style slider per page/screen
-    var $peekSlider = $(".slider-style-peek").find("ul");
-    if ($peekSlider.length > 0) {
+    if ($(".slider-style-peek").find("ul").length > 0) {
 
-        if ($peekSlider.children().length > 1) { // there's more than one slide to show
+        if ($(".slider-style-peek").find("ul").children().length > 1) { // there's more than one slide to show
             console.log("Initializing peeking slider");
 
-            var peekSlideInstance = $peekSlider.bxSlider({
+            var peekSlideInstance = $(".slider-style-peek").find("ul").bxSlider({
                 oneToOneTouch:false,
                 pager:false,
                 auto:false,
                 onSliderLoad: function(currentIndex) {
                     //console.log("currentIndex: " + currentIndex);
-                    $peekSlider.find("li").eq(currentIndex).addClass("slide-prev");
-                    $peekSlider.find("li").eq(currentIndex+2).addClass("slide-next");
+                    $(".slider-style-peek").find("ul").find("li").eq(currentIndex).addClass("slide-prev");
+                    $(".slider-style-peek").find("ul").find("li").eq(currentIndex+2).addClass("slide-next");
                 },
                 onSlideBefore: function($slideElement, oldIndex, newIndex) {
                     //console.log("oldIndex: " + oldIndex);
                     //console.log("newIndex: " + newIndex);
                     $(".slide-prev").removeClass("slide-prev");
                     $(".slide-next").removeClass("slide-next");
-                    $peekSlider.find("li").eq(newIndex).addClass("slide-prev");
-                    $peekSlider.find("li").eq(newIndex+2).addClass("slide-next");
+                    $(".slider-style-peek").find("ul").find("li").eq(newIndex).addClass("slide-prev");
+                    $(".slider-style-peek").find("ul").find("li").eq(newIndex+2).addClass("slide-next");
                 }
             });
 
@@ -245,7 +164,6 @@ ArtX.setupPeekSlider = function() {
    ========================================================================== */
 ArtX.footerSlider = {
     vars: {
-        footSlideContainer: $("#footer-slider"),
         footSlideInstance: "",
         footSlideOptions: {
             minSlides:3,
@@ -258,16 +176,16 @@ ArtX.footerSlider = {
         itemTemplate : $("#item-template").html()
     },
     init: function() {
-
-        if (ArtX.footerSlider.vars.footSlideContainer.length > 0) {
-
+        if ($("#footer-slider").length > 0) {
             console.log("Initializing footer slider");
 
-            var numberOfSlides = ArtX.footerSlider.vars.footSlideContainer.children();
+            var numberOfSlides = $("#footer-slider").children().length;
 
-            ArtX.footerSlider.vars.footSlideInstance = ArtX.footerSlider.vars.footSlideContainer.bxSlider(ArtX.footerSlider.vars.footSlideOptions);
+            console.log("Number of footer slides: " + numberOfSlides);
 
-            if (numberOfSlides.children().length > 3) {
+            ArtX.footerSlider.vars.footSlideInstance = $("#footer-slider").bxSlider(ArtX.footerSlider.vars.footSlideOptions);
+
+            if (numberOfSlides > 3) {
                 $('#footer-slider-next').click(function(){
                   ArtX.footerSlider.vars.footSlideInstance.goToNextSlide();
                   return false;
@@ -280,6 +198,19 @@ ArtX.footerSlider = {
             } else {
                 $(".footer-slider").addClass("not-enough-slides");
             }
+        }
+    },
+    reload: function() {
+        if ($(".ui-page-active #footer-slider").length > 0) {
+            console.log("Reloading footer slider");
+            ArtX.footerSlider.vars.footSlideInstance.reloadSlider(ArtX.footerSlider.vars.footSlideOptions);
+        }
+    },
+    destroy: function() {
+        if ($(".ui-page-active #footer-slider").length > 0) {
+            console.log("Destroying footer slider");
+            ArtX.footerSlider.vars.footSlideInstance.destroySlider();
+            ArtX.footerSlider.vars.footSlideInstance = "";
         }
     }
 };
@@ -327,10 +258,9 @@ ArtX.favoriteStars = {
                         success: function(data) {
                             // If it exists on the page, reload the favorites slider after the new item has been added
 
-                            if (ArtX.footerSlider.vars.footSlideContainer.length > 0) {
-                                console.log("Reloading slider");
+                            if ($("#footer-slider").length > 0) {
 
-                                ArtX.footerSlider.vars.footSlideContainer.fadeOut(400, function() {
+                                $("#footer-slider").fadeOut(400, function() {
 
                                     /*  DEV NOTE: When this is hooked up to a real JSON feed,
                                         we'll feed it the URL including the eventID like this:
@@ -347,9 +277,10 @@ ArtX.favoriteStars = {
                                         // Format results with underscore.js template
                                         var eventHtml = _.template(ArtX.footerSlider.vars.itemTemplate, {jsonArray:jsonArray});
 
-                                        $(eventHtml).prependTo(ArtX.footerSlider.vars.footSlideContainer);
+                                        $(eventHtml).prependTo($("#footer-slider"));
 
-                                        ArtX.footerSlider.vars.footSlideInstance.reloadSlider(ArtX.footerSlider.vars.footSlideOptions);
+                                        //ArtX.footerSlider.vars.footSlideInstance.reloadSlider(ArtX.footerSlider.vars.footSlideOptions);
+                                        ArtX.footerSlider.reload();
 
                                     });
                                 });
@@ -880,61 +811,63 @@ ArtX.map = {
 
     init : function() {
 
-        console.log( "Initializing map" );
+        if ($("#event-map").length > 0) {
+            console.log( "Initializing map" );
 
-        // Set up map
-        // TODO: displays error when map container not on page
-        L.mapbox.accessToken = 'pk.eyJ1IjoiYXRvc2NhIiwiYSI6IlFSSDhOU0EifQ.8j2CBSsaQQmn-Ic7Vjx1bw';
-        var map = L.mapbox.map( ArtX.map.vars.mapContainer, 'atosca.j55ofa87' )
-        .setView([42.3581, -71.0636], 12);
+            // Set up map
+            L.mapbox.accessToken = 'pk.eyJ1IjoiYXRvc2NhIiwiYSI6IlFSSDhOU0EifQ.8j2CBSsaQQmn-Ic7Vjx1bw';
+            var map = L.mapbox.map( ArtX.map.vars.mapContainer, 'atosca.j55ofa87' )
+            .setView([42.3581, -71.0636], 12);
 
-        // Fetch location feed
-        var $locations = $.getJSON( ArtX.map.vars.locationUrl, function( data ){
-        
-            $.each( data, function(){
-                
-        
-        //Create a marker for each location
-               
-        var name = this.name;
-
-        var marker = L.marker( [ this.latitude, this.longitude ], { 
-                    icon : L.mapbox.marker.icon({ 
-                        'marker-color': '#f86767',
-                    })
-                });
-
-        marker.bindPopup( name ).openPopup();
-
-        //Fetch event feed when marker is clicked
-        marker.on( "click", function( e ){
-        var eventArray = [];
-        $.getJSON( ArtX.map.vars.eventUrl, function( data ) {
-        $.each( data, function(){ 
-             //Save events with matching location name
-             if ( this.location.name === name ) {
-                if ( eventArray.length < ArtX.var.itemsPerPage ) {
-                    eventArray.push( this );
-                  }
-                } 
-        }); //End each
-                                
-        //Refresh event list
-        ArtX.el.eventListTarget.fadeOut( 400, function() {   
-        ArtX.el.eventListTarget.html(_.template(ArtX.el.eventListTemplate, {eventArray:eventArray}));
-            ArtX.loadMore.init();
-        ArtX.el.eventListTarget.fadeIn(400);            
-                        }); //End fade out
-                            
-                    }); //End events getJON
-                    
-                }); //End click handler
-                
-        marker.addTo( map );
-
-            }); //End each location
+            // Fetch location feed
+            var $locations = $.getJSON( ArtX.map.vars.locationUrl, function( data ){
             
-        }); //End locations getJSON
+                $.each( data, function(){
+                    
+            
+            //Create a marker for each location
+                   
+            var name = this.name;
+
+            var marker = L.marker( [ this.latitude, this.longitude ], { 
+                        icon : L.mapbox.marker.icon({ 
+                            'marker-color': '#f86767',
+                        })
+                    });
+
+            marker.bindPopup( name ).openPopup();
+
+            //Fetch event feed when marker is clicked
+            marker.on( "click", function( e ){
+            var eventArray = [];
+            $.getJSON( ArtX.map.vars.eventUrl, function( data ) {
+            $.each( data, function(){ 
+                 //Save events with matching location name
+                 if ( this.location.name === name ) {
+                    if ( eventArray.length < ArtX.var.itemsPerPage ) {
+                        eventArray.push( this );
+                      }
+                    } 
+            }); //End each
+                                    
+            //Refresh event list
+            ArtX.el.eventListTarget.fadeOut( 400, function() {   
+            ArtX.el.eventListTarget.html(_.template(ArtX.el.eventListTemplate, {eventArray:eventArray}));
+                ArtX.loadMore.init();
+            ArtX.el.eventListTarget.fadeIn(400);            
+                            }); //End fade out
+                                
+                        }); //End events getJON
+                        
+                    }); //End click handler
+                    
+            marker.addTo( map );
+
+                }); //End each location
+                
+            }); //End locations getJSON
+        }
+
     }
 };
 
@@ -942,44 +875,41 @@ ArtX.map = {
    ========================================================================== */
 ArtX.startup = {
     init : function () {
-        //console.log("Initial load: scripting initializing");
+        console.log("Scripts initializing");
 
         $('a[href="#"]').click(function(e){e.preventDefault();});
         picturefill();
 
-        ArtX.setupSkipLinks();
         ArtX.setupSignupModal();
-        ArtX.setupBackButton();
         ArtX.setupTextTruncation();
         ArtX.calendar.init();
-        ArtX.setupSlidingPanels();
         ArtX.setupPeekSlider();
         ArtX.footerSlider.init();
         ArtX.favoriteStars.init();
         ArtX.setupCustomCheckboxes();
-        ArtX.setupToggleSwitches();
         ArtX.setupFormValidation();
         ArtX.setupMySettings();
         ArtX.setupMyInterests();
         ArtX.setupHistory();
         ArtX.loadMore.init();
         ArtX.map.init();
-
-        // Initialize FastClick on certain items, to remove the 300ms delay on touch events
-        FastClick.attach(document.body);
     },
     finalize : function() {
-
+        // Initialize FastClick on certain items, to remove the 300ms delay on touch events
+        FastClick.attach(document.body);
+        console.log("Script initialization complete");
     }
 };
 
-
 $(document).ready(function() {
-
     handleAppCache();
+});
+
+/* Initial document load */
+$(document).on( "mobileinit", function( event ) {
+    console.log("jQuery Mobile is initializing");
 
     Modernizr.load([
-
         // Test need for matchMedia polyfill
         {
             test: window.matchMedia,
@@ -990,19 +920,54 @@ $(document).ready(function() {
                 /* Fire based on document context
                 ========================================================================== */
 
-                var namespace  = ArtX.startup, context = document.body.id;
+                var namespace  = ArtX.startup;
                 if (typeof namespace.init === 'function') {
                     namespace.init();
-                }
-                if (namespace && namespace[ context ] && (typeof namespace[ context ] === 'function')) {
-                    namespace[ context ]();
                 }
                 if (typeof namespace.finalize === 'function') {
                     namespace.finalize();
                 }
 
+                ArtX.var.isInitialLoad = false;
 
             }
         }
     ]);
 });
+
+/* Destroying sliders before hiding a page */
+$(document).on( "pagebeforehide", function( event ) {
+    console.log("Scripting before hiding the current page");
+
+    ArtX.footerSlider.destroy();
+});
+
+/* Removing the prior page on page hide, so that we don't have multiple versions of pages cluttering the DOM */
+$(document).on("pagehide", "div[data-role=page]", function(event){
+    console.log("Hiding the previous page");
+
+    $(event.target).remove();
+});
+
+/* Triggering the initialization scripts on page change, rather than document load */
+$(document).on( "pageshow", function( event ) {
+
+    console.log("New page is being shown!");
+
+    if (!ArtX.var.isInitialLoad) {
+        console.log("Not the initial load, either");
+
+        /* Fire based on document context
+        ========================================================================== */
+
+        var namespace  = ArtX.startup;
+        if (typeof namespace.init === 'function') {
+            namespace.init();
+        }
+        if (typeof namespace.finalize === 'function') {
+            namespace.finalize();
+        }
+    }
+});
+
+

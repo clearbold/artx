@@ -139,8 +139,6 @@ module.exports = function(grunt) {
                 },
                 // Source file(s), in the order we want to concatenate them.
                 src: [
-                    '<%= jsPathDev %>jquery/jquery-1.10.2.js',
-                    '<%= jsPathDev %>jquery/jquery.migrate.1.2.1.js',
                     '<%= jsPathDev %>plugins/*.js',
                     '<%= jsPathDev %>scripts.js'
                 ],

@@ -25,6 +25,11 @@ body {
     font-family:"Lato", Arial, sans-serif;
     font-weight:300;
     letter-spacing:1px;
+    line-height:normal;
+    
+    * {
+        text-shadow:none !important;
+    }
 }
 
 /* Skipnav links */
@@ -100,6 +105,7 @@ a {
     vertical-align:middle;
     position:relative;
     background-color:$black-20pct;
+    text-shadow:none;
     padding:.5em;
     line-height:1;
     border:none;
@@ -179,6 +185,10 @@ h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
     font-weight:400;
     line-height:1.2;
+    
+    a {
+        font-weight:400 !important;
+    }
 }
 
 h1, .h1 {
@@ -285,7 +295,7 @@ hr {
 }
 
 
-label {
+label, .ui-mobile label, div.ui-controlgroup-label {
     font-weight:bold;
     display:block;
     @include font-size(14px, false);
@@ -298,7 +308,8 @@ label {
 
 input[type=text],
 input[type=email],
-input[type=password] {
+input[type=password],
+.ui-input-text input {
     -webkit-appearance: none;
     border-radius: 0;
     border:none;
@@ -309,16 +320,21 @@ input[type=password] {
     display:block;
     width:100%;
     max-width:240px;
+    font-family:"Lato", Arial, sans-serif;
+    font-weight:300;
+    min-height:0;
+    line-height:normal;
 
     &.error {
         outline:2px solid red;
     }
 }
-button {
+button, .ui-page-theme-a button.ui-btn {
     white-space:nowrap;
     text-decoration:none;
     @include font-smoothing(on);
     @include font-size(16px, false);
+    font-family:"Lato", Arial, sans-serif;
     font-weight:400;
     text-align:center;
     margin:0 0 $spacing-unit;
@@ -330,6 +346,10 @@ button {
     padding-right:1em;
     padding-left: 1em;
     line-height:2;
+    display:inline-block;
+    width:auto;
+    -webkit-border-radius: 0;
+            border-radius: 0;
 
     @include transition(color .1s linear, background-color .1s linear);
 
@@ -347,8 +367,10 @@ button {
 
 // Custom checkboxes
 .js {
-    .custom-checkbox {
+    .ui-checkbox {
         position:relative;
+        margin:0;
+
 
         input {
             position: absolute;
@@ -359,6 +381,7 @@ button {
         }
 
         label {
+            font-family:"Lato", Arial, sans-serif;
             font-weight:normal;
             display: block;
             position: relative;
@@ -371,37 +394,52 @@ button {
             background-image:url("/ui/img/sprite-checkboxes.png");
             background-repeat:no-repeat;
             background-position: 95% 10px;
+            border:none;
+            color:$white;
+            -webkit-border-radius: 0;
+                    border-radius: 0;
 
-            &.hover,
-            &.focus {
-                background-position: 95% -90px;
-            }
-
-            &.checked {
-                background-position: 95% -190px;
-            }
-
-            &.checkedHover,
-            &.checkedFocus {
-                background-position: 95% -290px;
-            }
-
-            &.focus {
+            &:hover,
+            &:focus {
                 background-color:lighten($page-bg, 2);
+                background-position: 95% -90px;
+                color:$white;
+            }
+
+            &:focus {
                 outline:none;
+            }
+
+            &.ui-checkbox-on {
+                background-position: 95% -190px;
+
+                &:hover,
+                &:focus {
+                    background-color:lighten($page-bg, 2);
+                    background-position: 95% -190px;
+                }
+            }
+
+            &:after {
+                display:none;
             }
         }
     }
-    .thumb-list .custom-checkbox {
+    .thumb-list .ui-checkbox {
         display:inline-block;
 
         label {
             padding:10px 30px 10px 0;
         }
     }
-    .custom-checkbox-list .custom-checkbox label {
+    .custom-checkbox-list .ui-checkbox label {
         background-color:lighten($page-bg, 5);
         padding:10px 30px 10px $spacing-unit;
+        
+        &:hover,
+        &:focus {
+            background-color:lighten($page-bg, 3);
+        }
     }
 }
 
@@ -430,7 +468,7 @@ button {
     text-align:center;
     padding:11px $spacing-unit;
 
-    h1, .h1 {
+    h1, .h1, .ui-title {
         margin:0;
         @include font-size(17px);
 
@@ -443,15 +481,22 @@ button {
         }
     }
 
-    .btn-left,
-    .btn-right {
+    .ui-btn-left,
+    .ui-btn-right {
         position:absolute;
-        margin-top:-.3em;
+        top:.3em;
+        margin-top:0;
+        color:$link-color;
+        font-size:1em;
+        
+        &:hover {
+            color:$link-hover-color;
+        }
     }
-    .btn-left {
+    .ui-btn-left {
         left:$spacing-unit;
     }
-    .btn-right {
+    .ui-btn-right {
         right:$spacing-unit;
     }
 }
@@ -521,14 +566,9 @@ button {
     }
     .content {
         position:relative;
-        padding:(45px+$spacing-unit) $spacing-unit 147px;
+        padding:$spacing-unit $spacing-unit 147px;
         z-index:1;
     }
-
-    .sidr {
-        top:45px;
-    }
-
     .layout-nofooter .content {
         padding-bottom:$spacing-unit !important;
     }
@@ -989,36 +1029,117 @@ div#event-map {
     }
 }
 
-/* Overriding some sidr styles */
-.sidr {
-    height:auto;
-    bottom:0;
+/* Overriding some panel styles */
+.ui-panel-inner {
+    padding:0;
+}
+.ui-page-theme-a .menu-panel {
+    top:46px;
+    box-shadow:-10px 0 20px $black-20pct;
 
+    /* Theme Settings */
+    font-family: $panel-font-family;
+    font-size: $panel-font-size;
+    background: $panel-background;
+    color: $panel-text-color;
+    
     ul {
-        margin-bottom:0;
+        display: block;
+        margin:0;
+        padding: 0;
+        border-top: 1px solid darken($panel-background, 10%);
+        border-bottom: 1px solid lighten($panel-background, 10%);
 
         li {
-
+            display: block;
+            margin: 0;
             line-height:3em;
+            border-top: 1px solid lighten($panel-background, 10%);
+            border-bottom: 1px solid darken($panel-background, 10%);
 
             &:hover,
             &.active,
             &.sidr-class-active {
                 border-top:1px solid transparent;
                 line-height:3em;
+
+                > a, > span {
+                    background:darken($panel-background, 5%);
+                }
+            }
+
+            a, span {
+                padding: 0 15px;
+                display: block;
+                text-decoration: none;
+                color: $panel-text-color;
+                font-weight:300;
+                
+                &:hover {
+                    color:$link-hover-color;
+                }
+            }
+
+            ul {
+                border-bottom: none;
+                margin: 0;
+                li {
+                    line-height: 40px;
+                    font-size: $panel-font-size - 2;
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+
+                    &:hover,
+                    &.active,
+                    &.sidr-class-active {
+                        border-top: none;
+                        line-height: 41px;
+
+                        > a, > span {
+                            background:darken($panel-background, 5%);
+                        }
+                    }
+
+                    a, span {
+                        color: rgba($panel-text-color, .8);
+                        padding-left: 30px;
+                    }
+                }
             }
         }
-
     }
+}
 
-    &.right {
-        box-shadow:-10px 0 20px $black-20pct;
+/* Other jQuery Mobile overrides */
+.ui-btn,
+label.ui-btn,
+.ui-page-theme-a a,
+html .ui-bar-a a,
+html .ui-body-a a,
+html body .ui-group-theme-a a {
+    font-weight: 300;
+}
+
+.ui-header,
+.ui-footer {
+    border:none !important;
+    
+    .ui-title {
+        min-height:0;
+        padding:0;
     }
+}
 
-    &.left {
-        left: -260px;
-        right: auto;
-        box-shadow:10px 0 20px $black-20pct;
+.ui-page-theme-a {
+    .ui-input-text {
+        background-color:transparent;
+        -webkit-box-shadow:none;
+        -moz-box-shadow:none;
+        box-shadow:none;
+        margin:0;
+        border:none;
     }
 }
 
@@ -1063,17 +1184,16 @@ div#event-map {
     min-height:35px;
 
     > label,
-    .onoffswitch {
+    .ui-flipswitch {
         display:inline-block;
         vertical-align:middle;
     }
 
     > label {
-        width:70%;
+        width:75%;
+        max-width:430px;
         padding-right:$spacing-unit;
         font-weight:normal;
-
-
     }
 
     .item-block & {
@@ -1085,37 +1205,55 @@ div#event-map {
     }
 }
 
-.onoffswitch * {
-    -moz-box-sizing:content-box;
-    -webkit-box-sizing:content-box;
-    box-sizing:content-box;
-}
-.onoffswitch .onoffswitch-inner:before,
-.onoffswitch .onoffswitch-inner:after {
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    content: "";
-}
-.onoffswitch-inner:before {
-    color:$gray-darker;
+
+
+/* Flipswitches */
+.ui-flipswitch {
+    font-size:18px;
+
+    @include vendor(box-sizing, content-box);
+    -webkit-border-radius: 1em !important;
+    border-radius: 1em !important;
+    width:3em; // down from 5.875em
+    
+    &.ui-flipswitch-active {
+        padding-left: 1.125em; // down from 4em
+    }
+    
+    .ui-shadow {
+        -webkit-box-shadow:0 0 5px rgba(0,0,0,0.2);
+        -moz-box-shadow:0 0 5px rgba(0,0,0,0.2);
+        box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+
+    &.ui-shadow-inset {
+        border:none !important;
+        -webkit-box-shadow:inset 0 0 2px rgba(0,0,0,.3);
+        -moz-box-shadow:inset 0 0 2px rgba(0,0,0,.3);
+        box-shadow: inset 0 0 2px rgba(0,0,0,.3);
+    }
+
+    span {
+       display:none;
+    }
+
+    .ui-btn.ui-flipswitch-on {
+        text-indent:-10em;
+    }
 }
 
-.onoffswitch-inner:after {
-    background-color: $gray-light;
-    color:$gray-mediumdark;
+// Changing the colors
+.ui-page-theme-a {
+
+    .ui-flipswitch {
+        background-color:$gray-light;
+    }
+
+    .ui-flipswitch-active {
+        background-color:rgb(76,216,100);
+    }
 }
-.onoffswitch-label {
-    border:none;
-    margin:0;
-}
-.onoffswitch-switch {
-    border:none;
-    box-shadow:0 0 5px rgba(0,0,0,.2);
-    width: 31px;
-    margin: 2px;
-    right: 45px;
-}
+
 
 /* Calendar styles */
 .calendar {
