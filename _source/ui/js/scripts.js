@@ -826,17 +826,17 @@ ArtX.map = {
                         var eventArray = [];
                         $.getJSON( ArtX.map.vars.eventUrl, function( data ) {
                             $.each( data, function(){ 
-                                 //Save events with matching location name
-                                 if ( this.location.name === name ) {
+                                //Save events with matching location name
+                                if ( this.location.name === name ) {
                                     if ( eventArray.length < ArtX.var.itemsPerPage ) {
                                         eventArray.push( this );
-                                      }
-                                    } 
+                                    }
+                                } 
                             }); //End each
                                                     
                             //Refresh event list
                             $("#event-list").fadeOut( 400, function() {   
-                                $("#event-list").html(_.template($('#template-calendar').html(), {eventArray:eventArray}));
+                                $("#event-list").html(_.template($('#template-eventlist').html(), {eventArray:eventArray}));
                                 ArtX.loadMore.init();
                                 $("#event-list").fadeIn(400);            
                             }); //End fade out
