@@ -373,18 +373,6 @@ ArtX.setupSignupModal = function() {
 
 };
 
-/* Set up custom checkboxes
-   ========================================================================== */
-ArtX.setupCustomCheckboxes = function() {
-    var $checkboxes = $(".customize-checkbox");
-
-    if ($checkboxes.length > 0) {
-        console.log("Setting up custom checkboxes");
-
-        $checkboxes.customInput();
-    }
-};
-
 /* Set up By Date Event Calendar
    ========================================================================== */
 ArtX.calendar = {
@@ -886,7 +874,6 @@ ArtX.startup = {
         ArtX.setupPeekSlider();
         ArtX.footerSlider.init();
         ArtX.favoriteStars.init();
-        ArtX.setupCustomCheckboxes();
         ArtX.setupFormValidation();
         ArtX.setupMySettings();
         ArtX.setupMyInterests();
