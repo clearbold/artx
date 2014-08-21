@@ -192,7 +192,7 @@
   <ul>
     <li class="active"><a href="home.html">Discover ArtsConnect</a></li>
     <li><a href="bydate.html">By Date</a></li>
-    <li><a href="#">By Location</a></li>
+    <li><a href="bylocation.html">By Location</a></li>
     <li><a href="favorites.html">Favorites</a></li>
     <li><a href="history.html">History</a></li>
     <li><a href="settings.html">Settings</a></li>
@@ -203,7 +203,7 @@
 
     </div>
 
-    <div id="signup-popup" class="modal reveal-modal">
+    <div id="signup-popup" class="modal">
     <div id="signup-popup-target" class="modal-content">
         <h2>Sign up</h2>
                 <p>Introductory copy lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus, architecto itaque mollitia saepe ab sint omnis quia temporibus officiis aperiam.</p>
@@ -225,10 +225,10 @@
             </p>
 
             <button type="submit">Submit</button>
-            <p><small>Already have an account? <a href="sign-in.html">Sign in</a></small></p>
+            <p><small>Already have an account? <a href="sign-in.html" class="close-modal">Sign in</a></small></p>
         </form>
     </div>
-    <a href="#" class="btn btn-round close-reveal-modal close"><i class="icon icon-cross"></i><span class="visuallyhidden">Close</span></a>
+    <a href="#close" data-rel="back" class="btn btn-round ui-btn close"><i class="icon icon-cross"></i><span class="visuallyhidden">Close</span></a>
 </div>
 
     <!-- Javascript -->

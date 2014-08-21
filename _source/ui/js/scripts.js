@@ -348,27 +348,21 @@ ArtX.setupSignupModal = function() {
     // DEV NOTE: This should be replaced with a more robust solution in the final site.
     // This detection is just for demo purposes.
 
-    if ($("#favorite-notsignedin").length > 0) {
+    /* if ($("#favorite-notsignedin").length > 0) {
         isSignedIn = false;
     }
 
     console.log("Signed in? " + isSignedIn);
 
     if (!isSignedIn) {
-        $signupModalObj.foundation('reveal', 'open');
-    }
+        $("#signup-popup").popup('open');
+    } */
 
     // Set up behavior on modal close
-    $(document).on("click", ".close-reveal-modal, .reveal-modal-bg", function() {
-        $signupModalObj.foundation('reveal', 'close');
+    $(document).on("click", ".close-modal", function() {
+        $("#signup-popup").popup('close');
         //console.log("Modal closed");
     });
-
-    // Set up modal trigger link
-    $(document).on("click", ".open-signup", function() {
-        $signupModalObj.foundation('reveal', 'open');
-    });
-
 };
 
 /* Set up By Date Event Calendar
@@ -892,6 +886,9 @@ ArtX.startup = {
 
 $(document).ready(function() {
     handleAppCache();
+
+    // Since the modal popup is outside jQuery Mobile's "pages", we need to instantiate it separately
+    $("#signup-popup").enhanceWithin().popup();
 });
 
 /* Initial document load */

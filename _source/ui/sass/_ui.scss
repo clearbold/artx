@@ -1147,21 +1147,45 @@ html body .ui-group-theme-a a {
 }
 
 /* Modal styles */
-.reveal-modal {
-    margin-left: -45%;
-    width: 90%;
-    background-color:$main-color-dark;
-    padding:$spacing-unit;
+.ui-popup-container {
+    width:100% !important;
+    max-width:none !important;
+    left:0 !important;
+}
+.modal {
+    left: 5% !important;
+    right: 5% !important;
+    width: 90% !important;
+    margin-left: 0 !important;
+    background-color:$main-color-dark !important;
+    border:none !important;
+    -webkit-border-radius: 0;
+            border-radius: 0;
 
+    .close {
+        font-size:inherit;
+        line-height: 1;
+        position: absolute;
+        top: 0.5em;
+        right: 0.6875em;
+        color: $text-color;
+        text-decoration:none;
+        font-weight: bold;
+        cursor: pointer;
+        margin:0;
+        
+        &:hover {
+            color:$link-hover-color;
+        }
+    }
+}
+.modal-content {
+    padding:$spacing-unit;
+    
     @include mq($lap-start) {
         padding:$spacing-desktop;
     }
 
-    .close-reveal-modal {
-        font-size:inherit;
-    }
-}
-.modal-content {
     a {
         color:$accent-color;
 
@@ -1169,7 +1193,8 @@ html body .ui-group-theme-a a {
             color:$white;
         }
     }
-    button {
+    button,
+    button.ui-btn {
         background-color:$main-color-darker;
         color:$white;
 
@@ -1178,6 +1203,13 @@ html body .ui-group-theme-a a {
             color:$white;
         }
     }
+}
+.ui-popup-screen.in {
+    opacity: 0.75;
+    filter: Alpha(Opacity=75);
+}
+.ui-overlay-inherit {
+    background: black;
 }
 
 /* Toggle switch overrides */

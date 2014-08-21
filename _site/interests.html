@@ -71,13 +71,13 @@
 
     <div data-role="page" class="wrapper">
 
-    <header class="masthead" role="banner" data-role="header" data-position="fixed" data-tap-toggle="false">
+        <header class="masthead" role="banner" data-role="header" data-position="fixed" data-tap-toggle="false">
     <h1><a href="index.html">My Interests</a></h1>
 
     <a href="#menu-panel" id="menu-trigger" class="ui-btn-right ui-btn-noborder ui-btn-nopadding ui-btn-icon-notext btn btn-round" title="Menu"><i class="icon icon-menu"></i><span class="visuallyhidden">Menu</span></a>
 </header> <!-- /header -->
 
-            <div class="content" role="main">
+                <div class="content" role="main">
             <p>Introductory text lorem ipsum dolor sit amet, consectetur adipisicing elit. Molestias, quisquam obcaecati eum maxime voluptatem quos praesentium esse saepe sunt officiis.</p>
 
             <form id="interest-form" name="interest-form" method="post" action="">
@@ -149,11 +149,11 @@
         </div> <!-- end content -->
 
 
-    <div id="menu-panel" data-role="panel" data-position="right" data-position-fixed="true" data-display="overlay" class="menu-panel">
+        <div id="menu-panel" data-role="panel" data-position="right" data-position-fixed="true" data-display="overlay" class="menu-panel">
   <ul>
     <li><a href="home.html">Discover ArtsConnect</a></li>
     <li><a href="bydate.html">By Date</a></li>
-    <li><a href="#">By Location</a></li>
+    <li><a href="bylocation.html">By Location</a></li>
     <li><a href="favorites.html">Favorites</a></li>
     <li><a href="history.html">History</a></li>
     <li><a href="settings.html">Settings</a></li>
@@ -164,7 +164,7 @@
 
     </div> <!-- /wrapper -->
 
-    <div id="signup-popup" class="modal reveal-modal">
+    <div id="signup-popup" class="modal">
     <div id="signup-popup-target" class="modal-content">
         <h2>Sign up</h2>
                 <p>Introductory copy lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus, architecto itaque mollitia saepe ab sint omnis quia temporibus officiis aperiam.</p>
@@ -186,10 +186,10 @@
             </p>
 
             <button type="submit">Submit</button>
-            <p><small>Already have an account? <a href="sign-in.html">Sign in</a></small></p>
+            <p><small>Already have an account? <a href="sign-in.html" class="close-modal">Sign in</a></small></p>
         </form>
     </div>
-    <a href="#" class="btn btn-round close-reveal-modal close"><i class="icon icon-cross"></i><span class="visuallyhidden">Close</span></a>
+    <a href="#close" data-rel="back" class="btn btn-round ui-btn close"><i class="icon icon-cross"></i><span class="visuallyhidden">Close</span></a>
 </div>
 
     <!-- Javascript -->
