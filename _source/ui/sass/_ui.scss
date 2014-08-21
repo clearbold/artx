@@ -1141,6 +1141,9 @@ html body .ui-group-theme-a a {
         margin:0;
         border:none;
     }
+    .ui-icon-loading {
+        background: url("/ui/img/ajax-loader.gif");
+    }
 }
 
 /* Modal styles */

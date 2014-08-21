@@ -40,9 +40,7 @@ ArtX.el = {
     doc             : $(document),
     body            : $('body'),
     calendarContainer: $("#event-calendar"),
-    eventCalendar   : "",
-    eventListTarget : $("#event-list"),
-    eventListTemplate: $("#template-eventlist").html()
+    eventCalendar   : ""
 };
 
 ArtX.util = {
@@ -381,7 +379,7 @@ ArtX.calendar = {
             eventArray = data;
 
             // Create a Clndr and save the instance as myCalendar
-            ArtX.el.eventCalendar = ArtX.el.calendarContainer.clndr({
+            ArtX.el.eventCalendar = $("#event-calendar").clndr({
                 template: $('#template-calendar').html(),
                 events: eventArray,
                 dateParameter: 'start_date',
@@ -393,12 +391,15 @@ ArtX.calendar = {
                     click: function(target) {
                         // if we click on a day
                         if ($(target.element).hasClass("day")) {
+                            console.log("Day clicked!");
                             // clear any existing selection states
                             $(".day").removeClass("day-selected");
                             // select the new day
                             $(target.element).addClass("day-selected");
                             // and display events for that day
                             ArtX.calendar.displayEventList(target);
+                        } else {
+                            console.log("Click target not a day.");
                         }
                     },
                     onMonthChange: function(month) {
@@ -443,17 +444,19 @@ ArtX.calendar = {
         });
     },
     displayEventList: function(target) {
+        console.log("Displaying event list");
         var eventArray = target.events;
-        ArtX.el.eventListTarget.fadeOut(400, function() {
-            ArtX.el.eventListTarget.html(_.template(ArtX.el.eventListTemplate, {eventArray:eventArray}));
-            ArtX.el.eventListTarget.fadeIn(400, function() {
+        var eventTemplate = $('#template-eventlist').html();
+        $("#event-list").fadeOut(400, function() {
+            $("#event-list").html(_.template(eventTemplate, {eventArray:eventArray}));
+            $("#event-list").fadeIn(400, function() {
                 // Re-do truncation once fade is complete
                 ArtX.setupTextTruncation();
             });
         });
     },
     init: function() {
-        if (ArtX.el.calendarContainer.length > 0) {
+        if ($("#event-calendar").length > 0) {
             console.log("Setting up event calendar");
 
             var eventArray = [],
@@ -811,45 +814,44 @@ ArtX.map = {
             var $locations = $.getJSON( ArtX.map.vars.locationUrl, function( data ){
             
                 $.each( data, function(){
-                    
-            
-            //Create a marker for each location
-                   
-            var name = this.name;
 
-            var marker = L.marker( [ this.latitude, this.longitude ], { 
+                    //Create a marker for each location
+                           
+                    var name = this.name;
+
+                    var marker = L.marker( [ this.latitude, this.longitude ], { 
                         icon : L.mapbox.marker.icon({ 
                             'marker-color': '#f86767',
                         })
                     });
 
-            marker.bindPopup( name ).openPopup();
+                    marker.bindPopup( name ).openPopup();
 
-            //Fetch event feed when marker is clicked
-            marker.on( "click", function( e ){
-            var eventArray = [];
-            $.getJSON( ArtX.map.vars.eventUrl, function( data ) {
-            $.each( data, function(){ 
-                 //Save events with matching location name
-                 if ( this.location.name === name ) {
-                    if ( eventArray.length < ArtX.var.itemsPerPage ) {
-                        eventArray.push( this );
-                      }
-                    } 
-            }); //End each
-                                    
-            //Refresh event list
-            ArtX.el.eventListTarget.fadeOut( 400, function() {   
-            ArtX.el.eventListTarget.html(_.template(ArtX.el.eventListTemplate, {eventArray:eventArray}));
-                ArtX.loadMore.init();
-            ArtX.el.eventListTarget.fadeIn(400);            
+                    //Fetch event feed when marker is clicked
+                    marker.on( "click", function( e ){
+                        var eventArray = [];
+                        $.getJSON( ArtX.map.vars.eventUrl, function( data ) {
+                            $.each( data, function(){ 
+                                 //Save events with matching location name
+                                 if ( this.location.name === name ) {
+                                    if ( eventArray.length < ArtX.var.itemsPerPage ) {
+                                        eventArray.push( this );
+                                      }
+                                    } 
+                            }); //End each
+                                                    
+                            //Refresh event list
+                            $("#event-list").fadeOut( 400, function() {   
+                                $("#event-list").html(_.template($('#template-calendar').html(), {eventArray:eventArray}));
+                                ArtX.loadMore.init();
+                                $("#event-list").fadeIn(400);            
                             }); //End fade out
-                                
+                                            
                         }); //End events getJON
-                        
+                                
                     }); //End click handler
-                    
-            marker.addTo( map );
+                            
+                    marker.addTo( map );
 
                 }); //End each location
                 
