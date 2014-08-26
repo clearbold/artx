@@ -365,6 +365,19 @@ ArtX.setupSignupModal = function() {
     });
 };
 
+/* Set up custom checkboxes
+   ========================================================================== */
+ArtX.setupCustomCheckboxes = function() {
+    var $checkboxes = $(".customize-checkbox");
+
+    if ($checkboxes.length > 0) {
+        console.log("Setting up custom checkboxes");
+
+        $checkboxes.customInput();
+    }
+};
+
+
 /* Set up By Date Event Calendar
    ========================================================================== */
 ArtX.calendar = {
@@ -747,7 +760,8 @@ ArtX.setupHistory = function() {
                 data: {
                     eventCheckbox: checkboxID,
                     eventAttended: isCheckboxChecked
-                }
+                },
+                async: true
             });
         });
     }
@@ -826,19 +840,22 @@ ArtX.map = {
                         var eventArray = [];
                         $.getJSON( ArtX.map.vars.eventUrl, function( data ) {
                             $.each( data, function(){ 
-                                 //Save events with matching location name
-                                 if ( this.location.name === name ) {
+                                //Save events with matching location name
+                                if ( this.location.name === name ) {
                                     if ( eventArray.length < ArtX.var.itemsPerPage ) {
                                         eventArray.push( this );
-                                      }
-                                    } 
+                                    }
+                                } 
                             }); //End each
                                                     
                             //Refresh event list
                             $("#event-list").fadeOut( 400, function() {   
-                                $("#event-list").html(_.template($('#template-calendar').html(), {eventArray:eventArray}));
+                                $("#event-list").html(_.template($('#template-eventlist').html(), {eventArray:eventArray}));
                                 ArtX.loadMore.init();
-                                $("#event-list").fadeIn(400);            
+                                $("#event-list").fadeIn(400, function() {
+                                    // Re-do truncation once fade is complete
+                                    ArtX.setupTextTruncation();
+                                });            
                             }); //End fade out
                                             
                         }); //End events getJON
@@ -870,6 +887,7 @@ ArtX.startup = {
         ArtX.setupPeekSlider();
         ArtX.footerSlider.init();
         ArtX.favoriteStars.init();
+        ArtX.setupCustomCheckboxes();
         ArtX.setupFormValidation();
         ArtX.setupMySettings();
         ArtX.setupMyInterests();

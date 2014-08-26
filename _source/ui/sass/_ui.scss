@@ -172,6 +172,12 @@ a {
         }
     }
 }
+.touchcapable .btn {
+    &:focus,
+    &:hover {
+        background-color:inherit;
+    }
+}
 
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6,
@@ -367,10 +373,8 @@ button, .ui-page-theme-a button.ui-btn {
 
 // Custom checkboxes
 .js {
-    .ui-checkbox {
+    .custom-checkbox {
         position:relative;
-        margin:0;
-
 
         input {
             position: absolute;
@@ -399,47 +403,36 @@ button, .ui-page-theme-a button.ui-btn {
             -webkit-border-radius: 0;
                     border-radius: 0;
 
-            &:hover,
-            &:focus {
-                background-color:lighten($page-bg, 2);
+            &.hover,
+            &.focus {
                 background-position: 95% -90px;
-                color:$white;
             }
 
-            &:focus {
-                outline:none;
-            }
-
-            &.ui-checkbox-on {
+            &.checked {
                 background-position: 95% -190px;
-
-                &:hover,
-                &:focus {
-                    background-color:lighten($page-bg, 2);
-                    background-position: 95% -190px;
-                }
             }
 
-            &:after {
-                display:none;
+            &.checkedHover,
+            &.checkedFocus {
+                background-position: 95% -290px;
+            }
+
+            &.focus {
+                background-color:lighten($page-bg, 2);
+                outline:none;
             }
         }
     }
-    .thumb-list .ui-checkbox {
+    .thumb-list .custom-checkbox {
         display:inline-block;
 
         label {
             padding:10px 30px 10px 0;
         }
     }
-    .custom-checkbox-list .ui-checkbox label {
+    .custom-checkbox-list .custom-checkbox label {
         background-color:lighten($page-bg, 5);
         padding:10px 30px 10px $spacing-unit;
-        
-        &:hover,
-        &:focus {
-            background-color:lighten($page-bg, 3);
-        }
     }
 }
 
@@ -1130,6 +1123,10 @@ html body .ui-group-theme-a a {
         min-height:0;
         padding:0;
     }
+}
+
+.ui-header-fixed.ui-fixed-hidden {
+    padding-top:11px;
 }
 
 .ui-page-theme-a {
