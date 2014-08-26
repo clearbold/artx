@@ -18208,16 +18208,15 @@ ArtX.footerSlider = {
    ========================================================================== */
 
 ArtX.favoriteStars = {
-    vars: {
-        favoriteStars: $(".favorite-star")
-    },
     init: function() {
-        if (ArtX.favoriteStars.vars.favoriteStars.length > 0) {
+        if ($(".favorite-star").length > 0) {
             console.log("Initializing favorite stars");
 
             var selectedEventID;
 
-            ArtX.favoriteStars.vars.favoriteStars.click(function() {
+            $(".favorite-star").click(function() {
+
+                console.log("The user clicked a star!");
 
                 // Capture the Event ID from the data-attribute on the clicked link
                 selectedEventID = $(this).data("eventID");
@@ -18242,7 +18241,9 @@ ArtX.favoriteStars = {
                     setterJsonUrl = "/SetEventFavorite/";
 
                     $.ajax({
-                        type: "POST",
+                        type: "GET",
+                        /* SMA: This is set to GET because POST was causing 412 errors on iPhone 
+                        (http://stackoverflow.com/questions/21616009/412-server-response-code-from-ajax-request) */
                         url: setterJsonUrl,
                         success: function(data) {
                             // If it exists on the page, reload the favorites slider after the new item has been added
@@ -18293,7 +18294,9 @@ ArtX.favoriteStars = {
                     jsonUrl = "/DeleteFavorite/";
 
                     $.ajax({
-                        type: "POST",
+                        type: "GET",
+                        /* SMA: This is set to GET because POST was causing 412 errors on iPhone 
+                        (http://stackoverflow.com/questions/21616009/412-server-response-code-from-ajax-request) */
                         url: jsonUrl,
                         success: function() {
                             // Swap the star
