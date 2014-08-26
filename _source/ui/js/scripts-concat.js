@@ -18265,7 +18265,9 @@ ArtX.favoriteStars = {
                                         var jsonArray = data;
 
                                         // Format results with underscore.js template
-                                        var eventHtml = _.template(ArtX.footerSlider.vars.itemTemplate, {jsonArray:jsonArray});
+                                        var eventHtml = _.template($("#item-template").html(), {jsonArray:jsonArray});
+
+                                        //console.log("item template html" + $("#item-template").html());
 
                                         $(eventHtml).prependTo($("#footer-slider"));
 
