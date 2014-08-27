@@ -806,6 +806,42 @@ ArtX.setupMyInterests = function() {
     }
 };
 
+/* Login functionality
+   ========================================================================== */
+ArtX.login = {
+    init: function() {
+        if ($("#signin-form").length > 0) {
+            console.log("Initializing sign-in form");
+            $("#signin-form").submit(function(event) {
+                event.preventDefault();
+                ArtX.login.ajaxSubmit();
+            });
+        }
+    },
+    ajaxSubmit: function() {
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "http://artx-staging.herokuapp.com/tokens",
+            data: {
+                email: $("#email").val(),
+                password:  $("#password").val()
+            },
+            success: function( data ){
+                $.cookie('token', data.authentication_token);
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error:" + error + ", " + errorThrown);
+                /* if (jqXHR.status && jqXHR.status == 401) {
+                    alert("Unauthorized request");
+                } else if (jqXHR.status && jqXHR.status == 404) {
+                    alert("The requested page not found");
+                }*/
+            }
+        });
+    }
+};
+
 ArtX.map = {
 
     vars : {
@@ -889,6 +925,7 @@ ArtX.startup = {
         $('a[href="#"]').click(function(e){e.preventDefault();});
         picturefill();
 
+        ArtX.login.init();
         ArtX.setupSignupModal();
         ArtX.setupTextTruncation();
         ArtX.calendar.init();
