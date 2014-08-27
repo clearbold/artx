@@ -760,7 +760,7 @@ ArtX.setupHistory = function() {
             /* This stub Ajax call sends the checkbox ID and whether it's checked to the /SetAttendance/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc */
 
             $.ajax({
-                type: "GET", 
+                type: "GET",
                 /* SMA: This is set to GET because POST was causing 412 errors on iPhone 
                 (http://stackoverflow.com/questions/21616009/412-server-response-code-from-ajax-request) */
                 url: "/SetAttendance/",
@@ -793,7 +793,7 @@ ArtX.setupMyInterests = function() {
             The "success" call could also be used to display more interests -- see the Load More scripting for examples of how that can be done. */
 
             $.ajax({
-                type: "GET",
+                type: "POST",
                 /* SMA: This is set to GET because POST was causing 412 errors on iPhone 
                 (http://stackoverflow.com/questions/21616009/412-server-response-code-from-ajax-request) */
                 url: "/SetInterest/",

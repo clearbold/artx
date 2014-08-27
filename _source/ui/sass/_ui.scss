@@ -477,7 +477,7 @@ button, .ui-page-theme-a button.ui-btn {
     .ui-btn-left,
     .ui-btn-right {
         position:absolute;
-        top:.3em;
+        top:7px;
         margin-top:0;
         color:$link-color;
         font-size:1em;
@@ -559,11 +559,12 @@ button, .ui-page-theme-a button.ui-btn {
     }
     .content {
         position:relative;
-        padding:$spacing-unit $spacing-unit 147px;
+        padding:$spacing-unit;
         z-index:1;
-    }
-    .layout-nofooter .content {
-        padding-bottom:$spacing-unit !important;
+        
+        &.layout-footer {
+            padding-bottom:147px !important;
+        }
     }
 }
 
