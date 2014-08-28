@@ -23474,11 +23474,11 @@ ArtX.setupFormValidation = function() {
                 },
                 "email": {
                     required: true,
-                    email: true,
+                    email: true/*,
                     remote: {
                         url: "/CheckEmail/",
                         type: "post"
-                    }
+                    }*/
                 }
             },
             messages: {
