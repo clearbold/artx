@@ -514,7 +514,7 @@ ArtX.setupFormValidation = function() {
                     required: true,
                     email: true,
                     remote: {
-                        url: "/CheckEmail",
+                        url: "/CheckEmail/",
                         type: "post"
                     }
                 }
@@ -775,33 +775,169 @@ ArtX.setupHistory = function() {
 
 /* Setting up My Interests functionality
    ========================================================================== */
+ArtX.myInterests = {
+    init: function() {
+        var $myInterestsForm = $("#interest-form");
+
+        if ($myInterestsForm.length > 0) {
+            console.log("Initializing functionality for My Interests");
+
+            var $ajaxInputs = $myInterestsForm.find("input[type=checkbox]");
+            var isCheckboxChecked = false;
+            var checkboxID;
+
+            $ajaxInputs.click(function() {
+                isCheckboxChecked = $(this).prop("checked");
+                checkboxID = $(this).prop("id");
+
+                /* This stub Ajax call sends the checkbox ID and whether it's checked to the /SetInterest/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc.
+                The "success" call could also be used to display more interests -- see the Load More scripting for examples of how that can be done. */
+
+                $.ajax({
+                    type: "POST",
+                    /* SMA: This is set to GET because POST was causing 412 errors on iPhone 
+                    (http://stackoverflow.com/questions/21616009/412-server-response-code-from-ajax-request) */
+                    url: "/SetInterest/",
+                    data: {
+                        interestCheckbox: checkboxID,
+                        interestSelected: isCheckboxChecked
+                    }
+                });
+            });
+        }
+    },
+    createList: function() {
+
+    },
+    destroy: function() {
+
+    }
+};
+
 ArtX.setupMyInterests = function() {
     var $myInterestsForm = $("#interest-form");
 
     if ($myInterestsForm.length > 0) {
         console.log("Initializing functionality for My Interests");
 
+        console.log("First, let's see what my interests are.");
+
+        $.ajax({
+            type: "GET",
+            url: "http://artx-staging.herokuapp.com/interests",
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function( data ){
+                console.log(data);
+
+                /*$.ajax({
+                    type: "POST",
+                    data: {"_method":"delete"},
+                    url: "http://artx-staging.herokuapp.com/interests/3",
+                    beforeSend: function (request) {
+                        request.setRequestHeader("authentication_token", $.cookie('token'));
+                    },
+                    success: function () {
+                        console.log("Callback for deleting an interest");
+                    },
+                    error: function (jqXHR, error, errorThrown) {
+                        console.log("Error:" + error + ", " + errorThrown);
+                    }
+                });*/
+            }
+        });
+
+        
+
         var $ajaxInputs = $myInterestsForm.find("input[type=checkbox]");
         var isCheckboxChecked = false;
         var checkboxID;
 
+        var ajaxType, 
+            ajaxURL,
+            ajaxData, 
+            ajaxSuccessMsg, 
+            ajaxErrorMsg,
+            ajaxCallback;
+
+        var $thisCheckbox;
+
         $ajaxInputs.click(function() {
             isCheckboxChecked = $(this).prop("checked");
-            checkboxID = $(this).prop("id");
+            checkboxID = $(this).data("interest-id");
+            console.log("checkboxID: " + checkboxID);
+            checkboxValue = $(this).val();
 
-            /* This stub Ajax call sends the checkbox ID and whether it's checked to the /SetInterest/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc.
+            $thisCheckbox = $(this);
+
+            if (isCheckboxChecked) {
+                // We're interested in this, send a POST request
+                ajaxType = "POST";
+                ajaxURL = "http://artx-staging.herokuapp.com/interests";
+                ajaxData = {
+                    "tag_id": checkboxID
+                };
+                ajaxSuccessMsg = "Interest '" + checkboxValue + "' saved.";
+                ajaxErrorMsg = "Saving interest '" + checkboxValue + "' failed!";
+
+                ajaxCallback = function(checkboxObj, ajaxData) {
+                    console.log("Callback for adding an interest");
+                    var $myCheckbox = checkboxObj;
+                    var userInterestID; 
+                    $.each(ajaxData, function(index, interest) {
+                        userInterestID = interest.id;
+                        console.log("Selected interest ID for this user: " + userInterestID);
+                    });
+                    $myCheckbox.data("user-interest-id", userInterestID);
+                };
+            } else {
+                // We're not interested in this anymore, send a DELETE request
+                var userInterestID = $(this).data("user-interest-id");
+                console.log("userInterestID: " + userInterestID);
+
+                ajaxType = "POST";
+                ajaxURL = "http://artx-staging.herokuapp.com/interests/" + userInterestID;
+                ajaxData = {
+                    "_method":"delete"
+                };
+                ajaxSuccessMsg = "Interest '" + checkboxValue + "' deleted.";
+                ajaxErrorMsg = "Deleting interest '" + checkboxValue + "' failed!";
+
+                ajaxCallback = function(checkboxObj) {
+                    console.log("Callback for deleting an interest");
+                    var $myCheckbox = checkboxObj;
+                    $myCheckbox.removeData("user-interest-id");
+                };
+            }
+
+            /* This stub Ajax call sends the checkbox ID via POST to the http://artx-staging.herokuapp.com/interests URL.  
+            TODO: add success/fail/error handling, etc.
             The "success" call could also be used to display more interests -- see the Load More scripting for examples of how that can be done. */
 
+            
             $.ajax({
-                type: "POST",
-                /* SMA: This is set to GET because POST was causing 412 errors on iPhone 
-                (http://stackoverflow.com/questions/21616009/412-server-response-code-from-ajax-request) */
-                url: "/SetInterest/",
-                data: {
-                    interestCheckbox: checkboxID,
-                    interestSelected: isCheckboxChecked
+                type: ajaxType,
+                url: ajaxURL,
+                data: ajaxData,
+                beforeSend: function (request) {
+                    request.setRequestHeader("authentication_token", $.cookie('token'));
+                },
+                success: function ( data, textStatus, jqXHR ) {
+                    console.log(ajaxSuccessMsg);
+                    ajaxCallback($thisCheckbox, data);
+                },
+                error: function (jqXHR, error, errorThrown) {
+                    console.log(ajaxErrorMsg);
+                    console.log("Error:" + error + ", " + errorThrown);
+                    // if (jqXHR.status && jqXHR.status == 401) {
+                    //    alert("Unauthorized request");
+                    //} else if (jqXHR.status && jqXHR.status == 404) {
+                    //    alert("The requested page not found");
+                    //}
                 }
             });
+
         });
     }
 };
@@ -828,6 +964,7 @@ ArtX.login = {
                 password:  $("#password").val()
             },
             success: function( data ){
+                console.log("Login successful! Saving a cookie");
                 $.cookie('token', data.authentication_token);
             },
             error: function (jqXHR, error, errorThrown) {
@@ -848,7 +985,8 @@ ArtX.map = {
    
         mapContainer : "event-map",
         locationUrl : "/ui/js/json/locations_temp.json",
-        eventUrl : "/ui/js/json/events-all.json"
+        eventUrl : "/ui/js/json/events-all.json",
+        openWithLocationID : "-1"
     
     },
 
@@ -859,9 +997,8 @@ ArtX.map = {
 
             // Set up map
             L.mapbox.accessToken = 'pk.eyJ1IjoiYXRvc2NhIiwiYSI6IlFSSDhOU0EifQ.8j2CBSsaQQmn-Ic7Vjx1bw';
-            var map = L.mapbox.map( ArtX.map.vars.mapContainer, 'atosca.j55ofa87' )
-            .setView([42.3581, -71.0636], 12);
-
+            var map = L.mapbox.map( ArtX.map.vars.mapContainer, 'atosca.j55ofa87' );
+            
             // Fetch location feed
             var $locations = $.getJSON( ArtX.map.vars.locationUrl, function( data ){
             
@@ -886,6 +1023,7 @@ ArtX.map = {
                             $.each( data, function(){ 
                                 //Save events with matching location name
                                 if ( this.location.name === name ) {
+                                    console.log(this.location.name);
                                     if ( eventArray.length < ArtX.var.itemsPerPage ) {
                                         eventArray.push( this );
                                     }
@@ -909,6 +1047,16 @@ ArtX.map = {
                     marker.addTo( map );
 
                 }); //End each location
+
+                // After locations are all loaded, we either need to display a specifically-requested venue, or all venues.
+                // TODO: actually hook this up and test for real
+                var foo = false;
+                if (foo) {
+
+                } else {
+                    // generic Boston map
+                    map.setView([42.3581, -71.0636], 12);
+                }
                 
             }); //End locations getJSON
         }
@@ -984,25 +1132,28 @@ $(document).on( "mobileinit", function( event ) {
     ]);
 });
 
-/* Destroying sliders before hiding a page */
+/* Functions that should fire before hiding a page */
 $(document).on( "pagebeforehide", function( event ) {
     console.log("Scripting before hiding the current page");
 
+    /* Destroying sliders before hiding a page */
     ArtX.footerSlider.destroy();
 });
 
-/* Removing the prior page on page hide, so that we don't have multiple versions of pages cluttering the DOM */
+/* Functions that should fire on page hide */
 $(document).on("pagehide", "div[data-role=page]", function(event){
+    
+    /* Removing the prior page on page hide, so that we don't have multiple versions of pages cluttering the DOM */
     console.log("Hiding the previous page");
-
     $(event.target).remove();
 });
 
-/* Triggering the initialization scripts on page change, rather than document load */
+/* Functions that should fire on page show */
 $(document).on( "pageshow", function( event ) {
 
     console.log("New page is being shown!");
 
+    /* Triggering the initialization scripts on page change, rather than document load */
     if (!ArtX.var.isInitialLoad) {
         console.log("Not the initial load, either");
 

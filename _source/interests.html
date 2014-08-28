@@ -9,6 +9,17 @@ active: interests
 
             <form id="interest-form" name="interest-form" method="post" action="">
                 <ul class="listview custom-checkbox-list">
+
+                    <li>
+                        <label for="interest-535">19th century</label>
+                        <input type="checkbox" name="interest" id="interest-535" value="19th century" class="customize-checkbox" data-role="none" data-interest-id="535" />
+                    </li>
+                    <li>
+                        <label for="interest-534">20th century</label>
+                        <input type="checkbox" name="interest" id="interest-534" value="20th century" class="customize-checkbox" data-role="none" data-interest-id="534" />
+                    </li>
+
+                    <!--
                     <li>
                         <label for="interest-architecture">Architecture</label>
                         <input type="checkbox" name="interest" id="interest-architecture" value="Architecture" class="customize-checkbox" data-role="none" />
@@ -52,22 +63,22 @@ active: interests
                     <li>
                         <label for="interest-video">Video</label>
                         <input type="checkbox" name="interest" id="interest-video" value="Video" class="customize-checkbox" data-role="none" />
-                    </li>
+                    </li>  -->
                 </ul>
             
             
-           <a href="#" id="load-more" class="btn btn-block btn-hidden" data-feed="/LoadInterests/">Load more</a>
-           
-           <script type="text/template" id="interests-template">
-           <% _.each(jsonArray, function(interestObj, key){ %>
-           <% var id = "interest-" + interestObj.name %>
-           <li>
-            <label for="<%= id %>"> <%= interestObj.name %> </label>
-            <input type="checkbox" name="interest"
-                id="<%= id %>" value="<%= interestObj.name %>"
-                class="customize-checkbox" />
-           </li>
-           </script>
+               <a href="#" id="load-more" class="btn btn-block btn-hidden" data-feed="/LoadInterests/">Load more</a>
+               
+               <script type="text/template" id="interests-template">
+               <% _.each(jsonArray, function(interestObj, key){ %>
+               <% var id = "interest-" + interestObj.id %>
+               <li>
+                <label for="<%= id %>"> <%= interestObj.name %> </label>
+                <input type="checkbox" name="interest"
+                    id="<%= id %>" value="<%= interestObj.name %>"
+                    class="customize-checkbox" />
+               </li>
+               </script>
 
             </form>
         </div> <!-- end content -->
