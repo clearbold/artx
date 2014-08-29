@@ -21,10 +21,23 @@ function handleAppCache() {
 /* New modernizr test for all touch devices */
 Modernizr.addTest('touchcapable', function () {
     var bool;
-    if(('ontouchstart' in window) || (window.DocumentTouch && document instanceof DocumentTouch) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0)) {
-      bool = true;
+    if (
+        ('ontouchstart' in window) || 
+        (window.DocumentTouch && document instanceof DocumentTouch) || 
+        (navigator.maxTouchPoints > 0) || 
+        (navigator.msMaxTouchPoints > 0)
+    ){
+        // Secondary test to rule out some false positives
+        if (
+            (window.screen.width > 1279 && window.devicePixelRatio == 1) ||
+            (window.screen.width > 1000 && window.innerWidth < (window.screen.width * 0.9)) // this checks if a user is using a resized browser window, not common on mobile devices
+        ){
+            bool = false;
+        } else {
+            bool = true;
+        }
     } else {
-      bool = false;
+        bool = false;
     }
     return bool;
 });
@@ -345,30 +358,18 @@ ArtX.setupTextTruncation = function() {
 
 /* Set up Signup Modal
    ========================================================================== */
-ArtX.setupSignupModal = function() {
-    console.log("Setting up Signup Modal window");
+ArtX.signupModal = {
+    init: function() {
+        console.log("Setting up Signup Modal window");
 
-    var isSignedIn = true,
-        $signupModalObj = $("#signup-popup");
-
-    // DEV NOTE: This should be replaced with a more robust solution in the final site.
-    // This detection is just for demo purposes.
-
-    /* if ($("#favorite-notsignedin").length > 0) {
-        isSignedIn = false;
-    }
-
-    console.log("Signed in? " + isSignedIn);
-
-    if (!isSignedIn) {
+        // Set up behavior for modal close
+        $(document).on("click", ".close-modal", function() {
+            $("#signup-popup").popup('close');
+        });
+    },
+    open: function() {
         $("#signup-popup").popup('open');
-    } */
-
-    // Set up behavior on modal close
-    $(document).on("click", ".close-modal", function() {
-        $("#signup-popup").popup('close');
-        //console.log("Modal closed");
-    });
+    }
 };
 
 /* Set up custom checkboxes
@@ -1071,13 +1072,13 @@ ArtX.map = {
    ========================================================================== */
 ArtX.startup = {
     init : function () {
-        console.log("Scripts initializing");
+        console.log("**Beginning of scripts initializing");
 
         $('a[href="#"]').click(function(e){e.preventDefault();});
-        picturefill();
+        //picturefill();
 
         ArtX.login.init();
-        ArtX.setupSignupModal();
+        ArtX.signupModal.init();
         ArtX.setupTextTruncation();
         ArtX.calendar.init();
         ArtX.setupPeekSlider();
@@ -1090,21 +1091,27 @@ ArtX.startup = {
         ArtX.setupHistory();
         ArtX.loadMore.init();
         ArtX.map.init();
+        console.log("**End of scripts initializing");
     },
     finalize : function() {
+        console.log("**Beginning of scripts finalizing");
+
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
-        console.log("Script initialization complete");
-
+        
         // If it's a new visitor, pop the Sign Up window
         if (ArtX.var.hasVisitedBefore !== true) {
-            console.log("Placeholder for popping the new visitor sign up window");
+            //setTimeout(function() {
+                console.log("Popping the new visitor sign up window");
+                ArtX.signupModal.open();
+            //}, 2000);
 
             // Plant the cookie for next time
             $.cookie('priorvisit', 'yes', { expires: 365 * 10, path: '/' });
             // Set the variable to true as well
             ArtX.var.hasVisitedBefore = true;
         }
+        console.log("**End of scripts finalizing");
     }
 };
 
@@ -1112,90 +1119,98 @@ $(document).ready(function() {
     handleAppCache();
 
     // Since the modal popup is outside jQuery Mobile's "pages", we need to instantiate it separately
-    $("#signup-popup").enhanceWithin().popup();
-});
-
-/* Initial document load */
-$(document).on( "mobileinit", function( event ) {
-    console.log("jQuery Mobile is initializing");
-
-    Modernizr.load([
-        // Test need for matchMedia polyfill
-        {
-            test: window.matchMedia,
-            nope: ['/ui/js/standalone/media.match.min.js'],
-            load: ['/ui/js/standalone/enquire.min.js','/ui/js/standalone/picturefill.min.js'],
-            complete: function() {
-
-                console.log("***Beginning of the initial load");
-
-                /* Fire based on document context
-                ========================================================================== */
-
-                var namespace  = ArtX.startup;
-                if (typeof namespace.init === 'function') {
-                    namespace.init();
-                }
-                
-                console.log("Cookie value: " + $.cookie('priorvisit'));
-
-                // Check for a cookie that says that they've visited before.
-                if ($.cookie('priorvisit') === undefined) { 
-                    console.log("Checking cookie -- new visitor");
-                } else {
-                    console.log("Checking cookie -- they've been here before");
-                    ArtX.var.hasVisitedBefore = true;  
-                }
-
-                if (typeof namespace.finalize === 'function') {
-                    namespace.finalize();
-                }
-
-                ArtX.var.isInitialLoad = false;
-
-                console.log("***End of the initial load");
-
-            }
+    $("#signup-popup").enhanceWithin().popup({
+        afterclose: function( event, ui ) {
+            console.log("Popup native close event firing");
         }
-    ]);
+    });
 });
 
-/* Functions that should fire before hiding a page */
+/*
+ * ------------------------------------------------------
+ * jQuery Mobile events (in the order in which they fire) 
+ * (reference: http://jqmtricks.wordpress.com/2014/03/26/jquery-mobile-page-events/)
+ * ------------------------------------------------------
+ */
+
+$(document).on( "mobileinit", function( event ) {
+    console.log("****JQM mobileinit event firing");
+});
+
+
+$(document).on( "pagebeforechange", function( event ) {
+    console.log("****JQM pagebeforechange event firing");
+});
+
+
+$(document).on( "pagebeforecreate", function( event ) {
+    console.log("****JQM pagebeforecreate event firing");
+});
+
+
+$(document).on( "pagecreate", function( event ) {
+    console.log("****JQM pagecreate event firing");
+});
+
+
 $(document).on( "pagebeforehide", function( event ) {
-    console.log("Scripting before hiding the current page");
+    console.log("****JQM pagebeforehide event firing");
 
     /* Destroying sliders before hiding a page */
     ArtX.footerSlider.destroy();
+
+    // Setting the initial load variable to false, as we're moving to another page
+    ArtX.var.isInitialLoad = false;
 });
 
-/* Functions that should fire on page hide */
+
 $(document).on("pagehide", "div[data-role=page]", function(event){
-    
+    console.log("****JQM pagehide event firing");
+
     /* Removing the prior page on page hide, so that we don't have multiple versions of pages cluttering the DOM */
     console.log("Hiding the previous page");
     $(event.target).remove();
 });
 
-/* Functions that should fire on page show */
-$(document).on( "pageshow", function( event ) {
 
-    console.log("New page is being shown!");
+$(document).on( "pagecontainerbeforeshow", function( event ) {
+    console.log("****JQM pagecontainerbeforeshow event firing");
+});
 
-    /* Triggering the initialization scripts on page change, rather than document load */
-    if (!ArtX.var.isInitialLoad) {
-        console.log("***Beginning of page load");
 
-        /* Fire based on document context
-        ========================================================================== */
+$(document).on( "pagecontainershow", function( event ) {
 
-        var namespace  = ArtX.startup;
-        if (typeof namespace.init === 'function') {
-            namespace.init();
-        }
-        if (typeof namespace.finalize === 'function') {
-            namespace.finalize();
-        }
+    console.log("****JQM pagecontainershow event firing");
 
-        console.log("***End of page load");
-    } 
+    console.log("***Beginning of new page load scripts");
+
+    /* Fire based on document context
+    ========================================================================== */
+
+    var namespace  = ArtX.startup;
+    if (typeof namespace.init === 'function') {
+        namespace.init();
+    }
+
+    console.log("Cookie value: " + $.cookie('priorvisit'));
+
+    // Check for a cookie that says that they've visited before.
+    if ($.cookie('priorvisit') === undefined) { 
+        console.log("Checking cookie -- new visitor");
+    } else {
+        console.log("Checking cookie -- they've been here before");
+        ArtX.var.hasVisitedBefore = true;  
+    }
+
+    if (typeof namespace.finalize === 'function') {
+        namespace.finalize();
+    }
+
+    console.log("***End of new page load scripts");
+  
+});
+
+
+$(document).on( "pagecontainertransition", function( event ) {
+    console.log("****JQM pagecontainertransition event firing");
 });
