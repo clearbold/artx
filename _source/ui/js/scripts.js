@@ -366,6 +366,11 @@ ArtX.signupModal = {
         $(document).on("click", ".close-modal", function() {
             $("#signup-popup").popup('close');
         });
+
+        // log popup events
+        $(document).on("popupcreate popupinit popupafteropen popupafterclose", "#signup-popup", function (e) {
+            console.log(e.target.id + " -> " + e.type);
+        });
     },
     open: function() {
         $("#signup-popup").popup('open');
@@ -1101,10 +1106,11 @@ ArtX.startup = {
         
         // If it's a new visitor, pop the Sign Up window
         if (ArtX.var.hasVisitedBefore !== true) {
-            //setTimeout(function() {
-                console.log("Popping the new visitor sign up window");
+
+            console.log("Popping the new visitor sign up window");
+            setTimeout(function(){
                 ArtX.signupModal.open();
-            //}, 2000);
+            },1000);
 
             // Plant the cookie for next time
             $.cookie('priorvisit', 'yes', { expires: 365 * 10, path: '/' });
@@ -1116,13 +1122,12 @@ ArtX.startup = {
 };
 
 $(document).ready(function() {
+    console.log("****jQuery DOM Ready event firing");
     handleAppCache();
 
     // Since the modal popup is outside jQuery Mobile's "pages", we need to instantiate it separately
-    $("#signup-popup").enhanceWithin().popup({
-        afterclose: function( event, ui ) {
-            console.log("Popup native close event firing");
-        }
+    $("#signup-popup").enhanceWithin().popup({ 
+        history: false
     });
 });
 
@@ -1135,6 +1140,7 @@ $(document).ready(function() {
 
 $(document).on( "mobileinit", function( event ) {
     console.log("****JQM mobileinit event firing");
+    $.mobile.popup.prototype.options.history = false;
 });
 
 

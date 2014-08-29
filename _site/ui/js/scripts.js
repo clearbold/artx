@@ -366,6 +366,11 @@ ArtX.signupModal = {
         $(document).on("click", ".close-modal", function() {
             $("#signup-popup").popup('close');
         });
+
+        // log popup events
+        $(document).on("popupcreate popupinit popupafteropen popupafterclose", "#signup-popup", function (e) {
+            console.log(e.target.id + " -> " + e.type);
+        });
     },
     open: function() {
         $("#signup-popup").popup('open');
@@ -1100,29 +1105,30 @@ ArtX.startup = {
         FastClick.attach(document.body);
         
         // If it's a new visitor, pop the Sign Up window
-        if (ArtX.var.hasVisitedBefore !== true) {
-            //setTimeout(function() {
-                console.log("Popping the new visitor sign up window");
+        //if (ArtX.var.hasVisitedBefore !== true) {
+
+            console.log("Popping the new visitor sign up window");
+            //var signupModalDelayed = setInterval(function(){
                 ArtX.signupModal.open();
-            //}, 2000);
+            //    clearInterval(signupModalDelayed);
+            //},1);
 
             // Plant the cookie for next time
-            $.cookie('priorvisit', 'yes', { expires: 365 * 10, path: '/' });
+            //$.cookie('priorvisit', 'yes', { expires: 365 * 10, path: '/' });
             // Set the variable to true as well
-            ArtX.var.hasVisitedBefore = true;
-        }
+            //ArtX.var.hasVisitedBefore = true;
+        //}
         console.log("**End of scripts finalizing");
     }
 };
 
 $(document).ready(function() {
+    console.log("****jQuery DOM Ready event firing");
     handleAppCache();
 
     // Since the modal popup is outside jQuery Mobile's "pages", we need to instantiate it separately
-    $("#signup-popup").enhanceWithin().popup({
-        afterclose: function( event, ui ) {
-            console.log("Popup native close event firing");
-        }
+    $("#signup-popup").enhanceWithin().popup({ 
+        history: false
     });
 });
 
@@ -1135,6 +1141,7 @@ $(document).ready(function() {
 
 $(document).on( "mobileinit", function( event ) {
     console.log("****JQM mobileinit event firing");
+    $.mobile.popup.prototype.options.history = false;
 });
 
 
