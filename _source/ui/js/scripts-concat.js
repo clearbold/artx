@@ -23075,7 +23075,8 @@ ArtX.dataService = {
 // Variables that can be used throughout
 ArtX.var = {
     itemsPerPage : 5,
-    isInitialLoad: true
+    isInitialLoad: true,
+    hasVisitedBefore: false
 };
 
 
@@ -24056,6 +24057,16 @@ ArtX.startup = {
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
         console.log("Script initialization complete");
+
+        // If it's a new visitor, pop the Sign Up window
+        if (ArtX.var.hasVisitedBefore !== true) {
+            console.log("Placeholder for popping the new visitor sign up window");
+
+            // Plant the cookie for next time
+            $.cookie('priorvisit', 'yes', { expires: 365 * 10, path: '/' });
+            // Set the variable to true as well
+            ArtX.var.hasVisitedBefore = true;
+        }
     }
 };
 
@@ -24078,6 +24089,8 @@ $(document).on( "mobileinit", function( event ) {
             load: ['/ui/js/standalone/enquire.min.js','/ui/js/standalone/picturefill.min.js'],
             complete: function() {
 
+                console.log("***Beginning of the initial load");
+
                 /* Fire based on document context
                 ========================================================================== */
 
@@ -24085,11 +24098,24 @@ $(document).on( "mobileinit", function( event ) {
                 if (typeof namespace.init === 'function') {
                     namespace.init();
                 }
+                
+                console.log("Cookie value: " + $.cookie('priorvisit'));
+
+                // Check for a cookie that says that they've visited before.
+                if ($.cookie('priorvisit') === undefined) { 
+                    console.log("Checking cookie -- new visitor");
+                } else {
+                    console.log("Checking cookie -- they've been here before");
+                    ArtX.var.hasVisitedBefore = true;  
+                }
+
                 if (typeof namespace.finalize === 'function') {
                     namespace.finalize();
                 }
 
                 ArtX.var.isInitialLoad = false;
+
+                console.log("***End of the initial load");
 
             }
         }
@@ -24119,7 +24145,7 @@ $(document).on( "pageshow", function( event ) {
 
     /* Triggering the initialization scripts on page change, rather than document load */
     if (!ArtX.var.isInitialLoad) {
-        console.log("Not the initial load, either");
+        console.log("***Beginning of page load");
 
         /* Fire based on document context
         ========================================================================== */
@@ -24131,7 +24157,7 @@ $(document).on( "pageshow", function( event ) {
         if (typeof namespace.finalize === 'function') {
             namespace.finalize();
         }
-    }
+
+        console.log("***End of page load");
+    } 
 });
-
-

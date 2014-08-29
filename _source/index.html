@@ -1,22 +1,13 @@
 ---
-layout: minimal
-title: Template List
-active: index
+layout: default
+title: ArtsConnect
+active: home
 ---
-        <div class="content" role="main">
-            <ul class="listview">
-                <li><a href="home.html">Home screen</a></li>
-                <li><a href="home-with-signup.html">Home screen with sign up</a></li>
-                <li><a href="event.html">Event detail screen</a></li>
-                <li><a href="exhibition.html">Exhibition detail screen</a></li>
-                <li><a href="venue.html">Venue detail screen</a></li>
-                <li><a href="favorites.html">Favorites listing screen</a></li>
-                <li><a href="interests.html">My Interests screen</a></li>
-                <li><a href="settings.html">Settings screen</a></li>
-                <li><a href="sign-in.html">Sign In screen</a></li>
-                <li><a href="history.html">History screen</a></li>
-                <li><a href="bydate.html">By Date screen</a></li>
-                <li><a href="bylocation.html">By Location (map) screen</a></li>
-                <li><a href="styleguide.html">Styleguide</a></li>
-            </ul>
-        </div>
+
+        <div class="content layout-footer" role="main">
+{% include _slider-discover.html %}            
+        </div> <!-- /content -->
+
+        <footer class="footer">
+{% include _footer-favorites.html %}
+        </footer> <!-- /footer -->
