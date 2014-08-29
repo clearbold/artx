@@ -368,8 +368,42 @@ ArtX.signupModal = {
         });
 
         // log popup events
-        $(document).on("popupcreate popupinit popupafteropen popupafterclose", "#signup-popup", function (e) {
-            console.log(e.target.id + " -> " + e.type);
+        //$(document).on("popupcreate popupinit popupafteropen popupafterclose", "#signup-popup", function (e) {
+        //    console.log(e.target.id + " -> " + e.type);
+        //});
+
+        // Set up form submit
+        $("#signup-form").submit(function(event) {
+            event.preventDefault();
+            ArtX.signupModal.ajaxSubmit();
+        });
+    },
+    ajaxSubmit: function() {
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "http://artx-staging.herokuapp.com/registrations",
+            data: {
+                email: $("#email").val(),
+                password:  $("#password").val(),
+                password_confirmation: $("#confirmpassword").val(),
+                zipcode:  $("#zipcode").val()
+            },
+            success: function( data ){
+                console.log(data);
+                $.cookie('token', data.user.authentication_token);
+                $.cookie('currentuser', $("#email").val());
+                $.mobile.pageContainer.pagecontainer ("change", "interests.html", {reloadPage: true});
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error: " + errorThrown);
+                console.log("jqXHR status: " + jqXHR.status);
+                /* if (jqXHR.status && jqXHR.status == 401) {
+                    alert("Unauthorized request");
+                } else if (jqXHR.status && jqXHR.status == 404) {
+                    alert("The requested page not found");
+                }*/
+            }
         });
     },
     open: function() {
@@ -507,15 +541,17 @@ ArtX.calendar = {
 /* Set up form validation for email, passwords, etc.
    ========================================================================== */
 ArtX.setupFormValidation = function() {
-    var $formToValidate = $("form.validate");
+    jQuery.validator.addMethod("zipcode", function(value, element) {
+      return this.optional(element) || /^\d{5}(?:-\d{4})?$/.test(value);
+    }, "Please provide a valid zip code.");
 
-    if ($formToValidate.length > 0) {
+    if ($("form.validate").length > 0) {
        console.log("Setting up form validation");
-       $formToValidate.validate({
+       $("form.validate").validate({
             rules: {
                 "password": "required",
                 "confirmpassword": {
-                    equalTo: "#signup-password"
+                    equalTo: "#password"
                 },
                 "email": {
                     required: true,
@@ -524,7 +560,8 @@ ArtX.setupFormValidation = function() {
                         url: "/CheckEmail/",
                         type: "post"
                     }*/
-                }
+                },
+                "zipcode": "zipcode"
             },
             messages: {
                 "email": {
@@ -784,34 +821,7 @@ ArtX.setupHistory = function() {
    ========================================================================== */
 ArtX.myInterests = {
     init: function() {
-        var $myInterestsForm = $("#interest-form");
-
-        if ($myInterestsForm.length > 0) {
-            console.log("Initializing functionality for My Interests");
-
-            var $ajaxInputs = $myInterestsForm.find("input[type=checkbox]");
-            var isCheckboxChecked = false;
-            var checkboxID;
-
-            $ajaxInputs.click(function() {
-                isCheckboxChecked = $(this).prop("checked");
-                checkboxID = $(this).prop("id");
-
-                /* This stub Ajax call sends the checkbox ID and whether it's checked to the /SetInterest/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc.
-                The "success" call could also be used to display more interests -- see the Load More scripting for examples of how that can be done. */
-
-                $.ajax({
-                    type: "POST",
-                    /* SMA: This is set to GET because POST was causing 412 errors on iPhone 
-                    (http://stackoverflow.com/questions/21616009/412-server-response-code-from-ajax-request) */
-                    url: "/SetInterest/",
-                    data: {
-                        interestCheckbox: checkboxID,
-                        interestSelected: isCheckboxChecked
-                    }
-                });
-            });
-        }
+        
     },
     createList: function() {
 
@@ -827,6 +837,7 @@ ArtX.setupMyInterests = function() {
     if ($myInterestsForm.length > 0) {
         console.log("Initializing functionality for My Interests");
 
+        
         console.log("First, let's see what my interests are.");
 
         $.ajax({
@@ -837,21 +848,10 @@ ArtX.setupMyInterests = function() {
             },
             success: function( data ){
                 console.log(data);
-
-                /*$.ajax({
-                    type: "POST",
-                    data: {"_method":"delete"},
-                    url: "http://artx-staging.herokuapp.com/interests/3",
-                    beforeSend: function (request) {
-                        request.setRequestHeader("authentication_token", $.cookie('token'));
-                    },
-                    success: function () {
-                        console.log("Callback for deleting an interest");
-                    },
-                    error: function (jqXHR, error, errorThrown) {
-                        console.log("Error:" + error + ", " + errorThrown);
-                    }
-                });*/
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error: " + errorThrown);
+                console.log("jqXHR status: " + jqXHR.status);
             }
         });
 
@@ -918,11 +918,10 @@ ArtX.setupMyInterests = function() {
                 };
             }
 
-            /* This stub Ajax call sends the checkbox ID via POST to the http://artx-staging.herokuapp.com/interests URL.  
+            /* Make the actual Ajax request to handle the interest  
             TODO: add success/fail/error handling, etc.
-            The "success" call could also be used to display more interests -- see the Load More scripting for examples of how that can be done. */
+            No Load More functionality, possibly a future enhancement. */
 
-            
             $.ajax({
                 type: ajaxType,
                 url: ajaxURL,
@@ -936,7 +935,7 @@ ArtX.setupMyInterests = function() {
                 },
                 error: function (jqXHR, error, errorThrown) {
                     console.log(ajaxErrorMsg);
-                    console.log("Error:" + error + ", " + errorThrown);
+                    console.log("Error: " + errorThrown);
                     // if (jqXHR.status && jqXHR.status == 401) {
                     //    alert("Unauthorized request");
                     //} else if (jqXHR.status && jqXHR.status == 404) {
@@ -944,7 +943,6 @@ ArtX.setupMyInterests = function() {
                     //}
                 }
             });
-
         });
     }
 };
@@ -974,9 +972,11 @@ ArtX.login = {
             success: function( data ){
                 console.log("Login successful! Saving a cookie");
                 $.cookie('token', data.authentication_token);
+                $.cookie('currentuser', $("#email").val());
             },
             error: function (jqXHR, error, errorThrown) {
-                console.log("Error:" + error + ", " + errorThrown);
+                console.log("Error: " + errorThrown);
+                console.log("jqXHR status: " + jqXHR.status);
                 /* if (jqXHR.status && jqXHR.status == 401) {
                     alert("Unauthorized request");
                 } else if (jqXHR.status && jqXHR.status == 404) {
@@ -1080,7 +1080,6 @@ ArtX.startup = {
         console.log("**Beginning of scripts initializing");
 
         $('a[href="#"]').click(function(e){e.preventDefault();});
-        //picturefill();
 
         ArtX.login.init();
         ArtX.signupModal.init();
