@@ -1103,8 +1103,30 @@ div#event-map {
                 }
             }
         }
+
+        /* Menu changes when logged in */
+        .menu-settings,
+        .menu-interests,
+        .menu-logout {
+            display:none;
+        }
+
+        
     }
 }
+
+.is-logged-in .menu-panel ul {
+    .menu-settings,
+    .menu-interests,
+    .menu-logout {
+        display:block;
+    }
+    .menu-signin {
+        display:none;
+    }
+}
+
+
 
 /* Other jQuery Mobile overrides */
 .ui-btn,

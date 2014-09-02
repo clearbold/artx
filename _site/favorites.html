@@ -218,14 +218,15 @@
 
         <div id="menu-panel" data-role="panel" data-position="right" data-position-fixed="true" data-display="overlay" class="menu-panel">
   <ul>
-    <li><a href="home.html">Discover ArtsConnect</a></li>
-    <li><a href="bydate.html">By Date</a></li>
-    <li><a href="bylocation.html">By Location</a></li>
-    <li class="active"><a href="favorites.html">Favorites</a></li>
-    <li><a href="history.html">History</a></li>
-    <li id="menu-settings"><a href="settings.html">Settings</a></li>
-    <li><a href="interests.html">My Interests</a></li>
-    <li id="menu-auth"><a href="sign-in.html">Sign in</a></li>
+    <li class="menu-home"><a href="home.html">Discover ArtsConnect</a></li>
+    <li class="menu-calendar"><a href="bydate.html">By Date</a></li>
+    <li class="menu-location"><a href="bylocation.html">By Location</a></li>
+    <li class="menu-favorites active"><a href="favorites.html">Favorites</a></li>
+    <li class="menu-history"><a href="history.html">History</a></li>
+    <li class="menu-settings"><a href="settings.html">Settings</a></li>
+    <li class="menu-interests"><a href="interests.html">My Interests</a></li>
+    <li class="menu-signin"><a href="sign-in.html">Sign in</a></li>
+    <li class="menu-logout"><a href="#" class="action-logout">Log out</a></li>
   </ul>
 </div>
 
@@ -234,7 +235,7 @@
     <div id="signup-popup" class="modal" data-history="false">
     <div id="signup-popup-target" class="modal-content">
         <h2>Sign up</h2>
-                <p>Introductory copy lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus, architecto itaque mollitia saepe ab sint omnis quia temporibus officiis aperiam.</p>
+                <p>Introductory copy lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
 
         <form id="signup-form" name="signup-form" method="post" action="" class="validate">
             <p>
@@ -250,6 +251,11 @@
             <p>
                 <label for="confirmpassword">Confirm Password</label>
                 <input type="password" id="confirmpassword" name="confirmpassword" required="required" />
+            </p>
+
+            <p>
+                <label for="zipcode">Zip code</label>
+                <input type="text" id="zipcode" name="zipcode" />
             </p>
 
             <button type="submit">Submit</button>
