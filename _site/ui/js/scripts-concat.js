@@ -23089,7 +23089,8 @@ ArtX.dataService = {
 ArtX.var = {
     itemsPerPage : 5,
     isInitialLoad: true,
-    hasVisitedBefore: false
+    hasVisitedBefore: false,
+    jsonDomain: "http://artx-staging.herokuapp.com"
 };
 
 
@@ -23344,7 +23345,7 @@ ArtX.signupModal = {
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "http://artx-staging.herokuapp.com/registrations",
+            url: ArtX.var.jsonDomain + "/registrations",
             data: {
                 email: $("#email").val(),
                 password:  $("#password").val(),
@@ -23375,8 +23376,17 @@ ArtX.signupModal = {
 
 /* Set up custom checkboxes
    ========================================================================== */
-ArtX.setupCustomCheckboxes = function() {
-    var $checkboxes = $(".customize-checkbox");
+ArtX.setupCustomCheckboxes = function(targetContainer) {
+    var $checkboxes;
+
+    console.log("targetContainer: " + targetContainer);
+
+    if (targetContainer !== undefined && targetContainer !== null) {
+        $checkboxes = $(targetContainer).find(".customize-checkbox");
+        console.log("Number of checkboxes: " + $checkboxes.length);
+    } else {
+        $checkboxes = $(".customize-checkbox");
+    }
 
     if ($checkboxes.length > 0) {
         console.log("Setting up custom checkboxes");
@@ -23585,10 +23595,6 @@ ArtX.loadMore = {
                 var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
 
                 switch(temporaryJsonURL) {
-                
-                    //case "/LoadInterests/" :
-                    //    ArtX.loadMore.var.nextPageJsonURL = "/ui/js/json/loadInterests-page" + ".json";
-                    //    break;
                     case "/GetEventsByLocation/" :
                         ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/getEventsByLocation-page" + ArtX.loadMore.vars.nextPage + ".json";
                         break;
@@ -23635,9 +23641,6 @@ ArtX.loadMore = {
                     var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
 
                     switch(temporaryJsonURL) {
-                        //case "/LoadInterests/" :
-                        //    ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/loadInterests-page" + ".json";
-                        //    break;
                         case "/GetEventsByLocation/" :
                             ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/getEventsByLocation-page" + ArtX.vars.nextPageJsonURL + ".json";
                             break;
@@ -23690,9 +23693,6 @@ ArtX.loadMore = {
                 var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
 
                 switch(temporaryJsonURL) {
-                    //case "/LoadInterests/":
-                    //    ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadInterests-page2.json";
-                    //     break;
                     case "/GetEventsByLocation/" :
                         ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/getEventsByLocation-page2.json";
                         break;
@@ -23779,24 +23779,251 @@ ArtX.setupHistory = function() {
     }
 };
 
-/* Setting up My Interests functionality
+/* Setting up Interests functionality
    ========================================================================== */
-ArtX.myInterests = {
-    init: function() {
-        
+ArtX.interests = {
+    vars: { // Defaults are set to get the full list of interests
+        ajaxType : "GET",
+        ajaxURL : ArtX.var.jsonDomain + "/possible_interests/",
+        ajaxData : "",
+        ajaxSuccessMsg : "Successfully retrieved full list of possible interests",
+        ajaxErrorMsg : "Retrieval of full possible interest list failed",
+        ajaxCallback : function() {
+            // empty function for now, will define later in the script
+        },
+        ajaxCallsComplete: 0
     },
-    createList: function() {
+    init: function() {
+        if ($("#interest-form").length > 0) {
+            console.log("Initializing functionality for My Interests");
 
+            ArtX.interests.checkForInterests();
+            
+            var isCheckboxChecked = false;
+            var checkboxID;
+            var $thisCheckbox;
+
+            // Set up click event for interest form checkboxes
+            $("#interest-form-list").on("click", "input[type=checkbox]", function() {
+                isCheckboxChecked = $(this).prop("checked");
+                checkboxID = $(this).data("interest-id");
+                console.log("checkboxID: " + checkboxID);
+                checkboxValue = $(this).val();
+
+                $thisCheckbox = $(this);
+
+                if (isCheckboxChecked) {
+                    // We're interested in this, send a POST request
+                    ArtX.interests.vars.ajaxType = "POST";
+                    ArtX.interests.vars.ajaxURL = ArtX.var.jsonDomain + "/interests/";
+                    ArtX.interests.vars.ajaxData = {
+                        "tag_id": checkboxID
+                    };
+                    ArtX.interests.vars.ajaxSuccessMsg = "Interest '" + checkboxValue + "' saved.";
+                    ArtX.interests.vars.ajaxErrorMsg = "Saving interest '" + checkboxValue + "' failed!";
+
+                    ArtX.interests.vars.ajaxCallback = function(checkboxObj, ajaxData) {
+                        console.log("Callback for adding an interest");
+                        var $myCheckbox = checkboxObj;
+                        var userInterestID; 
+                        $.each(ajaxData, function(index, interest) {
+                            userInterestID = interest.id;
+                            console.log("Selected interest ID for this user: " + userInterestID);
+                        });
+                        $myCheckbox.data("user-interest-id", userInterestID);
+                    };
+                } else {
+                    // We're not interested in this anymore, send a DELETE request
+                    var userInterestID = $(this).data("user-interest-id");
+                    console.log("userInterestID: " + userInterestID);
+
+                    ArtX.interests.vars.ajaxType = "POST";
+                    ArtX.interests.vars.ajaxURL = ArtX.var.jsonDomain + "/interests/" + userInterestID;
+                    ArtX.interests.vars.ajaxData = {
+                        "_method":"delete"
+                    };
+                    ArtX.interests.vars.ajaxSuccessMsg = "Interest '" + checkboxValue + "' deleted.";
+                    ArtX.interests.vars.ajaxErrorMsg = "Deleting interest '" + checkboxValue + "' failed!";
+
+                    ArtX.interests.vars.ajaxCallback = function(checkboxObj) {
+                        console.log("Callback for deleting an interest");
+                        var $myCheckbox = checkboxObj;
+                        $myCheckbox.removeData("user-interest-id");
+                    };
+                }
+
+                /* Make the actual Ajax request to handle the interest  
+                TODO: add success/fail/error handling, etc.
+                No Load More functionality, possibly a future enhancement. */
+
+                $.ajax({
+                    type: ArtX.interests.vars.ajaxType,
+                    url: ArtX.interests.vars.ajaxURL,
+                    data: ArtX.interests.vars.ajaxData,
+                    beforeSend: function (request) {
+                        request.setRequestHeader("authentication_token", $.cookie('token'));
+                    },
+                    success: function ( data, textStatus, jqXHR ) {
+                        console.log(ArtX.interests.vars.ajaxSuccessMsg);
+                        ArtX.interests.vars.ajaxCallback($thisCheckbox, data);
+                    },
+                    error: function (jqXHR, error, errorThrown) {
+                        console.log(ArtX.interests.vars.ajaxErrorMsg);
+                        console.log("Error: " + errorThrown);
+                        // if (jqXHR.status && jqXHR.status == 401) {
+                        //    alert("Unauthorized request");
+                        //} else if (jqXHR.status && jqXHR.status == 404) {
+                        //    alert("The requested page not found");
+                        //}
+                    }
+                });
+            });
+
+        }
     },
     destroy: function() {
+        if ($("#interest-form").length > 0) {
+            console.log("Destroying interest checkbox click events");
+            $("#interest-form-list").off("click");
+        }
+    },
+    checkForInterests: function() {
+        console.log("Checking for user interests");
+
+        ArtX.interests.vars.ajaxType = "GET";
+        ArtX.interests.vars.ajaxURL = ArtX.var.jsonDomain + "/interests/";
+        ArtX.interests.vars.ajaxSuccessMsg = "Successfully checked list of user's interests";
+        ArtX.interests.vars.ajaxErrorMsg = "Check of user's interest list failed";
+
+        $.ajax({
+            type: ArtX.interests.vars.ajaxType,
+            url: ArtX.interests.vars.ajaxURL,
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function ( data, textStatus, jqXHR ) {
+                console.log(ArtX.interests.vars.ajaxSuccessMsg);
+                console.log("User interests: " + JSON.stringify(data));
+                
+                if(data.interests && data.interests.length) {
+                    console.log("User has interests!");
+                    
+                    // Display user's list
+                    $("#interest-form-list").fadeOut(400, function() {
+                        ArtX.interests.getUserInterests("#interest-normal-intro", 2);
+                        ArtX.interests.getAllInterests("#interest-normal-intro", 2); // **This will change to get subset of interests 
+                    });
+                    
+
+                } else {
+                    console.log("User has no interests yet");
+
+                    // Display all interests 
+                    $("#interest-form-list").fadeOut(400, function() {
+                        ArtX.interests.getAllInterests("#interest-onboarding-intro", 1);
+                    });
+                }
+
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log(ArtX.interests.vars.ajaxErrorMsg);
+                console.log("Error: " + errorThrown);
+                // if (jqXHR.status && jqXHR.status == 401) {
+                //    alert("Unauthorized request");
+                //} else if (jqXHR.status && jqXHR.status == 404) {
+                //    alert("The requested page not found");
+                //}
+            }
+        });
+    },
+    buildInterestList: function(data, isChecked) {
+        console.log("Building interest list");
+
+        var jsonArray = data;
+        var interestHtml;
+
+        //console.log("Data from getAllInterests Ajax call: " + JSON.stringify(jsonArray));
+
+        // Format results with underscore.js template
+        if (isChecked) {
+            interestHtml = _.template($("#interests-user-template").html(), {jsonArray:jsonArray});
+        } else {
+            interestHtml = _.template($("#interests-template").html(), {jsonArray:jsonArray});
+        }
+        
+        //console.log("item template html" + $("#interests-template").html());
+
+        $(interestHtml).appendTo($("#interest-form-list"));
+
+    },
+    showList: function(intro, numberOfAjaxCalls) {
+        
+        var totalCalls = numberOfAjaxCalls;
+
+        ArtX.interests.vars.ajaxCallsComplete = ArtX.interests.vars.ajaxCallsComplete + 1;
+
+        if (ArtX.interests.vars.ajaxCallsComplete == totalCalls) {
+            console.log("Showing finished interest list");
+            ArtX.setupCustomCheckboxes("#interest-form-list");
+
+            $(intro).fadeIn(400);
+            $("#interest-form-list").fadeIn(400);
+
+            ArtX.interests.vars.ajaxCallsComplete = 0;
+        }
+        
+    },
+    getAllInterests: function(intro, numberOfAjaxCalls) {
+        $.ajax({
+            type: "GET",
+            url: ArtX.var.jsonDomain + "/possible_interests/",
+            success: function( data ){
+                console.log("Successfully retrieved full list of possible interests");
+
+                ArtX.interests.buildInterestList(data, false);
+                ArtX.interests.showList(intro, numberOfAjaxCalls);
+                console.log("End of Get All Interests success handler");
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Retrieval of full possible interest list failed");
+                console.log("Error: " + errorThrown);
+                console.log("jqXHR status: " + jqXHR.status);
+            }
+        });
+    },
+    getUserInterests: function(intro, numberOfAjaxCalls) {
+        
+        $.ajax({
+            type: "GET",
+            url: ArtX.var.jsonDomain + "/interests/",
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function ( data, textStatus, jqXHR ) {
+                console.log("Successfully retrieved list of user's interests");
+                ArtX.interests.buildInterestList(data, true);
+                ArtX.interests.showList(intro, numberOfAjaxCalls);
+                console.log("End of Get User Interests success handler");
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Retrieval of user's interest list failed");
+                console.log("Error: " + errorThrown);
+                // if (jqXHR.status && jqXHR.status == 401) {
+                //    alert("Unauthorized request");
+                //} else if (jqXHR.status && jqXHR.status == 404) {
+                //    alert("The requested page not found");
+                //}
+            }
+        });
 
     }
 };
 
+/* Depreciated in favor of the structure above, breaking out tasks more nicely */
 ArtX.setupMyInterests = function() {
     var $myInterestsForm = $("#interest-form");
 
-    if ($myInterestsForm.length > 0) {
+    if ($("#interest-form").length > 0) {
         console.log("Initializing functionality for My Interests");
 
         
@@ -23804,7 +24031,7 @@ ArtX.setupMyInterests = function() {
 
         $.ajax({
             type: "GET",
-            url: "http://artx-staging.herokuapp.com/interests",
+            url: ArtX.var.jsonDomain + "/interests",
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
             },
@@ -23817,9 +24044,6 @@ ArtX.setupMyInterests = function() {
             }
         });
 
-        
-
-        var $ajaxInputs = $myInterestsForm.find("input[type=checkbox]");
         var isCheckboxChecked = false;
         var checkboxID;
 
@@ -23832,7 +24056,7 @@ ArtX.setupMyInterests = function() {
 
         var $thisCheckbox;
 
-        $ajaxInputs.click(function() {
+        $(document).on("click", "#interest-form input[type=checkbox]", function() {
             isCheckboxChecked = $(this).prop("checked");
             checkboxID = $(this).data("interest-id");
             console.log("checkboxID: " + checkboxID);
@@ -23843,7 +24067,7 @@ ArtX.setupMyInterests = function() {
             if (isCheckboxChecked) {
                 // We're interested in this, send a POST request
                 ajaxType = "POST";
-                ajaxURL = "http://artx-staging.herokuapp.com/interests";
+                ajaxURL = ArtX.var.jsonDomain + "/interests/";
                 ajaxData = {
                     "tag_id": checkboxID
                 };
@@ -23866,7 +24090,7 @@ ArtX.setupMyInterests = function() {
                 console.log("userInterestID: " + userInterestID);
 
                 ajaxType = "POST";
-                ajaxURL = "http://artx-staging.herokuapp.com/interests/" + userInterestID;
+                ajaxURL = ArtX.var.jsonDomain + "/interests/" + userInterestID;
                 ajaxData = {
                     "_method":"delete"
                 };
@@ -23906,6 +24130,7 @@ ArtX.setupMyInterests = function() {
                 }
             });
         });
+
     }
 };
 
@@ -23923,19 +24148,18 @@ ArtX.login = {
         }
     },
     ajaxSubmit: function() {
-        console.log("Value of email field: " + document.getElementById('email').value);
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "http://artx-staging.herokuapp.com/tokens",
+            url: ArtX.var.jsonDomain + "/tokens/",
             data: {
-                email: $("#email").val(),
-                password:  $("#password").val()
+                email: $("#signin-email").val(),
+                password:  $("#signin-password").val()
             },
             success: function( data ){
                 console.log("Login successful! Saving a cookie");
                 $.cookie('token', data.authentication_token);
-                $.cookie('currentuser', $("#email").val());
+                $.cookie('currentuser', $("#signin-email").val());
                 if (!ArtX.el.html.hasClass("is-logged-in")) {
                     ArtX.el.html.addClass("is-logged-in");
                 }
@@ -24066,6 +24290,7 @@ ArtX.startup = {
         ArtX.login.init();
         ArtX.logout.init();
         ArtX.signupModal.init();
+        ArtX.interests.init();
         ArtX.setupTextTruncation();
         ArtX.calendar.init();
         ArtX.setupPeekSlider();
@@ -24074,7 +24299,7 @@ ArtX.startup = {
         ArtX.setupCustomCheckboxes();
         ArtX.setupFormValidation();
         ArtX.setupMySettings();
-        ArtX.setupMyInterests();
+        //ArtX.setupMyInterests();
         ArtX.setupHistory();
         ArtX.loadMore.init();
         ArtX.map.init();
@@ -24099,6 +24324,14 @@ ArtX.startup = {
             // Set the variable to true as well
             ArtX.var.hasVisitedBefore = true;
         }
+
+        // If they're already logged in, let's add the CSS class for that
+        if ($.cookie('token') !== undefined) { 
+            if (!ArtX.el.html.hasClass("is-logged-in")) {
+                ArtX.el.html.addClass("is-logged-in");
+            }
+        }
+
         console.log("**End of scripts finalizing");
     }
 };
@@ -24146,6 +24379,9 @@ $(document).on( "pagebeforehide", function( event ) {
 
     /* Destroying sliders before hiding a page */
     ArtX.footerSlider.destroy();
+
+    /* Destroying interest checkbox bindings before hiding a page */
+    ArtX.interests.destroy();
 
     // Setting the initial load variable to false, as we're moving to another page
     ArtX.var.isInitialLoad = false;
