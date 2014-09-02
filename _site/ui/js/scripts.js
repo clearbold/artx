@@ -961,6 +961,7 @@ ArtX.login = {
         }
     },
     ajaxSubmit: function() {
+        console.log("Value of email field: " + document.getElementById('email').value);
         $.ajax({
             type: "POST",
             dataType: "json",
@@ -973,6 +974,10 @@ ArtX.login = {
                 console.log("Login successful! Saving a cookie");
                 $.cookie('token', data.authentication_token);
                 $.cookie('currentuser', $("#email").val());
+                if (!ArtX.el.html.hasClass("is-logged-in")) {
+                    ArtX.el.html.addClass("is-logged-in");
+                }
+                $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Error: " + errorThrown);
@@ -983,6 +988,21 @@ ArtX.login = {
                     alert("The requested page not found");
                 }*/
             }
+        });
+    }
+};
+
+ArtX.logout = {
+    init: function() {
+        $(document).on("click", ".action-logout", function() {
+            console.log("Log out link clicked!");
+            // Remove the authorization token and username cookies
+            $.removeCookie('token');
+            $.removeCookie('currentuser');
+            // Remove the "is-logged-in" class from the HTML element
+            ArtX.el.html.removeClass("is-logged-in");
+            // Send them back to the main Discover page
+            $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
         });
     }
 };
@@ -1082,6 +1102,7 @@ ArtX.startup = {
         $('a[href="#"]').click(function(e){e.preventDefault();});
 
         ArtX.login.init();
+        ArtX.logout.init();
         ArtX.signupModal.init();
         ArtX.setupTextTruncation();
         ArtX.calendar.init();
@@ -1204,7 +1225,7 @@ $(document).on( "pagecontainershow", function( event ) {
         console.log("Checking cookie -- new visitor");
     } else {
         console.log("Checking cookie -- they've been here before");
-        ArtX.var.hasVisitedBefore = true;  
+        ArtX.var.hasVisitedBefore = true; 
     }
 
     if (typeof namespace.finalize === 'function') {

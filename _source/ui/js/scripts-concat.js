@@ -23928,13 +23928,17 @@ ArtX.login = {
             dataType: "json",
             url: "http://artx-staging.herokuapp.com/tokens",
             data: {
-                email: $("#email").val(),
-                password:  $("#password").val()
+                email: $("#signin-email").val(),
+                password:  $("#signin-password").val()
             },
             success: function( data ){
                 console.log("Login successful! Saving a cookie");
                 $.cookie('token', data.authentication_token);
-                $.cookie('currentuser', $("#email").val());
+                $.cookie('currentuser', $("#signin-email").val());
+                if (!ArtX.el.html.hasClass("is-logged-in")) {
+                    ArtX.el.html.addClass("is-logged-in");
+                }
+                $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Error: " + errorThrown);
@@ -23945,6 +23949,21 @@ ArtX.login = {
                     alert("The requested page not found");
                 }*/
             }
+        });
+    }
+};
+
+ArtX.logout = {
+    init: function() {
+        $(document).on("click", ".action-logout", function() {
+            console.log("Log out link clicked!");
+            // Remove the authorization token and username cookies
+            $.removeCookie('token');
+            $.removeCookie('currentuser');
+            // Remove the "is-logged-in" class from the HTML element
+            ArtX.el.html.removeClass("is-logged-in");
+            // Send them back to the main Discover page
+            $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
         });
     }
 };
@@ -24044,6 +24063,7 @@ ArtX.startup = {
         $('a[href="#"]').click(function(e){e.preventDefault();});
 
         ArtX.login.init();
+        ArtX.logout.init();
         ArtX.signupModal.init();
         ArtX.setupTextTruncation();
         ArtX.calendar.init();
@@ -24078,6 +24098,14 @@ ArtX.startup = {
             // Set the variable to true as well
             ArtX.var.hasVisitedBefore = true;
         }
+
+        // If they're already logged in, let's add the CSS class for that
+        if ($.cookie('token') !== undefined) { 
+            if (!ArtX.el.html.hasClass("is-logged-in")) {
+                ArtX.el.html.addClass("is-logged-in");
+            }
+        }
+
         console.log("**End of scripts finalizing");
     }
 };
@@ -24166,7 +24194,7 @@ $(document).on( "pagecontainershow", function( event ) {
         console.log("Checking cookie -- new visitor");
     } else {
         console.log("Checking cookie -- they've been here before");
-        ArtX.var.hasVisitedBefore = true;  
+        ArtX.var.hasVisitedBefore = true; 
     }
 
     if (typeof namespace.finalize === 'function') {
