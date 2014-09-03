@@ -23004,6 +23004,12 @@ Modernizr.addTest('touchcapable', function () {
     return bool;
 });
 
+/* Helper function to capitalize only the first letter of something */
+// Usage: "hello world".capitalize();  =>  "Hello world"
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
 /* Global namespace */
 var ArtX = ArtX || {};
 
@@ -23072,6 +23078,28 @@ ArtX.util = {
             console.log("No more results");
             return false;
         }
+    }
+};
+
+/* Logging Ajax errors */
+ArtX.errors = {
+    logAjaxError: function (jqXHR, error, errorThrown, isErrorAjaxResponse) {
+        console.log("Error: " + errorThrown);
+        console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+        if (isErrorAjaxResponse) {
+            console.log("jqXHR response: " + jqXHR.responseText);
+        }
+    },
+    showFormError: function (jsonError) {
+        // Get results from JSON returned
+        var result = $.parseJSON(jsonError);
+        var errorText;
+        var errorTarget;
+        $.each(result, function(k, v) {
+            errorTarget = $("#" + k);
+            errorText = k.capitalize() + ' ' + v;
+            console.log("Error text: " + errorText);
+        });
     }
 };
 
@@ -23343,6 +23371,8 @@ ArtX.signupModal = {
         });
     },
     ajaxSubmit: function() {
+        var $errorTarget = $("#signup-error");
+
         $.ajax({
             type: "POST",
             dataType: "json",
@@ -23360,13 +23390,9 @@ ArtX.signupModal = {
                 $.mobile.pageContainer.pagecontainer ("change", "interests.html", {reloadPage: true});
             },
             error: function (jqXHR, error, errorThrown) {
-                console.log("Error: " + errorThrown);
-                console.log("jqXHR status: " + jqXHR.status);
-                /* if (jqXHR.status && jqXHR.status == 401) {
-                    alert("Unauthorized request");
-                } else if (jqXHR.status && jqXHR.status == 404) {
-                    alert("The requested page not found");
-                }*/
+                console.log("User registration failed");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                ArtX.errors.showFormError(jqXHR.responseText);
             }
         });
     },
@@ -23866,12 +23892,7 @@ ArtX.interests = {
                     },
                     error: function (jqXHR, error, errorThrown) {
                         console.log(ArtX.interests.vars.ajaxErrorMsg);
-                        console.log("Error: " + errorThrown);
-                        // if (jqXHR.status && jqXHR.status == 401) {
-                        //    alert("Unauthorized request");
-                        //} else if (jqXHR.status && jqXHR.status == 404) {
-                        //    alert("The requested page not found");
-                        //}
+                        ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
                     }
                 });
             });
@@ -23925,12 +23946,7 @@ ArtX.interests = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log(ArtX.interests.vars.ajaxErrorMsg);
-                console.log("Error: " + errorThrown);
-                // if (jqXHR.status && jqXHR.status == 401) {
-                //    alert("Unauthorized request");
-                //} else if (jqXHR.status && jqXHR.status == 404) {
-                //    alert("The requested page not found");
-                //}
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         });
     },
@@ -23969,8 +23985,7 @@ ArtX.interests = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Retrieval of full possible interest list failed");
-                console.log("Error: " + errorThrown);
-                console.log("jqXHR status: " + jqXHR.status);
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         });
     },
@@ -24037,23 +24052,14 @@ ArtX.interests = {
 
                     },
                     error: function (jqXHR, error, errorThrown) {
-                        console.log("Failed retrieving selected interests feed for subsetting: " + errorThrown);
-                        // if (jqXHR.status && jqXHR.status == 401) {
-                        //    alert("Unauthorized request");
-                        //} else if (jqXHR.status && jqXHR.status == 404) {
-                        //    alert("The requested page not found");
-                        //}
+                        console.log("Failed retrieving selected interests feed for subsetting");
+                        ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
                     }
                 }); //End selected tags JSON call  
             },
             error: function (jqXHR, error, errorThrown) {
-                console.log("Failed retrieving all tags feed for subsetting: " + errorThrown); 
-
-                // if (jqXHR.status && jqXHR.status == 401) {
-                //    alert("Unauthorized request");
-                //} else if (jqXHR.status && jqXHR.status == 404) {
-                //    alert("The requested page not found");
-                //}
+                console.log("Failed retrieving all tags feed for subsetting"); 
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         }); //End all tags JSON call
       
@@ -24073,12 +24079,7 @@ ArtX.interests = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Retrieval of user's interest list failed");
-                console.log("Error: " + errorThrown);
-                // if (jqXHR.status && jqXHR.status == 401) {
-                //    alert("Unauthorized request");
-                //} else if (jqXHR.status && jqXHR.status == 404) {
-                //    alert("The requested page not found");
-                //}
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         });
 
@@ -24105,8 +24106,8 @@ ArtX.setupMyInterests = function() {
                 console.log(data);
             },
             error: function (jqXHR, error, errorThrown) {
-                console.log("Error: " + errorThrown);
-                console.log("jqXHR status: " + jqXHR.status);
+                console.log("Error retrieving user interests for Interests initialization");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         });
 
@@ -24187,12 +24188,7 @@ ArtX.setupMyInterests = function() {
                 },
                 error: function (jqXHR, error, errorThrown) {
                     console.log(ajaxErrorMsg);
-                    console.log("Error: " + errorThrown);
-                    // if (jqXHR.status && jqXHR.status == 401) {
-                    //    alert("Unauthorized request");
-                    //} else if (jqXHR.status && jqXHR.status == 404) {
-                    //    alert("The requested page not found");
-                    //}
+                    ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
                 }
             });
         });
@@ -24233,13 +24229,8 @@ ArtX.login = {
                 $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
             },
             error: function (jqXHR, error, errorThrown) {
-                console.log("Error: " + errorThrown);
-                console.log("jqXHR status: " + jqXHR.status);
-                /* if (jqXHR.status && jqXHR.status == 401) {
-                    alert("Unauthorized request");
-                } else if (jqXHR.status && jqXHR.status == 404) {
-                    alert("The requested page not found");
-                }*/
+                console.log("User login submit failed");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         });
     }
@@ -24356,7 +24347,6 @@ ArtX.startup = {
 
         ArtX.login.init();
         ArtX.logout.init();
-        ArtX.signupModal.init();
         ArtX.interests.init();
         ArtX.setupTextTruncation();
         ArtX.calendar.init();
@@ -24412,6 +24402,8 @@ $(document).ready(function() {
     $("#signup-popup").enhanceWithin().popup({ 
         history: false
     });
+
+    ArtX.signupModal.init();
 });
 
 /*

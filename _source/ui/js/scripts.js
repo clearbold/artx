@@ -42,6 +42,70 @@ Modernizr.addTest('touchcapable', function () {
     return bool;
 });
 
+
+/* Helper function to capitalize only the first letter of a string
+   ========================================================================== */
+// Usage: "hello world".capitalize();  =>  "Hello world"
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
+
+/* Set up form validation for email, passwords, etc.
+   ========================================================================== */
+jQuery.validator.addMethod("zipcode", function(value, element) {
+    return this.optional(element) || /^\d{5}(?:-\d{4})?$/.test(value);
+}, "Please provide a valid zip code.");
+
+jQuery.validator.addMethod("remoteEmail", function(value, element) {
+    return true;  // TODO: implement actual remote email check
+});
+
+var emailRuleSet = {
+    required: true,
+    email: true/*,
+    remote: {
+        url: "/CheckEmail/",
+        type: "post"
+    }*/
+};
+var emailMsgSet = {
+    required: "This field is required.",
+    email: "Please enter a valid email address.",
+    remote: "This email address is already taken."
+};
+var passwordMsgSet = {
+    required: "This field is required."
+};
+var confirmPasswordMsgSet = {
+    required: "This field is required.",
+    equalTo: "Passwords must match."
+};
+
+// Setting defaults for all validation -- submitHandlers should be added individually
+jQuery.validator.setDefaults({
+    focusCleanup: true,
+    focusInvalid: false,
+    rules: {
+        "password": "required",
+        "confirmpassword": {
+            equalTo: "#password"
+        },
+        "email": emailRuleSet,
+        "zipcode": "zipcode",
+        "signin-email": emailRuleSet,
+        "signin-password": "required"
+    },
+    messages: {
+        "email": emailMsgSet,
+        "password": passwordMsgSet,
+        "confirmpassword": confirmPasswordMsgSet,
+        "signin-email": emailMsgSet,
+        "signin-password": passwordMsgSet
+    }
+});
+
+
 /* Global namespace */
 var ArtX = ArtX || {};
 
@@ -110,6 +174,28 @@ ArtX.util = {
             console.log("No more results");
             return false;
         }
+    }
+};
+
+/* Logging Ajax errors */
+ArtX.errors = {
+    logAjaxError: function (jqXHR, error, errorThrown, isErrorAjaxResponse) {
+        console.log("Error: " + errorThrown);
+        console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+        if (isErrorAjaxResponse) {
+            console.log("jqXHR response: " + jqXHR.responseText);
+        }
+    },
+    showFormError: function (jsonError) {
+        // Get results from JSON returned
+        var result = $.parseJSON(jsonError);
+        var errorText;
+        var errorTarget;
+        $.each(result, function(k, v) {
+            errorTarget = $("#" + k);
+            errorText = k.capitalize() + ' ' + v;
+            console.log("Error text: " + errorText);
+        });
     }
 };
 
@@ -375,12 +461,13 @@ ArtX.signupModal = {
         //});
 
         // Set up form submit
-        $("#signup-form").submit(function(event) {
-            event.preventDefault();
-            ArtX.signupModal.ajaxSubmit();
+        $("#signup-form").validate({
+            submitHandler: ArtX.signupModal.ajaxSubmit
         });
     },
     ajaxSubmit: function() {
+        var $errorTarget = $("#signup-error");
+
         $.ajax({
             type: "POST",
             dataType: "json",
@@ -398,13 +485,9 @@ ArtX.signupModal = {
                 $.mobile.pageContainer.pagecontainer ("change", "interests.html", {reloadPage: true});
             },
             error: function (jqXHR, error, errorThrown) {
-                console.log("Error: " + errorThrown);
-                console.log("jqXHR status: " + jqXHR.status);
-                /* if (jqXHR.status && jqXHR.status == 401) {
-                    alert("Unauthorized request");
-                } else if (jqXHR.status && jqXHR.status == 404) {
-                    alert("The requested page not found");
-                }*/
+                console.log("User registration failed");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                ArtX.errors.showFormError(jqXHR.responseText);
             }
         });
     },
@@ -542,49 +625,6 @@ ArtX.calendar = {
 
             ArtX.calendar.getEvents(thisMonthURL);
         }
-    }
-};
-
-/* Set up form validation for email, passwords, etc.
-   ========================================================================== */
-ArtX.setupFormValidation = function() {
-    jQuery.validator.addMethod("zipcode", function(value, element) {
-      return this.optional(element) || /^\d{5}(?:-\d{4})?$/.test(value);
-    }, "Please provide a valid zip code.");
-
-    if ($("form.validate").length > 0) {
-       console.log("Setting up form validation");
-       $("form.validate").validate({
-            rules: {
-                "password": "required",
-                "confirmpassword": {
-                    equalTo: "#password"
-                },
-                "email": {
-                    required: true,
-                    email: true/*,
-                    remote: {
-                        url: "/CheckEmail/",
-                        type: "post"
-                    }*/
-                },
-                "zipcode": "zipcode"
-            },
-            messages: {
-                "email": {
-                    required: "This field is required.",
-                    email: "Please enter a valid email address.",
-                    remote: "This email address is already taken."
-                },
-                "password": {
-                    required: "This field is required."
-                },
-                "confirmpassword": {
-                    required: "This field is required.",
-                    equalTo: "Passwords must match."
-                }
-            }
-       });
     }
 };
 
@@ -904,12 +944,7 @@ ArtX.interests = {
                     },
                     error: function (jqXHR, error, errorThrown) {
                         console.log(ArtX.interests.vars.ajaxErrorMsg);
-                        console.log("Error: " + errorThrown);
-                        // if (jqXHR.status && jqXHR.status == 401) {
-                        //    alert("Unauthorized request");
-                        //} else if (jqXHR.status && jqXHR.status == 404) {
-                        //    alert("The requested page not found");
-                        //}
+                        ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
                     }
                 });
             });
@@ -963,12 +998,7 @@ ArtX.interests = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log(ArtX.interests.vars.ajaxErrorMsg);
-                console.log("Error: " + errorThrown);
-                // if (jqXHR.status && jqXHR.status == 401) {
-                //    alert("Unauthorized request");
-                //} else if (jqXHR.status && jqXHR.status == 404) {
-                //    alert("The requested page not found");
-                //}
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         });
     },
@@ -1007,8 +1037,7 @@ ArtX.interests = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Retrieval of full possible interest list failed");
-                console.log("Error: " + errorThrown);
-                console.log("jqXHR status: " + jqXHR.status);
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         });
     },
@@ -1075,23 +1104,14 @@ ArtX.interests = {
 
                     },
                     error: function (jqXHR, error, errorThrown) {
-                        console.log("Failed retrieving selected interests feed for subsetting: " + errorThrown);
-                        // if (jqXHR.status && jqXHR.status == 401) {
-                        //    alert("Unauthorized request");
-                        //} else if (jqXHR.status && jqXHR.status == 404) {
-                        //    alert("The requested page not found");
-                        //}
+                        console.log("Failed retrieving selected interests feed for subsetting");
+                        ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
                     }
                 }); //End selected tags JSON call  
             },
             error: function (jqXHR, error, errorThrown) {
-                console.log("Failed retrieving all tags feed for subsetting: " + errorThrown); 
-
-                // if (jqXHR.status && jqXHR.status == 401) {
-                //    alert("Unauthorized request");
-                //} else if (jqXHR.status && jqXHR.status == 404) {
-                //    alert("The requested page not found");
-                //}
+                console.log("Failed retrieving all tags feed for subsetting"); 
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         }); //End all tags JSON call
       
@@ -1111,128 +1131,8 @@ ArtX.interests = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Retrieval of user's interest list failed");
-                console.log("Error: " + errorThrown);
-                // if (jqXHR.status && jqXHR.status == 401) {
-                //    alert("Unauthorized request");
-                //} else if (jqXHR.status && jqXHR.status == 404) {
-                //    alert("The requested page not found");
-                //}
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
             }
-        });
-
-    }
-};
-
-/* Depreciated in favor of the structure above, breaking out tasks more nicely */
-ArtX.setupMyInterests = function() {
-    var $myInterestsForm = $("#interest-form");
-
-    if ($("#interest-form").length > 0) {
-        console.log("Initializing functionality for My Interests");
-
-        
-        console.log("First, let's see what my interests are.");
-
-        $.ajax({
-            type: "GET",
-            url: ArtX.var.jsonDomain + "/interests",
-            beforeSend: function (request) {
-                request.setRequestHeader("authentication_token", $.cookie('token'));
-            },
-            success: function( data ){
-                console.log(data);
-            },
-            error: function (jqXHR, error, errorThrown) {
-                console.log("Error: " + errorThrown);
-                console.log("jqXHR status: " + jqXHR.status);
-            }
-        });
-
-        var isCheckboxChecked = false;
-        var checkboxID;
-
-        var ajaxType, 
-            ajaxURL,
-            ajaxData, 
-            ajaxSuccessMsg, 
-            ajaxErrorMsg,
-            ajaxCallback;
-
-        var $thisCheckbox;
-
-        $(document).on("click", "#interest-form input[type=checkbox]", function() {
-            isCheckboxChecked = $(this).prop("checked");
-            checkboxID = $(this).data("interest-id");
-            console.log("checkboxID: " + checkboxID);
-            checkboxValue = $(this).val();
-
-            $thisCheckbox = $(this);
-
-            if (isCheckboxChecked) {
-                // We're interested in this, send a POST request
-                ajaxType = "POST";
-                ajaxURL = ArtX.var.jsonDomain + "/interests/";
-                ajaxData = {
-                    "tag_id": checkboxID
-                };
-                ajaxSuccessMsg = "Interest '" + checkboxValue + "' saved.";
-                ajaxErrorMsg = "Saving interest '" + checkboxValue + "' failed!";
-
-                ajaxCallback = function(checkboxObj, ajaxData) {
-                    console.log("Callback for adding an interest");
-                    var $myCheckbox = checkboxObj;
-                    var userInterestID; 
-                    $.each(ajaxData, function(index, interest) {
-                        userInterestID = interest.id;
-                        console.log("Selected interest ID for this user: " + userInterestID);
-                    });
-                    $myCheckbox.data("user-interest-id", userInterestID);
-                };
-            } else {
-                // We're not interested in this anymore, send a DELETE request
-                var userInterestID = $(this).data("user-interest-id");
-                console.log("userInterestID: " + userInterestID);
-
-                ajaxType = "POST";
-                ajaxURL = ArtX.var.jsonDomain + "/interests/" + userInterestID;
-                ajaxData = {
-                    "_method":"delete"
-                };
-                ajaxSuccessMsg = "Interest '" + checkboxValue + "' deleted.";
-                ajaxErrorMsg = "Deleting interest '" + checkboxValue + "' failed!";
-
-                ajaxCallback = function(checkboxObj) {
-                    console.log("Callback for deleting an interest");
-                    var $myCheckbox = checkboxObj;
-                    $myCheckbox.removeData("user-interest-id");
-                };
-            }
-
-            /* Make the actual Ajax request to handle the interest  
-            TODO: add success/fail/error handling, etc.
-            No Load More functionality, possibly a future enhancement. */
-
-            $.ajax({
-                type: ajaxType,
-                url: ajaxURL,
-                data: ajaxData,
-                beforeSend: function (request) {
-                    request.setRequestHeader("authentication_token", $.cookie('token'));
-                },
-                success: function ( data, textStatus, jqXHR ) {
-                    console.log(ajaxSuccessMsg);
-                    ajaxCallback($thisCheckbox, data);
-                },
-                error: function (jqXHR, error, errorThrown) {
-                    console.log(ajaxErrorMsg);
-                    console.log("Error: " + errorThrown);
-                    // if (jqXHR.status && jqXHR.status == 401) {
-                    //    alert("Unauthorized request");
-                    //} else if (jqXHR.status && jqXHR.status == 404) {
-                    //    alert("The requested page not found");
-                    //}
-                }
-            });
         });
 
     }
@@ -1245,9 +1145,9 @@ ArtX.login = {
         if ($("#signin-form").length > 0) {
             console.log("Initializing sign-in form");
             console.log("Value of token cookie: " + $.cookie('token'));
-            $("#signin-form").submit(function(event) {
-                event.preventDefault();
-                ArtX.login.ajaxSubmit();
+
+            $("#signin-form").validate({
+                submitHandler: ArtX.login.ajaxSubmit
             });
         }
     },
@@ -1271,13 +1171,8 @@ ArtX.login = {
                 $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
             },
             error: function (jqXHR, error, errorThrown) {
-                console.log("Error: " + errorThrown);
-                console.log("jqXHR status: " + jqXHR.status);
-                /* if (jqXHR.status && jqXHR.status == 401) {
-                    alert("Unauthorized request");
-                } else if (jqXHR.status && jqXHR.status == 404) {
-                    alert("The requested page not found");
-                }*/
+                console.log("User login submit failed");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         });
     }
@@ -1394,7 +1289,6 @@ ArtX.startup = {
 
         ArtX.login.init();
         ArtX.logout.init();
-        ArtX.signupModal.init();
         ArtX.interests.init();
         ArtX.setupTextTruncation();
         ArtX.calendar.init();
@@ -1402,9 +1296,7 @@ ArtX.startup = {
         ArtX.footerSlider.init();
         ArtX.favoriteStars.init();
         ArtX.setupCustomCheckboxes();
-        ArtX.setupFormValidation();
         ArtX.setupMySettings();
-        //ArtX.setupMyInterests();
         ArtX.setupHistory();
         ArtX.loadMore.init();
         ArtX.map.init();
@@ -1446,10 +1338,12 @@ $(document).ready(function() {
     console.log("****jQuery DOM Ready event firing");
     handleAppCache();
 
-    // Since the modal popup is outside jQuery Mobile's "pages", we need to instantiate it separately
+    // Since the modal Signup popup is outside jQM's "pages", we need to instantiate it separately and only once
     $("#signup-popup").enhanceWithin().popup({ 
         history: false
     });
+
+    ArtX.signupModal.init();
 });
 
 /*
