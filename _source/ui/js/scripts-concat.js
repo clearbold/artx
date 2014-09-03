@@ -23021,7 +23021,7 @@ jQuery.validator.addMethod("zipcode", function(value, element) {
 
 jQuery.validator.addMethod("remoteEmail", function(value, element) {
     return true;  // TODO: implement actual remote email check
-});
+}, "Email address not found in our system; please try another.");
 
 var emailRuleSet = {
     required: true,
@@ -23428,8 +23428,6 @@ ArtX.signupModal = {
         });
     },
     ajaxSubmit: function() {
-        var $errorTarget = $("#signup-error");
-
         $.ajax({
             type: "POST",
             dataType: "json",
