@@ -18,55 +18,6 @@ function handleAppCache() {
     applicationCache.addEventListener('updateready', handleAppCache, false);
 }
 
-//Developer note: Temporary location for getUncheckedTags
-function getUncheckedTags(){
-
-    var unchecked = {};
-    unchecked.tags = [];
-
-    $.getJSON("/ui/js/json/interests-all.json", function(data){ 
-
-        allTags = data.tags;
-        
-        $.getJSON("/ui/js/json/interests-userselected.json", function(data){
-
-                selectedInterests = data.interests;
-        
-                // Circle through all possible tags
-                for(i = 0; i < allTags.length; i++) {
-                    tag = allTags[i];
-                    unchecked.tags.push(tag);
-                    //console.log("Comparing: " + tag.id);
-                    
-                    // Check against selected tags
-                    for(j = 0; j < selectedInterests.length; j++){
-                        interest = selectedInterests[j];        
-                        //console.log("to " + interest.tag.id);
-                        if (tag.id === interest.tag.id) {
-                            //console.log("Removing " + tag.id + " from list");
-                            unchecked.tags.splice(i, 1);
-                            selectedInterests.splice(j, 1);
-                        }   
-                        
-                    } //End loop over selected tags
-                    
-                } //End loop over all possible tags
-                
-	        // For testing: print results
-	        // for(i = 0; i < unchecked.tags.length; i++) {
-                //    console.log(unchecked.tags[i].id);
-                //}
-
-        }).fail(function(jqXHR, textStatus, errorThrown) {
-            console.log("Failed retrieving selected interests feed: " + textStatus);
-        }); //End selected tags JSON call  
-    }).fail(function(jqXHR, textStatus, errorThrown) { 
-        console.log("Failed retrieving all tags feed: " + textStatus); 
-    }); //End all tags JSON call
-  
-    return unchecked;
-}
-
 /* New modernizr test for all touch devices */
 Modernizr.addTest('touchcapable', function () {
     var bool;
@@ -413,9 +364,10 @@ ArtX.signupModal = {
         console.log("Setting up Signup Modal window");
 
         // Set up behavior for modal close
-        $(document).on("click", ".close-modal", function() {
-            $("#signup-popup").popup('close');
-        });
+        //$(document).on("click", ".close-modal", function() {
+        //    console.log("How many times does it think I clicked this?");
+        //    $("#signup-popup").popup('close');
+        //});
 
         // log popup events
         //$(document).on("popupcreate popupinit popupafteropen popupafterclose", "#signup-popup", function (e) {
@@ -466,18 +418,14 @@ ArtX.signupModal = {
 ArtX.setupCustomCheckboxes = function(targetContainer) {
     var $checkboxes;
 
-    console.log("targetContainer: " + targetContainer);
-
     if (targetContainer !== undefined && targetContainer !== null) {
         $checkboxes = $(targetContainer).find(".customize-checkbox");
-        console.log("Number of checkboxes: " + $checkboxes.length);
     } else {
         $checkboxes = $(".customize-checkbox");
     }
 
     if ($checkboxes.length > 0) {
         console.log("Setting up custom checkboxes");
-
         $checkboxes.customInput();
     }
 };
@@ -990,7 +938,7 @@ ArtX.interests = {
             },
             success: function ( data, textStatus, jqXHR ) {
                 console.log(ArtX.interests.vars.ajaxSuccessMsg);
-                console.log("User interests: " + JSON.stringify(data));
+                //console.log("User interests: " + JSON.stringify(data));
                 
                 if(data.interests && data.interests.length) {
                     console.log("User has interests!");
@@ -1064,14 +1012,90 @@ ArtX.interests = {
             }
         });
     },
-    getAllExceptUserInterests: function() {
-        // We will need to hook Angela's scripting up here.
+    getUncheckedInterests: function() {
 
-        //ArtX.interests.buildInterestList(data, false);
+        var unchecked = {};
+        unchecked.tags = [];
 
-        $("<li><span>List of all interests excluding the user's interests will go here.</span></li>").appendTo($("#interest-form-list"));
-        ArtX.interests.showList();
+        var allTagsUrl = ArtX.var.jsonDomain + "/possible_interests/";
 
+        // All interests Ajax call
+        $.ajax({
+            type: "GET",
+            url: allTagsUrl,
+            success: function ( allTagsData, textStatus, jqXHR ) {
+                console.log("Successfully retrieved full list of interests for subsetting");
+                allTags = allTagsData.tags;
+                //console.log("Total number of tags: " + allTags.length);
+
+                // User's interests Ajax call
+                $.ajax({
+                    type: "GET",
+                    url: ArtX.var.jsonDomain + "/interests/",
+                    beforeSend: function (request) {
+                        request.setRequestHeader("authentication_token", $.cookie('token'));
+                    },
+                    success: function ( userTagsData, textStatus, jqXHR ) {
+                        console.log("Successfully retrieved list of user's interests for subsetting");
+                        //console.log("User interests: " + JSON.stringify(userTagsData));
+                        selectedInterests = userTagsData.interests;
+                        
+                        // Circle through all possible tags
+                        for(i = 0; i < allTags.length; i++) {
+                            tag = allTags[i];
+                            unchecked.tags.push(tag);
+                            //console.log("Number of unchecked tags after push: " + unchecked.tags.length);
+                            //console.log("Comparing: " + tag.id);
+                            
+                            // Check against selected tags
+                            for(j = 0; j < selectedInterests.length; j++){
+                                interest = selectedInterests[j];        
+                                //console.log("to " + interest.tag.id);
+                                
+                                if (tag.id === interest.tag.id) {
+                                    //console.log("Removing " + tag.id + " from list");
+                                    unchecked.tags.pop();
+                                    selectedInterests.splice(j, 1);
+                                    //console.log("Number of unchecked tags after splice: " + unchecked.tags.length);
+                                }   
+                                
+                            } //End loop over selected tags
+                            
+                        } //End loop over all possible tags
+
+                        // For testing: print results
+                        // for(i = 0; i < unchecked.tags.length; i++) {
+                        //    console.log(unchecked.tags[i].id);
+                        //}
+
+                        //console.log("Total number of unchecked tags: " + unchecked.tags.length);
+
+                        ArtX.interests.buildInterestList(unchecked, false);
+                        ArtX.interests.showList();
+
+                    },
+                    error: function (jqXHR, error, errorThrown) {
+                        console.log("Failed retrieving selected interests feed for subsetting: " + errorThrown);
+                        // if (jqXHR.status && jqXHR.status == 401) {
+                        //    alert("Unauthorized request");
+                        //} else if (jqXHR.status && jqXHR.status == 404) {
+                        //    alert("The requested page not found");
+                        //}
+                    }
+                }); //End selected tags JSON call  
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Failed retrieving all tags feed for subsetting: " + errorThrown); 
+
+                // if (jqXHR.status && jqXHR.status == 401) {
+                //    alert("Unauthorized request");
+                //} else if (jqXHR.status && jqXHR.status == 404) {
+                //    alert("The requested page not found");
+                //}
+            }
+        }); //End all tags JSON call
+      
+        return unchecked;
     },
     getUserInterests: function() {
         $.ajax({
@@ -1083,8 +1107,7 @@ ArtX.interests = {
             success: function ( data, textStatus, jqXHR ) {
                 console.log("Successfully retrieved list of user's interests");
                 ArtX.interests.buildInterestList(data, true);
-                ArtX.interests.getAllExceptUserInterests();
-                console.log("End of Get User Interests success handler");
+                ArtX.interests.getUncheckedInterests();
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Retrieval of user's interest list failed");
@@ -1262,7 +1285,7 @@ ArtX.login = {
 
 ArtX.logout = {
     init: function() {
-        $(document).on("click", ".action-logout", function() {
+        $(".action-logout").click(function() {
             console.log("Log out link clicked!");
             // Remove the authorization token and username cookies
             $.removeCookie('token');
@@ -1385,9 +1408,6 @@ ArtX.startup = {
         ArtX.setupHistory();
         ArtX.loadMore.init();
         ArtX.map.init();
-
-        //Developer note : Angela temporarily calling getUncheckedTags here
-        getUncheckedTags();
 
         console.log("**End of scripts initializing");
     },
