@@ -63,16 +63,16 @@ jQuery.validator.addMethod("remoteEmail", function(value, element) {
 
 var emailRuleSet = {
     required: true,
+    email: true
+};
+var existingEmailRuleSet = {
+    required: true,
     email: true/*,
-    remote: {
-        url: "/CheckEmail/",
-        type: "post"
-    }*/
+    "remoteEmail": "remoteEmail"*/
 };
 var emailMsgSet = {
     required: "This field is required.",
-    email: "Please enter a valid email address.",
-    remote: "This email address is already taken."
+    email: "Please enter a valid email address."
 };
 var passwordMsgSet = {
     required: "This field is required."
@@ -93,7 +93,7 @@ jQuery.validator.setDefaults({
         },
         "email": emailRuleSet,
         "zipcode": "zipcode",
-        "signin-email": emailRuleSet,
+        "signin-email": existingEmailRuleSet,
         "signin-password": "required"
     },
     messages: {
