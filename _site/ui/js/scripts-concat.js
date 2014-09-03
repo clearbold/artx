@@ -23326,9 +23326,10 @@ ArtX.signupModal = {
         console.log("Setting up Signup Modal window");
 
         // Set up behavior for modal close
-        $(document).on("click", ".close-modal", function() {
-            $("#signup-popup").popup('close');
-        });
+        //$(document).on("click", ".close-modal", function() {
+        //    console.log("How many times does it think I clicked this?");
+        //    $("#signup-popup").popup('close');
+        //});
 
         // log popup events
         //$(document).on("popupcreate popupinit popupafteropen popupafterclose", "#signup-popup", function (e) {
@@ -24246,7 +24247,7 @@ ArtX.login = {
 
 ArtX.logout = {
     init: function() {
-        $(document).on("click", ".action-logout", function() {
+        $(".action-logout").click(function() {
             console.log("Log out link clicked!");
             // Remove the authorization token and username cookies
             $.removeCookie('token');
