@@ -23152,11 +23152,21 @@ ArtX.errors = {
         // Get results from JSON returned
         var result = $.parseJSON(jsonError);
         var errorText;
-        var errorTarget;
+        var $errorSource;
+        var errorLabelHTML;
         $.each(result, function(k, v) {
-            errorTarget = $("#" + k);
+            $errorSource = $("#" + k);
             errorText = k.capitalize() + ' ' + v;
             console.log("Error text: " + errorText);
+
+            $errorLabel = $("<label>")
+                .attr("id", k + "-error")
+                .addClass("error")
+                .html(errorText)
+                .attr( "for", k );
+
+            $errorSource.addClass("error");
+            $errorLabel.insertAfter( $errorSource );
         });
     }
 };
@@ -24133,6 +24143,7 @@ ArtX.login = {
             error: function (jqXHR, error, errorThrown) {
                 console.log("User login submit failed");
                 ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                ArtX.errors.showFormError(jqXHR.responseText);
             }
         });
     }
