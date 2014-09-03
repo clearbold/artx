@@ -459,12 +459,13 @@ ArtX.signupModal = {
     init: function() {
         console.log("Setting up Signup Modal window");
 
-        // Set up form submit
-        $("#signup-form").validate({
-            submitHandler: ArtX.signupModal.ajaxSubmit
+        // Set up some click events for the sign up links
+        $(document).on("click", ".signup-trigger", function() {
+            ArtX.signupModal.open();
         });
     },
     ajaxSubmit: function() {
+        $.mobile.loading('show');
         $.ajax({
             type: "POST",
             dataType: "json",
@@ -485,11 +486,42 @@ ArtX.signupModal = {
                 console.log("User registration failed");
                 ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
                 ArtX.errors.showFormError(jqXHR.responseText);
+                $.mobile.loading('hide');
             }
         });
     },
     open: function() {
-        $("#signup-popup").popup('open');
+        // Make the ajax call to load up the form into the modal window
+        $.mobile.loading('show');
+        $.ajax({
+            type: "POST",
+            dataType: "html",
+            url: "/signup-form.html",
+            success: function( data ){
+                // Insert the form fields into the form
+                $("#signup-form").html(data);
+                // Create the form for jQM
+                $("#signup-form").trigger('create');
+                // Open the popup
+                $("#signup-popup").popup("open");
+
+                // Set up form submit
+                $("#signup-form").validate({
+                    submitHandler: ArtX.signupModal.ajaxSubmit
+                });
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Inserting the sign up form via Ajax failed");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
+        });
+    },
+    close: function() {
+        // Remove the form fields so we won't have conflicts
+        $("#signup-form").empty();
     }
 };
 
@@ -643,6 +675,8 @@ ArtX.loadMore = {
         ArtX.loadMore.vars.loadMoreLink
             .removeClass("btn-hidden") // Show the Load More link
             .click(function() {
+                $.mobile.loading('show');
+
                 // Fade out the button, so that we don't get into a situation where a slow Ajax load
                 // leaves the button there, and a frustrated user clicks a million times and you
                 // get lots of multiple entries
@@ -732,6 +766,8 @@ ArtX.loadMore = {
                             }
                         }
                     );
+
+                    $.mobile.loading('hide');
 
                 });
             });
@@ -927,6 +963,7 @@ ArtX.interests = {
                 /* Make the actual Ajax request to handle the interest  
                 TODO: add success/fail/error handling, etc.
                 No Load More functionality, possibly a future enhancement. */
+                $.mobile.loading('show');
 
                 $.ajax({
                     type: ArtX.interests.vars.ajaxType,
@@ -942,6 +979,9 @@ ArtX.interests = {
                     error: function (jqXHR, error, errorThrown) {
                         console.log(ArtX.interests.vars.ajaxErrorMsg);
                         ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                    },
+                    complete: function() {
+                        $.mobile.loading('hide');
                     }
                 });
             });
@@ -971,6 +1011,8 @@ ArtX.interests = {
             success: function ( data, textStatus, jqXHR ) {
                 console.log(ArtX.interests.vars.ajaxSuccessMsg);
                 //console.log("User interests: " + JSON.stringify(data));
+
+                $.mobile.loading('show');
                 
                 if(data.interests && data.interests.length) {
                     console.log("User has interests!");
@@ -1019,11 +1061,13 @@ ArtX.interests = {
 
         console.log("Showing finished interest list");
         ArtX.setupCustomCheckboxes("#interest-form-list");
-
+        
+        $.mobile.loading('hide');
         $interestIntro.fadeIn(400);
         $("#interest-form-list").fadeIn(400);
     },
     getAllInterests: function() {
+        
         $.ajax({
             type: "GET",
             url: ArtX.var.jsonDomain + "/possible_interests/",
@@ -1149,6 +1193,7 @@ ArtX.login = {
         }
     },
     ajaxSubmit: function() {
+        $.mobile.loading('show');
         $.ajax({
             type: "POST",
             dataType: "json",
@@ -1169,8 +1214,40 @@ ArtX.login = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("User login submit failed");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
-                ArtX.errors.showFormError(jqXHR.responseText);
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown, true);
+
+                /* If authentication failed, it will return 403 Forbidden and we can't run it through the usual showFormError because the form field ID doesn't match up */
+
+                if (jqXHR.status == 403) {
+                    
+                    // Get results from JSON error
+                    var result = $.parseJSON(jqXHR.responseText);
+                    var errorText;
+                    var $errorSource;
+                    var errorLabelHTML;
+                    var $errorLabel;
+
+                    $.each(result, function(k, v) {
+                        errorText = v.capitalize();
+                        console.log("Error text: " + errorText);
+
+                        $errorLabel = $("<label>")
+                            .attr("id", "signin-password-error")
+                            .addClass("error")
+                            .html(errorText)
+                            .attr( "for", "signin-password");
+
+                        $("#signin-password").addClass("error");
+                        $errorLabel.insertAfter( $("#signin-password") );
+                    });
+
+                } else {
+                    ArtX.errors.showFormError(jqXHR.responseText);
+                }
+                
+            },
+            complete: function() {
+                $.mobile.loading('hide');
             }
         });
     }
@@ -1338,7 +1415,9 @@ $(document).ready(function() {
 
     // Since the modal Signup popup is outside jQM's "pages", we need to instantiate it separately and only once
     $("#signup-popup").enhanceWithin().popup({ 
-        history: false
+        history: false,
+        positionTo: "window",
+        afterclose: ArtX.signupModal.close
     });
 
     ArtX.signupModal.init();
