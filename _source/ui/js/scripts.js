@@ -18,6 +18,55 @@ function handleAppCache() {
     applicationCache.addEventListener('updateready', handleAppCache, false);
 }
 
+//Developer note: Temporary location for getUncheckedTags
+function getUncheckedTags(){
+
+    var unchecked = {};
+    unchecked.tags = [];
+
+    $.getJSON("/ui/js/json/interests-all.json", function(data){ 
+
+        allTags = data.tags;
+        
+        $.getJSON("/ui/js/json/interests-userselected.json", function(data){
+
+                selectedInterests = data.interests;
+        
+                // Circle through all possible tags
+                for(i = 0; i < allTags.length; i++) {
+                    tag = allTags[i];
+                    unchecked.tags.push(tag);
+                    //console.log("Comparing: " + tag.id);
+                    
+                    // Check against selected tags
+                    for(j = 0; j < selectedInterests.length; j++){
+                        interest = selectedInterests[j];        
+                        //console.log("to " + interest.tag.id);
+                        if (tag.id === interest.tag.id) {
+                            //console.log("Removing " + tag.id + " from list");
+                            unchecked.tags.splice(i, 1);
+                            selectedInterests.splice(j, 1);
+                        }   
+                        
+                    } //End loop over selected tags
+                    
+                } //End loop over all possible tags
+                
+	        // For testing: print results
+	        // for(i = 0; i < unchecked.tags.length; i++) {
+                //    console.log(unchecked.tags[i].id);
+                //}
+
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            console.log("Failed retrieving selected interests feed: " + textStatus);
+        }); //End selected tags JSON call  
+    }).fail(function(jqXHR, textStatus, errorThrown) { 
+        console.log("Failed retrieving all tags feed: " + textStatus); 
+    }); //End all tags JSON call
+  
+    return unchecked;
+}
+
 /* New modernizr test for all touch devices */
 Modernizr.addTest('touchcapable', function () {
     var bool;
@@ -1191,6 +1240,7 @@ ArtX.login = {
             success: function( data ){
                 console.log("Login successful! Saving a cookie");
                 $.cookie('token', data.authentication_token);
+                $.cookie('currentuser', $("#email").val());
                 $.cookie('currentuser', $("#signin-email").val());
                 if (!ArtX.el.html.hasClass("is-logged-in")) {
                     ArtX.el.html.addClass("is-logged-in");
@@ -1335,6 +1385,10 @@ ArtX.startup = {
         ArtX.setupHistory();
         ArtX.loadMore.init();
         ArtX.map.init();
+
+        //Developer note : Angela temporarily calling getUncheckedTags here
+        getUncheckedTags();
+
         console.log("**End of scripts initializing");
     },
     finalize : function() {

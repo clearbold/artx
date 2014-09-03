@@ -18,6 +18,55 @@ function handleAppCache() {
     applicationCache.addEventListener('updateready', handleAppCache, false);
 }
 
+//Developer note: Temporary location for getUncheckedTags
+function getUncheckedTags(){
+
+    var unchecked = {};
+    unchecked.tags = [];
+
+    $.getJSON("/ui/js/json/interests-all.json", function(data){ 
+
+        allTags = data.tags;
+        
+        $.getJSON("/ui/js/json/interests-userselected.json", function(data){
+
+                selectedInterests = data.interests;
+        
+                // Circle through all possible tags
+                for(i = 0; i < allTags.length; i++) {
+                    tag = allTags[i];
+                    unchecked.tags.push(tag);
+                    //console.log("Comparing: " + tag.id);
+                    
+                    // Check against selected tags
+                    for(j = 0; j < selectedInterests.length; j++){
+                        interest = selectedInterests[j];        
+                        //console.log("to " + interest.tag.id);
+                        if (tag.id === interest.tag.id) {
+                            //console.log("Removing " + tag.id + " from list");
+                            unchecked.tags.splice(i, 1);
+                            selectedInterests.splice(j, 1);
+                        }   
+                        
+                    } //End loop over selected tags
+                    
+                } //End loop over all possible tags
+                
+	        // For testing: print results
+	        // for(i = 0; i < unchecked.tags.length; i++) {
+                //    console.log(unchecked.tags[i].id);
+                //}
+
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            console.log("Failed retrieving selected interests feed: " + textStatus);
+        }); //End selected tags JSON call  
+    }).fail(function(jqXHR, textStatus, errorThrown) { 
+        console.log("Failed retrieving all tags feed: " + textStatus); 
+    }); //End all tags JSON call
+  
+    return unchecked;
+}
+
 /* New modernizr test for all touch devices */
 Modernizr.addTest('touchcapable', function () {
     var bool;
@@ -829,7 +878,7 @@ ArtX.interests = {
         ajaxCallback : function() {
             // empty function for now, will define later in the script
         },
-        ajaxCallsComplete: 0
+        interestIntro : "#interest-onboarding-intro"
     },
     init: function() {
         if ($("#interest-form").length > 0) {
@@ -945,23 +994,24 @@ ArtX.interests = {
                 
                 if(data.interests && data.interests.length) {
                     console.log("User has interests!");
+
+                    ArtX.interests.vars.interestIntro = "#interest-normal-intro";
                     
                     // Display user's list
                     $("#interest-form-list").fadeOut(400, function() {
-                        ArtX.interests.getUserInterests("#interest-normal-intro", 2);
-                        ArtX.interests.getAllInterests("#interest-normal-intro", 2); // **This will change to get subset of interests 
+                        ArtX.interests.getUserInterests();
                     });
                     
-
                 } else {
                     console.log("User has no interests yet");
 
+                    ArtX.interests.vars.interestIntro = "#interest-onboarding-intro";
+
                     // Display all interests 
                     $("#interest-form-list").fadeOut(400, function() {
-                        ArtX.interests.getAllInterests("#interest-onboarding-intro", 1);
+                        ArtX.interests.getAllInterests();
                     });
                 }
-
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log(ArtX.interests.vars.ajaxErrorMsg);
@@ -980,47 +1030,32 @@ ArtX.interests = {
         var jsonArray = data;
         var interestHtml;
 
-        //console.log("Data from getAllInterests Ajax call: " + JSON.stringify(jsonArray));
-
         // Format results with underscore.js template
         if (isChecked) {
             interestHtml = _.template($("#interests-user-template").html(), {jsonArray:jsonArray});
         } else {
             interestHtml = _.template($("#interests-template").html(), {jsonArray:jsonArray});
         }
-        
-        //console.log("item template html" + $("#interests-template").html());
 
         $(interestHtml).appendTo($("#interest-form-list"));
-
     },
-    showList: function(intro, numberOfAjaxCalls) {
-        
-        var totalCalls = numberOfAjaxCalls;
+    showList: function() {
+        var $interestIntro = $(ArtX.interests.vars.interestIntro);
 
-        ArtX.interests.vars.ajaxCallsComplete = ArtX.interests.vars.ajaxCallsComplete + 1;
+        console.log("Showing finished interest list");
+        ArtX.setupCustomCheckboxes("#interest-form-list");
 
-        if (ArtX.interests.vars.ajaxCallsComplete == totalCalls) {
-            console.log("Showing finished interest list");
-            ArtX.setupCustomCheckboxes("#interest-form-list");
-
-            $(intro).fadeIn(400);
-            $("#interest-form-list").fadeIn(400);
-
-            ArtX.interests.vars.ajaxCallsComplete = 0;
-        }
-        
+        $interestIntro.fadeIn(400);
+        $("#interest-form-list").fadeIn(400);
     },
-    getAllInterests: function(intro, numberOfAjaxCalls) {
+    getAllInterests: function() {
         $.ajax({
             type: "GET",
             url: ArtX.var.jsonDomain + "/possible_interests/",
             success: function( data ){
                 console.log("Successfully retrieved full list of possible interests");
-
                 ArtX.interests.buildInterestList(data, false);
-                ArtX.interests.showList(intro, numberOfAjaxCalls);
-                console.log("End of Get All Interests success handler");
+                ArtX.interests.showList();
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Retrieval of full possible interest list failed");
@@ -1029,8 +1064,16 @@ ArtX.interests = {
             }
         });
     },
-    getUserInterests: function(intro, numberOfAjaxCalls) {
-        
+    getAllExceptUserInterests: function() {
+        // We will need to hook Angela's scripting up here.
+
+        //ArtX.interests.buildInterestList(data, false);
+
+        $("<li><span>List of all interests excluding the user's interests will go here.</span></li>").appendTo($("#interest-form-list"));
+        ArtX.interests.showList();
+
+    },
+    getUserInterests: function() {
         $.ajax({
             type: "GET",
             url: ArtX.var.jsonDomain + "/interests/",
@@ -1040,7 +1083,7 @@ ArtX.interests = {
             success: function ( data, textStatus, jqXHR ) {
                 console.log("Successfully retrieved list of user's interests");
                 ArtX.interests.buildInterestList(data, true);
-                ArtX.interests.showList(intro, numberOfAjaxCalls);
+                ArtX.interests.getAllExceptUserInterests();
                 console.log("End of Get User Interests success handler");
             },
             error: function (jqXHR, error, errorThrown) {
@@ -1197,6 +1240,7 @@ ArtX.login = {
             success: function( data ){
                 console.log("Login successful! Saving a cookie");
                 $.cookie('token', data.authentication_token);
+                $.cookie('currentuser', $("#email").val());
                 $.cookie('currentuser', $("#signin-email").val());
                 if (!ArtX.el.html.hasClass("is-logged-in")) {
                     ArtX.el.html.addClass("is-logged-in");
@@ -1341,6 +1385,10 @@ ArtX.startup = {
         ArtX.setupHistory();
         ArtX.loadMore.init();
         ArtX.map.init();
+
+        //Developer note : Angela temporarily calling getUncheckedTags here
+        getUncheckedTags();
+
         console.log("**End of scripts initializing");
     },
     finalize : function() {
