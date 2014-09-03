@@ -459,17 +459,6 @@ ArtX.signupModal = {
     init: function() {
         console.log("Setting up Signup Modal window");
 
-        // Set up behavior for modal close
-        //$(document).on("click", ".close-modal", function() {
-        //    console.log("How many times does it think I clicked this?");
-        //    $("#signup-popup").popup('close');
-        //});
-
-        // log popup events
-        //$(document).on("popupcreate popupinit popupafteropen popupafterclose", "#signup-popup", function (e) {
-        //    console.log(e.target.id + " -> " + e.type);
-        //});
-
         // Set up form submit
         $("#signup-form").validate({
             submitHandler: ArtX.signupModal.ajaxSubmit
