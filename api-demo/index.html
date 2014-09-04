@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Artx</title>
+    <link data-turbolinks-track="true" href="http://artx-staging.herokuapp.com/assets/application-9cc0575249625b8d8648563841072913.css" media="all" rel="stylesheet" />
+    <script data-turbolinks-track="true" src="http://artx-staging.herokuapp.com/assets/application-e8dbdeba6b220afcdd1c77082a31f07e.js"></script>
+    <meta content="authenticity_token" name="csrf-param" />
+    <meta content="IJsgmxFlhe3mJ9GcV2Uzva0L8Naor0qfOYyQQTz3zFw=" name="csrf-token" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <script src="http://artx-staging.herokuapp.com/assets/jquery.cookie-823710d24be2fb1c8eeabdf37f41ea45.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="affix" role="complementary">
+                    <ul class="nav">
+                        <li><a href="#login-panel">Log in</a></li>
+                        <li><a href="#discover-panel">Discover</a></li>
+                        <li><a href="#favorites-panel">Favorites</a></li>
+                        <li><a href="#interests-panel">Interests</a></li>
+                        <li><a href="#events-location-panel">Events by location</a></li>
+                        <li><a href="#events-month-panel">Events by month</a></li>
+                        <li><a class="back-to-top" href="#top">Back to top</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div id="main" data-token="temp">
+                    <h4 class="page-heading ">ArtX RESTful Web API Examples</h4>
+                    <div class="panel panel-default" id='register-panel'>
+                        <div class="panel-heading">Register</div>
+                        <div class="panel-body">
+                            Email: <input type="text" name="register-email" id="register-email" value="" class="form-control" /><br>
+                            Password: <input type="password" name="register-password" id="register-password" value="" class="form-control" /><br>
+                            Confirmation: <input type="password" name="password_confirmation" id="password_confirmation" value="" class="form-control" /><br>
+                            Zip: <input type="text" name="zipcode" id="zipcode" value="" class="form-control" /><br>
+                            <button value="Log in" id='registrations-button' class="btn btn-default" />Register</button><br>
+                            <div class="well" id="registration-viewer"></div>
+                            <pre class="prettyprint lang-js">
+                                <code class="javascript">
+$.ajax({
+    type: "POST",
+    dataType: "json",
+    url: "http://artx-staging.herokuapp.com/registrations",
+    data: {
+        email: $("#register-email").val(),
+        password:  $("#register-password").val(),
+        password_confirmation: $("#password_confirmation").val(),
+        zipcode:  $("#zipcode").val()
+    },
+    success: function( data ){
+        $.cookie('token', data.authentication_token);
+    }
+});
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default" id='login-panel'>
+                        <div class="panel-heading">Log in</div>
+                        <div class="panel-body">
+                            Email: <input type="text" name="login-email" id="login-email" value="" class="form-control" /><br>
+                            Password: <input type="password" name="login-password" id="login-password" value="" class="form-control" /><br>
+                            <button value="Log in" id='login-button' class="btn btn-default" />Log in</button><br>
+                            <div class="well" id="token-viewer"></div>
+                            <pre class="prettyprint lang-js">
+                                <code class="javascript">
+$.ajax({
+    type: "POST",
+    dataType: "json",
+    url: "http://artx-staging.herokuapp.com/tokens",
+    data: {
+        email: $("#login-email").val(),
+        password:  $("#login-password").val()
+    },
+    success: function( data ){
+        $.cookie('token', data.authentication_token);
+    }
+});
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default" id='discover-panel'>
+                        <div class="panel-heading">Get Discover</div>
+                        <div class="panel-body">
+                            <button value="Get Discover" id='discover-button' class="btn btn-default" />Get Discover</button><br>
+                            <ul id="discoveries" class="list-group"></ul>
+                            <pre class="prettyprint lang-js">
+                                <code class="javascript">
+$.ajax({
+    type: "GET",
+    dataType: "json",
+    url: "http://artx-staging.herokuapp.com/discoveries",
+    beforeSend: function (request) {
+        request.setRequestHeader("authentication_token", $.cookie('token'));
+    },
+    success: function( data ) {
+        $('#discoveries').empty();
+        console.log(data.events);
+        $.each(data.events, function (key, value) {
+            $('#discoveries').append('&lt;li class="list-group-item"&gt;'+value.name +'&lt;/li&gt;')
+            console.log(value.name);
+        })
+    }
+})
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default" id='favorites-panel'>
+                        <div class="panel-heading">Get Favorites</div>
+                        <div class="panel-body">
+                            <button value="Get Favorites" id='faves-button' class="btn btn-default" />Get Favorites</button><br>
+                            <ul id="favorites" class="list-group"></ul>
+                            <pre class="prettyprint lang-js">
+                                <code class="javascript">
+$.ajax({
+type: "GET",
+dataType: "json",
+url: "http://artx-staging.herokuapp.com/favorites",
+beforeSend: function (request) {
+request.setRequestHeader("authentication_token", $.cookie('token'));
+},
+success: function( data ) {
+$('#favorites').empty();
+$.each(data.favorites, function (key, value) {
+$('#favorites').append('&lt;li class="list-group-item"&gt;' + value.event.name+ '&lt;/li&gt;')
+console.log(value.event);
+});
+}
+});
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default" id='interests-panel'>
+                        <div class="panel-heading">Get Interests</div>
+                        <div class="panel-body">
+                            <button value="Get Interests" id='interests-button' class="btn btn-default" />Get Interests</button><br>
+                            <ul id="interests" class="list-group"></ul>
+                            <pre class="prettyprint lang-js">
+                                <code class="javascript">
+$.ajax({
+type: "GET",
+url: "http://artx-staging.herokuapp.com/interests",
+beforeSend: function (request) {
+request.setRequestHeader("authentication_token", $.cookie('token'));
+},
+success: function( data ){
+console.log(data);
+$('#interests').empty();
+$.each(data.interests, function (key, value) {
+$('#interests').append('&lt;li class="list-group-item"&gt;' + tag.name+ '&lt;/li&gt;')
+console.log(value.name);
+});
+}
+});
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default" id='events-location-panel'>
+                        <div class="panel-heading">Get Events by Location</div>
+                        <div class="panel-body">
+                            <button value="Get Events by Location" id='events-location-button' class="btn btn-default" />Get Events by Location</button><br>
+                            <ul id="events-by-location" class="list-group"></ul>
+                            <pre class="prettyprint lang-js">
+                                <code class="javascript">
+$.ajax({
+type: "GET",
+dataType: "json",
+url: "http://artx-staging.herokuapp.com/locations/1/events",
+data: { },
+success: function( data ){
+console.log(data);
+$('#events-by-location').empty();
+$.each(data.events, function (key, value) {
+$('#events-by-location').append('&lt;li class="list-group-item"&gt;' + value.name+ '&lt;/li&gt;')
+console.log(value.name);
+});
+}
+});
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default" id='events-month-panel'>
+                        <div class="panel-heading">Get Events by Month</div>
+                        <div class="panel-body">
+                            <button value="Get Events by Month" id='events-month-button' class="btn btn-default" />Get Events by Month</button><br>
+                            <ul id="events-by-month" class="list-group"></ul>
+                            <pre class="prettyprint lang-js">
+                                <code class="javascript">
+$.ajax({
+type: "GET",
+url: "http://artx-staging.herokuapp.com/events",
+data: {
+year: '2014',
+month: '08',
+},
+success: function( data ){
+console.log(data);
+$('#events-by-month').empty();
+$.each(data.events, function (key, value) {
+$('#events-by-month').append('&lt;li class="list-group-item"&gt;' + value.name+ '&lt;/li&gt;')
+console.log(value.name);
+});
+}
+});
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+
+                </div>
+
+<!--
+<div>
+<button value="Get Interests" id='interests-button' class="btn btn-default" />Get interests</button><br>
+<ul id="interests" class="list-group"></ul>
+</div>
+
+
+<div>
+<button value="Get Attendances" id='attendances-button' class="btn btn-default" />Get attendances</button><br>
+<ul id="attendances" class="list-group"></ul>
+</div>
+-->
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+
+    $('#registrations-button').click(function(){
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "http://artx-staging.herokuapp.com/registrations",
+            data: {
+                email: $("#register-email").val(),
+                password:  $("#register-password").val(),
+                password_confirmation: $("#password_confirmation").val(),
+                zipcode:  $("#zipcode").val()
+            },
+            success: function( data ){
+                console.log(data);
+                $.cookie('token', data.user.authentication_token);
+                $('div#main').data("token", $.cookie('token'));
+                $('div#registration-viewer').html("Authentication Token: " + $.cookie('token'));
+                console.log($('div#main').data("token"));
+            }
+        });
+    });
+
+    $('#login-button').click(function(){
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "http://artx-staging.herokuapp.com/tokens",
+            data: {
+                email: $("#login-email").val(),
+                password:  $("#login-password").val(),
+            },
+            success: function( data ){
+                console.log(data);
+                $.cookie('token', data.authentication_token);
+                $('div#main').data("token", $.cookie('token'));
+                $('div#token-viewer').html("Authentication Token: " + $.cookie('token'));
+                console.log($('div#main').data("token"));
+            }
+        });
+    });
+
+    $('#discover-button').click(function(){
+        console.log("Start fetch Discover");
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "http://artx-staging.herokuapp.com/discoveries",
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function( data ) {
+                $('#discoveries').empty();
+                console.log(data.events);
+                $.each(data.events, function (key, value) {
+                    $('#discoveries').append('<li class="list-group-item">' + value.name + '</li>')
+                    console.log(value.name);
+                })
+            }
+        })
+    })
+
+    $('#faves-button').click(function(){
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "http://artx-staging.herokuapp.com/favorites",
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function( data ) {
+                $('#favorites').empty();
+                $.each(data.favorites, function (key, value) {
+                    $('#favorites').append('<li class="list-group-item">' + value.event.name+ '</li>')
+                    console.log(value.event);
+                });
+            }
+        });
+    });
+
+    $('#events-location-button').click(function(){
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "http://artx-staging.herokuapp.com/locations/1/events",
+            data: { },
+            success: function( data ){
+                console.log(data);
+                $('#events-by-location').empty();
+                $.each(data.events, function (key, value) {
+                    $('#events-by-location').append('<li class="list-group-item">' + value.name+ '</li>')
+                    console.log(value.name);
+                });
+            }
+        });
+    });
+
+    $('#events-month-button').click(function(){
+        $.ajax({
+            type: "GET",
+            url: "http://artx-staging.herokuapp.com/events",
+            data: {
+                year: '2014',
+                month: '08',
+            },
+            success: function( data ){
+                console.log(data);
+                $('#events-by-month').empty();
+                $.each(data.events, function (key, value) {
+                    $('#events-by-month').append('<li class="list-group-item">' + value.to_string + '</li>')
+                    console.log(value.name);
+                });
+            }
+        });
+    });
+
+    $('#interests-button').click(function(){
+        $.ajax({
+            type: "GET",
+            url: "http://artx-staging.herokuapp.com/interests",
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function( data ){
+                console.log(data);
+                $('#interests').empty();
+                $.each(data.interests, function (key, value) {
+                    $('#interests').append('<li class="list-group-item">' + value.tag.name+ '</li>')
+                    console.log(value.name);
+                });
+            }
+        });
+    });
+    // $('#attendances-button').click(function(){
+    //   $.ajax({
+    //     type: "GET",
+    //     dataType: "json",
+    //     url: "http://artx-staging.herokuapp.com/attendances",
+    //     data: {
+    //     },
+    //     success: function( data ){
+    //     }
+    //   });
+    // });
+    });
+</script>
+
+</body>
+</html>
