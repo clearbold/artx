@@ -101,7 +101,22 @@ $.ajax({
                             <ul id="discoveries" class="list-group"></ul>
                             <pre class="prettyprint lang-js">
                                 <code class="javascript">
-
+$.ajax({
+    type: "GET",
+    dataType: "json",
+    url: "http://artx-staging.herokuapp.com/discoveries",
+    beforeSend: function (request) {
+        request.setRequestHeader("authentication_token", $.cookie('token'));
+    },
+    success: function( data ) {
+        $('#discoveries').empty();
+        console.log(data.events);
+        $.each(data.events, function (key, value) {
+            $('#discoveries').append('&lt;li class="list-group-item"&gt;'+value.name +'&lt;/li&gt;')
+            console.log(value.name);
+        })
+    }
+})
                                 </code>
                             </pre>
                         </div>
