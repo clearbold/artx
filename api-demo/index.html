@@ -132,10 +132,10 @@ $.ajax({
                             <pre class="prettyprint lang-js">
                                 <code class="javascript">
 // Note the requested event is available at $.each(data), not data.event.
-// Related events are nested as data.related[3].events
-// Each data.related has a score associated for ranking
+// Related events are nested as data.related[3].events with tag
+// Each data.related/tag has a score associated for ranking
 $.ajax({
-type: "GET",
+    type: "GET",
     dataType: "json",
     url: "http://artx-staging.herokuapp.com/events/20/",
     data: {
@@ -145,8 +145,16 @@ type: "GET",
         console.log(data);
         $('#event').empty();
         $.each(data, function (key, value) {
-            $('#event').append('<li class="list-group-item">' + value.name + '</li>')
+            $('#event').append('&lt;li class="list-group-item"&gt;' + value.name + '&lt;/li&gt;')
             console.log(value.name);
+        })
+        console.log(data.event.related);
+        $.each(data.event.related, function (key, value) {
+            $.each(value.events, function (key, eventValue) {
+                $('#event').append('&lt;li class="list-group-item"&gt;Tag: ' + value.tag.name + ', Event: ' + eventValue.name + '&lt;/li&gt;')
+                console.log(eventValue.name);
+            })
+            console.log(value.tag.name);
         })
     }
 })
