@@ -23049,8 +23049,7 @@ jQuery.validator.setDefaults({
     focusCleanup: true,
     focusInvalid: false,
     rules: {
-        "password": "required",
-        "confirmpassword": {
+        "password_confirmation": {
             equalTo: "#password"
         },
         "email": emailRuleSet,
@@ -23061,7 +23060,7 @@ jQuery.validator.setDefaults({
     messages: {
         "email": emailMsgSet,
         "password": passwordMsgSet,
-        "confirmpassword": confirmPasswordMsgSet,
+        "password_confirmation": confirmPasswordMsgSet,
         "signin-email": emailMsgSet,
         "signin-password": passwordMsgSet
     }
@@ -23152,11 +23151,21 @@ ArtX.errors = {
         // Get results from JSON returned
         var result = $.parseJSON(jsonError);
         var errorText;
-        var errorTarget;
+        var $errorSource;
+        var errorLabelHTML;
         $.each(result, function(k, v) {
-            errorTarget = $("#" + k);
+            $errorSource = $("#" + k);
             errorText = k.capitalize() + ' ' + v;
             console.log("Error text: " + errorText);
+
+            $errorLabel = $("<label>")
+                .attr("id", k + "-error")
+                .addClass("error")
+                .html(errorText)
+                .attr( "for", k );
+
+            $errorSource.addClass("error");
+            $errorLabel.insertAfter( $errorSource );
         });
     }
 };
@@ -23411,23 +23420,13 @@ ArtX.signupModal = {
     init: function() {
         console.log("Setting up Signup Modal window");
 
-        // Set up behavior for modal close
-        //$(document).on("click", ".close-modal", function() {
-        //    console.log("How many times does it think I clicked this?");
-        //    $("#signup-popup").popup('close');
-        //});
-
-        // log popup events
-        //$(document).on("popupcreate popupinit popupafteropen popupafterclose", "#signup-popup", function (e) {
-        //    console.log(e.target.id + " -> " + e.type);
-        //});
-
-        // Set up form submit
-        $("#signup-form").validate({
-            submitHandler: ArtX.signupModal.ajaxSubmit
+        // Set up some click events for the sign up links
+        $(document).on("click", ".signup-trigger", function() {
+            ArtX.signupModal.open();
         });
     },
     ajaxSubmit: function() {
+        $.mobile.loading('show');
         $.ajax({
             type: "POST",
             dataType: "json",
@@ -23448,11 +23447,42 @@ ArtX.signupModal = {
                 console.log("User registration failed");
                 ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
                 ArtX.errors.showFormError(jqXHR.responseText);
+                $.mobile.loading('hide');
             }
         });
     },
     open: function() {
-        $("#signup-popup").popup('open');
+        // Make the ajax call to load up the form into the modal window
+        $.mobile.loading('show');
+        $.ajax({
+            type: "POST",
+            dataType: "html",
+            url: "/signup-form.html",
+            success: function( data ){
+                // Insert the form fields into the form
+                $("#signup-form").html(data);
+                // Create the form for jQM
+                $("#signup-form").trigger('create');
+                // Open the popup
+                $("#signup-popup").popup("open");
+
+                // Set up form submit
+                $("#signup-form").validate({
+                    submitHandler: ArtX.signupModal.ajaxSubmit
+                });
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Inserting the sign up form via Ajax failed");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
+        });
+    },
+    close: function() {
+        // Remove the form fields so we won't have conflicts
+        $("#signup-form").empty();
     }
 };
 
@@ -23477,73 +23507,109 @@ ArtX.setupCustomCheckboxes = function(targetContainer) {
 /* Set up By Date Event Calendar
    ========================================================================== */
 ArtX.calendar = {
-    getEvents: function(jsonURL) {
-        $.getJSON(jsonURL, function(data) {
-            eventArray = data;
+    getEvents: function(desiredMonth, desiredYear) {
+        
+        var jsonURL = ArtX.var.jsonDomain + "/events";
+        
+        $.mobile.loading('show');
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            data: {
+                year: desiredYear,
+                month: desiredMonth
+            },
+            url: jsonURL,
+            success: function( data ){
+                console.log("Initial calendar event fetch successful");
+                
+                console.log(JSON.stringify(data));
 
-            // Create a Clndr and save the instance as myCalendar
-            ArtX.el.eventCalendar = $("#event-calendar").clndr({
-                template: $('#template-calendar').html(),
-                events: eventArray,
-                dateParameter: 'start_date',
-                multiDayEvents: {
-                    startDate: 'start_date',
-                    endDate: 'end_date'
-                },
-                clickEvents: {
-                    click: function(target) {
-                        // if we click on a day
-                        if ($(target.element).hasClass("day")) {
-                            console.log("Day clicked!");
-                            // clear any existing selection states
-                            $(".day").removeClass("day-selected");
-                            // select the new day
-                            $(target.element).addClass("day-selected");
-                            // and display events for that day
-                            ArtX.calendar.displayEventList(target);
-                        } else {
-                            console.log("Click target not a day.");
+                eventArray = data.events;
+
+                // Create a Clndr and save the instance as myCalendar
+                ArtX.el.eventCalendar = $("#event-calendar").clndr({
+                    template: $('#template-calendar').html(),
+                    events: eventArray,
+                    dateParameter: 'start_date',
+                    multiDayEvents: {
+                        startDate: 'start_date',
+                        endDate: 'end_date'
+                    },
+                    clickEvents: {
+                        click: function(target) {
+                            // if we click on a day
+                            if ($(target.element).hasClass("day")) {
+                                console.log("Day clicked!");
+                                // clear any existing selection states
+                                $(".day").removeClass("day-selected");
+                                // select the new day
+                                $(target.element).addClass("day-selected");
+                                // and display events for that day
+                                ArtX.calendar.displayEventList(target);
+                            } else {
+                                console.log("Click target not a day.");
+                            }
+                        },
+                        onMonthChange: function(month) {
+                            var chosenMonth = month.format("MM");
+                            console.log("Month change!  New month: " + chosenMonth);
+                            var chosenYear = month.format("YYYY");
+                            var jsonURL = ArtX.var.jsonDomain + "/events";
+                            var newEventArray = [];
+
+                            $.mobile.loading('show');
+                            $.ajax({
+                                type: "GET",
+                                dataType: "json",
+                                url: jsonURL,
+                                data: {
+                                    year: chosenYear,
+                                    month: chosenMonth
+                                },
+                                success: function( data ){
+                                    console.log("Events for " + chosenMonth + " " + chosenYear + " retrieved successfully");
+                                    newEventArray = data.events;
+                                    ArtX.el.eventCalendar.setEvents(newEventArray);
+                                },
+                                error: function (jqXHR, error, errorThrown) {
+                                    console.log("Events for " + chosenMonth + " " + chosenYear + " failed");
+                                    ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                                },
+                                complete: function() {
+                                    $.mobile.loading('hide');
+                                }
+                            });
                         }
                     },
-                    onMonthChange: function(month) {
-                        var chosenMonth = month.format("MM");
-                        var chosenYear = month.format("YYYY");
-
-                        // DEV NOTE: When the GetEventsByMonth URL is in place, comment out the temporary URL
-                        // and uncomment the following line:
-
-                        //var jsonURL = "/GetEventsByMonth/" + chosenYear + "/" + chosenMonth;
-                        //console.log("New month JSON URL: " + jsonURL);
-
-                        jsonURL = "/ui/js/json/events-august.json"; // temporary URL for testing
-
-                        var newEventArray = [];
-                        $.getJSON(jsonURL, function(data) {
-                            newEventArray = data;
-                            ArtX.el.eventCalendar.setEvents(newEventArray);
-                        });
-
-                    }
-                },
-                doneRendering: function(){
-                    var thisMonth = moment().format("MMMM");
-                    var displayedMonth = $(".clndr-controls").find(".month").html();
-                    if (thisMonth == displayedMonth) {
-                        // It's this month
-                        // Show the events for today
-                        $(".day.today").trigger("click");
-                    } else {
-                        // It's a month in the past or future
-                        // Show the events for the first day of the month
-                        if ($(".last-month").last().next().length > 0) {
-                            $(".last-month").last().next().trigger("click");
+                    doneRendering: function(){
+                        var thisMonth = moment().format("MMMM");
+                        var displayedMonth = $(".clndr-controls").find(".month").html();
+                        if (thisMonth == displayedMonth) {
+                            // It's this month
+                            // Show the events for today
+                            $(".day.today").trigger("click");
                         } else {
-                            $(".day").first().trigger("click");
-                        }
+                            // It's a month in the past or future
+                            // Show the events for the first day of the month
+                            if ($(".last-month").last().next().length > 0) {
+                                $(".last-month").last().next().trigger("click");
+                            } else {
+                                $(".day").first().trigger("click");
+                            }
 
+                        }
                     }
-                }
-            });
+                });
+
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Initial calendar event fetch failed");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
         });
     },
     displayEventList: function(target) {
@@ -23563,27 +23629,13 @@ ArtX.calendar = {
             console.log("Setting up event calendar");
 
             var eventArray = [],
-                thisMonth,
-                thisMonthURL,
-                julyEventURL = "/ui/js/json/events-july.json",
-                augEventURL = "/ui/js/json/events-august.json";
+                thisMonth = moment().month(), // integer from 0 to 11
+                thisYear = moment().year();   // 4-digit year, ex. 2014
 
-            thisMonth = moment().month(); // integer from 0 to 11
-            thisYear = moment().year(); // 4-digit year, ex. 2014
+            // Adjust the month value by one, to be an integer from 1 to 12
+            thisMonth++;
 
-            // DEV NOTE: When the GetEventsByMonth URL is in place, comment out the temporary URL
-            // if statement and uncomment the following line:
-
-            //thisMonthURL = "/GetEventsByMonth/" + thisYear + "/" + thisMonth;
-
-            // Temporary static month URLs, until GetEventsByMonth is in place
-            if (thisMonth == 6) { // July
-                thisMonthURL = julyEventURL;
-            } else { // August and onward
-                thisMonthURL = augEventURL;
-            }
-
-            ArtX.calendar.getEvents(thisMonthURL);
+            ArtX.calendar.getEvents(thisMonth, thisYear);
         }
     }
 };
@@ -23606,6 +23658,8 @@ ArtX.loadMore = {
         ArtX.loadMore.vars.loadMoreLink
             .removeClass("btn-hidden") // Show the Load More link
             .click(function() {
+                $.mobile.loading('show');
+
                 // Fade out the button, so that we don't get into a situation where a slow Ajax load
                 // leaves the button there, and a frustrated user clicks a million times and you
                 // get lots of multiple entries
@@ -23696,6 +23750,8 @@ ArtX.loadMore = {
                         }
                     );
 
+                    $.mobile.loading('hide');
+
                 });
             });
     },
@@ -23754,33 +23810,133 @@ ArtX.loadMore = {
 
 /* Setting up My Settings Ajax functionality
    ========================================================================== */
-ArtX.setupMySettings = function() {
-    var $mySettingsForm = $("#settings-form");
+ArtX.settings = {
+    init: function() {
+        if ($("#settings-form").length > 0) {
+            console.log("Initializing app settings");
+     
+            // Preload the field values from the back-end API
+            ArtX.settings.fetchFieldValues();
 
-    if ($mySettingsForm.length > 0) {
-        console.log("Initializing Ajax for My Settings");
-
-        var $ajaxInputs = $mySettingsForm.find("input[type=checkbox]");
-        var isCheckboxChecked = false;
-        var checkboxID;
-
-        $ajaxInputs.click(function() {
-            isCheckboxChecked = $(this).prop("checked");
-            checkboxID = $(this).prop("id");
-
-            /* This stub Ajax call sends the checkbox ID and whether it's checked to the /SetOption/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc */
-
-            $.ajax({
-                type: "POST",
-                url: "/SetOption/",
-                data: {
-                    settingCheckbox: checkboxID,
-                    settingSelected: isCheckboxChecked
-                }
+            // Set up validation and Ajax submit
+            $("#settings-form").validate({
+                rules: {
+                    "password_confirmation": {
+                        equalTo: "#password"
+                    },
+                    "email": "email",
+                    "zipcode": "zipcode"
+                },
+                submitHandler: ArtX.settings.ajaxSubmit
             });
+        }
+    },
+    fetchFieldValues: function() {
+        $.ajax({
+            type: "GET",
+            url: ArtX.var.jsonDomain + "/preferences/",
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function ( data, textStatus, jqXHR ) {
+                console.log("User preferences retrieved successfully.");
+                ArtX.settings.populateFieldValues(data);
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error retrieving user preferences");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            }
+        });
+    },
+    populateFieldValues: function(data) {
+        var userInfo = data.user;
+        var $allInputs = $("#settings-form").find("input");
+
+        $allInputs.each(function() {
+            var key = $(this).attr("id");
+            if (userInfo[key] !== undefined ) {
+                console.log(key + ": " + userInfo[key]);
+
+                if ($(this).attr("type") == "checkbox") {
+                    if (userInfo[key] === true) {
+                        $(this).attr("checked", "checked").flipswitch("refresh");
+                    }
+                } else {
+                    $(this).val(userInfo[key]);
+                }
+            }
+        });
+
+        // Set up change event handling for the flip-switches
+        var $ajaxInputs = $("#settings-form").find("input[type=checkbox]");
+        $ajaxInputs.change(function() {
+            ArtX.settings.toggleThisOption(this);
+        });
+    },
+    toggleThisOption: function(checkboxObj) {
+        console.log("Toggling checkbox value");
+
+        $thisCheckbox = $(checkboxObj);
+        var isCheckboxChecked = $thisCheckbox.prop("checked");
+        var checkboxID = $(checkboxObj).prop("id");
+        console.log("Value of property 'checked': " + isCheckboxChecked);
+
+        var result = { };
+        result[checkboxID] = isCheckboxChecked;
+
+        $.mobile.loading('show');
+        $.ajax({
+            type: "PATCH",
+            url: ArtX.var.jsonDomain + "/preferences/",
+            data: result,
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function(data, textStatus, jqXHR) {
+                console.log("Toggle change successfully saved");
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error sending toggle Ajax call");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
+        });
+    },
+    ajaxSubmit: function() {
+        console.log("Submitting the changes to the Settings form");
+        
+        var $this = $("#settings-form"), 
+            viewArr = $this.serializeArray(), 
+            formData = {};
+
+        for (var i in viewArr) {
+            formData[viewArr[i].name] = viewArr[i].value;
+        }
+
+        $.mobile.loading('show');
+        $.ajax({
+            type: "PATCH",
+            url: ArtX.var.jsonDomain + "/preferences/",
+            data: formData,
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function(data, textStatus, jqXHR) {
+                console.log("All user preferences successfully saved");
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error saving all user preferences");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
         });
     }
 };
+
 
 /* Setting up History Ajax functionality
    ========================================================================== */
@@ -23890,6 +24046,7 @@ ArtX.interests = {
                 /* Make the actual Ajax request to handle the interest  
                 TODO: add success/fail/error handling, etc.
                 No Load More functionality, possibly a future enhancement. */
+                $.mobile.loading('show');
 
                 $.ajax({
                     type: ArtX.interests.vars.ajaxType,
@@ -23905,6 +24062,9 @@ ArtX.interests = {
                     error: function (jqXHR, error, errorThrown) {
                         console.log(ArtX.interests.vars.ajaxErrorMsg);
                         ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                    },
+                    complete: function() {
+                        $.mobile.loading('hide');
                     }
                 });
             });
@@ -23934,6 +24094,8 @@ ArtX.interests = {
             success: function ( data, textStatus, jqXHR ) {
                 console.log(ArtX.interests.vars.ajaxSuccessMsg);
                 //console.log("User interests: " + JSON.stringify(data));
+
+                $.mobile.loading('show');
                 
                 if(data.interests && data.interests.length) {
                     console.log("User has interests!");
@@ -23982,11 +24144,13 @@ ArtX.interests = {
 
         console.log("Showing finished interest list");
         ArtX.setupCustomCheckboxes("#interest-form-list");
-
+        
+        $.mobile.loading('hide');
         $interestIntro.fadeIn(400);
         $("#interest-form-list").fadeIn(400);
     },
     getAllInterests: function() {
+        
         $.ajax({
             type: "GET",
             url: ArtX.var.jsonDomain + "/possible_interests/",
@@ -24112,6 +24276,7 @@ ArtX.login = {
         }
     },
     ajaxSubmit: function() {
+        $.mobile.loading('show');
         $.ajax({
             type: "POST",
             dataType: "json",
@@ -24132,7 +24297,40 @@ ArtX.login = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("User login submit failed");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown, true);
+
+                /* If authentication failed, it will return 403 Forbidden and we can't run it through the usual showFormError because the form field ID doesn't match up */
+
+                if (jqXHR.status == 403) {
+                    
+                    // Get results from JSON error
+                    var result = $.parseJSON(jqXHR.responseText);
+                    var errorText;
+                    var $errorSource;
+                    var errorLabelHTML;
+                    var $errorLabel;
+
+                    $.each(result, function(k, v) {
+                        errorText = v.capitalize();
+                        console.log("Error text: " + errorText);
+
+                        $errorLabel = $("<label>")
+                            .attr("id", "signin-password-error")
+                            .addClass("error")
+                            .html(errorText)
+                            .attr( "for", "signin-password");
+
+                        $("#signin-password").addClass("error");
+                        $errorLabel.insertAfter( $("#signin-password") );
+                    });
+
+                } else {
+                    ArtX.errors.showFormError(jqXHR.responseText);
+                }
+                
+            },
+            complete: function() {
+                $.mobile.loading('hide');
             }
         });
     }
@@ -24256,7 +24454,7 @@ ArtX.startup = {
         ArtX.footerSlider.init();
         ArtX.favoriteStars.init();
         ArtX.setupCustomCheckboxes();
-        ArtX.setupMySettings();
+        ArtX.settings.init();
         ArtX.setupHistory();
         ArtX.loadMore.init();
         ArtX.map.init();
@@ -24300,7 +24498,9 @@ $(document).ready(function() {
 
     // Since the modal Signup popup is outside jQM's "pages", we need to instantiate it separately and only once
     $("#signup-popup").enhanceWithin().popup({ 
-        history: false
+        history: false,
+        positionTo: "window",
+        afterclose: ArtX.signupModal.close
     });
 
     ArtX.signupModal.init();

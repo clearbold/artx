@@ -8,18 +8,23 @@ active: settings
         <div class="content" role="main">
             <form id="settings-form" name="settings-form" method="post" action="">
                 <p>
-                    <label for="settings-email">Email</label>
-                    <input type="email" id="settings-email" name="settings-email" value="you@example.com" required="required" />
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required="required" />
                 </p>
 
                 <p>
-                    <label for="settings-password">Password</label>
-                    <input type="password" id="settings-password" name="settings-password" value="password" required="required" />
+                    <label for="password">Confirm Password</label>
+                    <input type="password" id="password" name="password" />
                 </p>
 
                 <p>
-                    <label for="settings-zipcode">Password</label>
-                    <input type="text" id="settings-zipcode" name="settings-zipcode" value="01752" required="required" />
+                    <label for="password_confirmation">Password</label>
+                    <input type="password" id="password_confirmation" name="password_confirmation" />
+                </p>
+
+                <p>
+                    <label for="zipcode">Zipcode</label>
+                    <input type="text" id="zipcode" name="zipcode" />
                 </p>
 
                 <button type="submit">Save</button>
@@ -29,16 +34,16 @@ active: settings
                 <h2 class="label">Notifications</h2>
                 <div class="toggle-list">
                     <div class="toggle-item">
-                        <label>Send me weekly emails</label>
-                        <input type="checkbox" name="settings-weeklyemail" data-role="flipswitch" id="settings-weeklyemail">
+                        <label for="send_weekly_emails">Send me weekly emails</label>
+                        <input type="checkbox" name="send_weekly_emails" data-role="flipswitch" id="send_weekly_emails">
                     </div>
                     <div class="toggle-item">
-                        <label>Send me a reminder the day before a saved event</label>
-                        <input type="checkbox" name="settings-reminder-event" data-role="flipswitch" id="settings-reminder-event">
+                        <label for="send_day_before_event_reminders">Send me a reminder the day before a saved event</label>
+                        <input type="checkbox" name="send_day_before_event_reminders" data-role="flipswitch" id="send_day_before_event_reminders">
                     </div>
                     <div class="toggle-item">
-                        <label>Send me a reminder the week before an exhibition closes</label>
-                        <input type="checkbox" name="settings-reminder-exhibition" data-role="flipswitch" id="settings-reminder-exhibition">
+                        <label for="send_week_before_close_reminders">Send me a reminder the week before an exhibition closes</label>
+                        <input type="checkbox" name="send_week_before_close_reminders" data-role="flipswitch" id="send_week_before_close_reminders">
                     </div>
                 </div>
 
