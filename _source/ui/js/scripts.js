@@ -58,7 +58,21 @@ jQuery.validator.addMethod("zipcode", function(value, element) {
 }, "Please provide a valid zip code.");
 
 jQuery.validator.addMethod("remoteEmail", function(value, element) {
-    return true;  // TODO: implement actual remote email check
+    $.ajax({
+        type: "POST",
+        data: {"_method":"head", "email": "angela.m.tosca@gmail.com"},
+        url: "/registration",
+        success: function(response){ 
+            return true;
+        },
+        error: function(jqXHR, status, text){
+            // 404 = Email not in system
+            if(jqXHR.status === 404){               
+                return false;
+            }
+            //TODO: Handle other response codes?      
+        }
+    }); 
 }, "Email address not found in our system; please try another.");
 
 var emailRuleSet = {

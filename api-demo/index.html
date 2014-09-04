@@ -131,20 +131,30 @@ $.ajax({
                             <ul id="event" class="list-group"></ul>
                             <pre class="prettyprint lang-js">
                                 <code class="javascript">
+// Note the requested event is available at $.each(data), not data.event.
+// Related events are nested as data.related[3].events with tag
+// Each data.related/tag has a score associated for ranking
 $.ajax({
     type: "GET",
     dataType: "json",
-    url: "http://artx-staging.herokuapp.com/events/20",
+    url: "http://artx-staging.herokuapp.com/events/20/",
     data: {
-        //related: false
+        related: true
     },
     success: function( data ) {
         console.log(data);
         $('#event').empty();
-        console.log(data.event);
-        $.each(data.event, function (key, value) {
+        $.each(data, function (key, value) {
             $('#event').append('&lt;li class="list-group-item"&gt;' + value.name + '&lt;/li&gt;')
             console.log(value.name);
+        })
+        console.log(data.event.related);
+        $.each(data.event.related, function (key, value) {
+            $.each(value.events, function (key, eventValue) {
+                $('#event').append('&lt;li class="list-group-item"&gt;Tag: ' + value.tag.name + ', Event: ' + eventValue.name + '&lt;/li&gt;')
+                console.log(eventValue.name);
+            })
+            console.log(value.tag.name);
         })
     }
 })
@@ -333,7 +343,7 @@ console.log(value.name);
             },
             success: function( data ) {
                 $('#discoveries').empty();
-                console.log(JSON.stringify(data.events);
+                console.log(JSON.stringify(data.events));
                 $.each(data.events, function (key, value) {
                     $('#discoveries').append('<li class="list-group-item">' + value.name + '</li>')
                     console.log(value.name);
@@ -347,20 +357,33 @@ console.log(value.name);
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "http://artx-staging.herokuapp.com/events/20",
-            data: { },
+            url: "http://artx-staging.herokuapp.com/events/20/",
+            data: {
+                related: true
+            },
             success: function( data ) {
                 console.log(data);
                 $('#event').empty();
-                console.log(data.event);
-                $.each(data.event, function (key, value) {
+                $.each(data, function (key, value) {
                     $('#event').append('<li class="list-group-item">' + value.name + '</li>')
                     console.log(value.name);
                 })
+                console.log(data.event.related);
+                $.each(data.event.related, function (key, value) {
+                    $.each(value.events, function (key, eventValue) {
+                        $('#event').append('<li class="list-group-item">Tag: ' + value.tag.name + ', Event: ' + eventValue.name + '</li>')
+                        console.log(eventValue.name);
+                    })
+                    console.log(value.tag.name);
+                })
             },
-            error: function( data ) {
+            /*error: function( data ) {
                 console.log("error");
                 console.log(data);
+            }*/
+            error: function (jqXHR, error, errorThrown) {
+                console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+                console.log("jqXHR response: " + jqXHR.responseText);
             }
         })
     })

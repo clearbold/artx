@@ -58,7 +58,21 @@ jQuery.validator.addMethod("zipcode", function(value, element) {
 }, "Please provide a valid zip code.");
 
 jQuery.validator.addMethod("remoteEmail", function(value, element) {
-    return true;  // TODO: implement actual remote email check
+    $.ajax({
+        type: "POST",
+        data: {"_method":"head", "email": "angela.m.tosca@gmail.com"},
+        url: "/registration",
+        success: function(response){ 
+            return true;
+        },
+        error: function(jqXHR, status, text){
+            // 404 = Email not in system
+            if(jqXHR.status === 404){               
+                return false;
+            }
+            //TODO: Handle other response codes?      
+        }
+    }); 
 }, "Email address not found in our system; please try another.");
 
 var emailRuleSet = {
@@ -364,7 +378,11 @@ ArtX.favoriteStars = {
                             },
                             success: function(data, textStatus, jqXHR) {
                                 console.log("New favorite successfully saved");
-                                ArtX.favoriteStars.highlightStar($thisStarLink, selectedEventID);
+
+                                var selectedFavoriteID = data.favorite.id;
+                                ArtX.favoriteStars.highlightStar($thisStarLink, selectedFavoriteID);
+                                // If it exists on the page, reload the favorites slider after the new item has been added
+                                ArtX.favoriteStars.reloadFavoritesSlider();
                             },
                             error: function (jqXHR, error, errorThrown) {
                                 console.log("Error saving favorite");
@@ -380,7 +398,9 @@ ArtX.favoriteStars = {
                         $.mobile.loading('show');
 
                         // Capture the User Favorite ID from the data-attribute on the clicked link
-                        var selectedUserEventID = $(this).data("user-favorite-id");
+                        var selectedUserEventID = $(this).attr("data-user-favorite-id");
+
+                        console.log("ID to delete: " + selectedUserEventID);
 
                         $.ajax({
                             type: "POST",
@@ -394,7 +414,8 @@ ArtX.favoriteStars = {
                             success: function(data, textStatus, jqXHR) {
                                 console.log("Favorite successfully deleted");
                                 // Swap the star
-                                $thisStarIcon.removeClass("icon-star2").addClass("icon-star");
+                                ArtX.favoriteStars.unhighlightStar($thisStarLink);
+
                             },
                             error: function (jqXHR, error, errorThrown) {
                                 console.log("Error deleting favorite");
@@ -431,8 +452,8 @@ ArtX.favoriteStars = {
                     request.setRequestHeader("authentication_token", $.cookie('token'));
                 },
                 success: function(data, textStatus, jqXHR) {
-                    console.log("Successfully syncing stars to match user favorites");
-                    console.log(JSON.stringify(data));
+                    console.log("Successfully fetched data for syncing stars");
+                    //console.log(JSON.stringify(data));
 
                     var userFavorites = data.favorites;
 
@@ -440,41 +461,44 @@ ArtX.favoriteStars = {
                     $.each(userFavorites, function(i, value) {
                         var userFavorite = userFavorites[i];
                         var userFavoriteEventID = userFavorite.event.id;
+                        var userFavoriteID = userFavorite.id;
 
                         // Then let's compare that favorite ID to the corresponding ones on the page
                         $(".favorite-star").each(function() {
-                            var pageFavoriteEventID = $(this).data("event-id");
-
-                            console.log("Comparing user favorite " + userFavoriteEventID + " with page favorite " + pageFavoriteEventID);
+                            var pageFavoriteEventID = $(this).attr("data-event-id");
 
                             // If they match, highlight the star
                             if (pageFavoriteEventID == userFavoriteEventID) {
-                                ArtX.favoriteStars.highlightStar($this, userFavoriteEventID);
+                                ArtX.favoriteStars.highlightStar($(this), userFavoriteID);
                             }
                         });
                     });
                 },
                 error: function (jqXHR, error, errorThrown) {
-                    console.log("Error syncing stars to match user favorites");
+                    console.log("Error fetching data to sync stars");
                     ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
                 }
             });
         }
     },
-    highlightStar : function(starLinkObj, userFavoriteEventID) {
-        
-        var $thisStarLink = starLinkObj;
+    highlightStar : function(starLinkObj, userFavoriteID) {
+        var $thisStarLink = $(starLinkObj);
         var $thisStarIcon = $thisStarLink.find(".icon");
-        var userFavoriteID = userFavoriteEventID;
 
-        // If it exists on the page, reload the favorites slider after the new item has been added
-        ArtX.favoriteStars.reloadFavoritesSlider();
+        console.log("User favorite ID: " + userFavoriteID);
         
         // Swap the star icon
         $thisStarIcon.removeClass("icon-star").addClass("icon-star2");
 
         // Give the star link a user favorite ID to use in deletion
-        $thisStarLink.data("user-favorite-id", userFavoriteID);
+        $thisStarLink.attr("data-user-favorite-id", userFavoriteID);
+    },
+    unhighlightStar : function(starLinkObj) {
+        var $thisStarLink = $(starLinkObj);
+        var $thisStarIcon = $thisStarLink.find(".icon");
+
+        $thisStarIcon.removeClass("icon-star2").addClass("icon-star");
+        $thisStarLink.removeAttr("data-user-favorite-id");
     },
     reloadFavoritesSlider : function() {
         if ($("#footer-slider").length > 0) {
@@ -1136,7 +1160,7 @@ ArtX.interests = {
                             userInterestID = interest.id;
                             console.log("Selected interest ID for this user: " + userInterestID);
                         });
-                        $myCheckbox.data("user-interest-id", userInterestID);
+                        $myCheckbox.attr("data-user-interest-id", userInterestID);
                     };
                 } else {
                     // We're not interested in this anymore, send a DELETE request
@@ -1154,7 +1178,7 @@ ArtX.interests = {
                     ArtX.interests.vars.ajaxCallback = function(checkboxObj) {
                         console.log("Callback for deleting an interest");
                         var $myCheckbox = checkboxObj;
-                        $myCheckbox.removeData("user-interest-id");
+                        $myCheckbox.removeAttr("data-user-interest-id");
                     };
                 }
 
