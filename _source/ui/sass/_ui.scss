@@ -683,7 +683,8 @@ div#event-map {
     text-align:center;
 
     a {
-        display:inline-block;
+        //display:inline-block;
+        display:block;
         cursor:pointer;
     }
 

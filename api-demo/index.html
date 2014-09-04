@@ -112,7 +112,7 @@ $.ajax({
     },
     success: function( data ) {
         $('#discoveries').empty();
-        console.log(data.events);
+        console.log(JSON.stringify(data.events);
         $.each(data.events, function (key, value) {
             $('#discoveries').append('&lt;li class="list-group-item"&gt;'+value.name +'&lt;/li&gt;')
             console.log(value.name);
@@ -333,7 +333,7 @@ console.log(value.name);
             },
             success: function( data ) {
                 $('#discoveries').empty();
-                console.log(data.events);
+                console.log(JSON.stringify(data.events);
                 $.each(data.events, function (key, value) {
                     $('#discoveries').append('<li class="list-group-item">' + value.name + '</li>')
                     console.log(value.name);
