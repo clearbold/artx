@@ -545,73 +545,109 @@ ArtX.setupCustomCheckboxes = function(targetContainer) {
 /* Set up By Date Event Calendar
    ========================================================================== */
 ArtX.calendar = {
-    getEvents: function(jsonURL) {
-        $.getJSON(jsonURL, function(data) {
-            eventArray = data;
+    getEvents: function(desiredMonth, desiredYear) {
+        
+        var jsonURL = ArtX.var.jsonDomain + "/events";
+        
+        $.mobile.loading('show');
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            data: {
+                year: desiredYear,
+                month: desiredMonth
+            },
+            url: jsonURL,
+            success: function( data ){
+                console.log("Initial calendar event fetch successful");
+                
+                console.log(JSON.stringify(data));
 
-            // Create a Clndr and save the instance as myCalendar
-            ArtX.el.eventCalendar = $("#event-calendar").clndr({
-                template: $('#template-calendar').html(),
-                events: eventArray,
-                dateParameter: 'start_date',
-                multiDayEvents: {
-                    startDate: 'start_date',
-                    endDate: 'end_date'
-                },
-                clickEvents: {
-                    click: function(target) {
-                        // if we click on a day
-                        if ($(target.element).hasClass("day")) {
-                            console.log("Day clicked!");
-                            // clear any existing selection states
-                            $(".day").removeClass("day-selected");
-                            // select the new day
-                            $(target.element).addClass("day-selected");
-                            // and display events for that day
-                            ArtX.calendar.displayEventList(target);
-                        } else {
-                            console.log("Click target not a day.");
+                eventArray = data.events;
+
+                // Create a Clndr and save the instance as myCalendar
+                ArtX.el.eventCalendar = $("#event-calendar").clndr({
+                    template: $('#template-calendar').html(),
+                    events: eventArray,
+                    dateParameter: 'start_date',
+                    multiDayEvents: {
+                        startDate: 'start_date',
+                        endDate: 'end_date'
+                    },
+                    clickEvents: {
+                        click: function(target) {
+                            // if we click on a day
+                            if ($(target.element).hasClass("day")) {
+                                console.log("Day clicked!");
+                                // clear any existing selection states
+                                $(".day").removeClass("day-selected");
+                                // select the new day
+                                $(target.element).addClass("day-selected");
+                                // and display events for that day
+                                ArtX.calendar.displayEventList(target);
+                            } else {
+                                console.log("Click target not a day.");
+                            }
+                        },
+                        onMonthChange: function(month) {
+                            var chosenMonth = month.format("MM");
+                            console.log("Month change!  New month: " + chosenMonth);
+                            var chosenYear = month.format("YYYY");
+                            var jsonURL = ArtX.var.jsonDomain + "/events";
+                            var newEventArray = [];
+
+                            $.mobile.loading('show');
+                            $.ajax({
+                                type: "GET",
+                                dataType: "json",
+                                url: jsonURL,
+                                data: {
+                                    year: chosenYear,
+                                    month: chosenMonth
+                                },
+                                success: function( data ){
+                                    console.log("Events for " + chosenMonth + " " + chosenYear + " retrieved successfully");
+                                    newEventArray = data.events;
+                                    ArtX.el.eventCalendar.setEvents(newEventArray);
+                                },
+                                error: function (jqXHR, error, errorThrown) {
+                                    console.log("Events for " + chosenMonth + " " + chosenYear + " failed");
+                                    ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                                },
+                                complete: function() {
+                                    $.mobile.loading('hide');
+                                }
+                            });
                         }
                     },
-                    onMonthChange: function(month) {
-                        var chosenMonth = month.format("MM");
-                        var chosenYear = month.format("YYYY");
-
-                        // DEV NOTE: When the GetEventsByMonth URL is in place, comment out the temporary URL
-                        // and uncomment the following line:
-
-                        //var jsonURL = "/GetEventsByMonth/" + chosenYear + "/" + chosenMonth;
-                        //console.log("New month JSON URL: " + jsonURL);
-
-                        jsonURL = "/ui/js/json/events-august.json"; // temporary URL for testing
-
-                        var newEventArray = [];
-                        $.getJSON(jsonURL, function(data) {
-                            newEventArray = data;
-                            ArtX.el.eventCalendar.setEvents(newEventArray);
-                        });
-
-                    }
-                },
-                doneRendering: function(){
-                    var thisMonth = moment().format("MMMM");
-                    var displayedMonth = $(".clndr-controls").find(".month").html();
-                    if (thisMonth == displayedMonth) {
-                        // It's this month
-                        // Show the events for today
-                        $(".day.today").trigger("click");
-                    } else {
-                        // It's a month in the past or future
-                        // Show the events for the first day of the month
-                        if ($(".last-month").last().next().length > 0) {
-                            $(".last-month").last().next().trigger("click");
+                    doneRendering: function(){
+                        var thisMonth = moment().format("MMMM");
+                        var displayedMonth = $(".clndr-controls").find(".month").html();
+                        if (thisMonth == displayedMonth) {
+                            // It's this month
+                            // Show the events for today
+                            $(".day.today").trigger("click");
                         } else {
-                            $(".day").first().trigger("click");
-                        }
+                            // It's a month in the past or future
+                            // Show the events for the first day of the month
+                            if ($(".last-month").last().next().length > 0) {
+                                $(".last-month").last().next().trigger("click");
+                            } else {
+                                $(".day").first().trigger("click");
+                            }
 
+                        }
                     }
-                }
-            });
+                });
+
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Initial calendar event fetch failed");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
         });
     },
     displayEventList: function(target) {
@@ -631,27 +667,13 @@ ArtX.calendar = {
             console.log("Setting up event calendar");
 
             var eventArray = [],
-                thisMonth,
-                thisMonthURL,
-                julyEventURL = "/ui/js/json/events-july.json",
-                augEventURL = "/ui/js/json/events-august.json";
+                thisMonth = moment().month(), // integer from 0 to 11
+                thisYear = moment().year();   // 4-digit year, ex. 2014
 
-            thisMonth = moment().month(); // integer from 0 to 11
-            thisYear = moment().year(); // 4-digit year, ex. 2014
+            // Adjust the month value by one, to be an integer from 1 to 12
+            thisMonth++;
 
-            // DEV NOTE: When the GetEventsByMonth URL is in place, comment out the temporary URL
-            // if statement and uncomment the following line:
-
-            //thisMonthURL = "/GetEventsByMonth/" + thisYear + "/" + thisMonth;
-
-            // Temporary static month URLs, until GetEventsByMonth is in place
-            if (thisMonth == 6) { // July
-                thisMonthURL = julyEventURL;
-            } else { // August and onward
-                thisMonthURL = augEventURL;
-            }
-
-            ArtX.calendar.getEvents(thisMonthURL);
+            ArtX.calendar.getEvents(thisMonth, thisYear);
         }
     }
 };

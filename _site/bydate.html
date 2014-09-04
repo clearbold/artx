@@ -127,7 +127,7 @@
             <div class="item-block cf">
                 <div class="item-image">
                     <a href="exhibition.html">
-                        <img src="<%= eventObj.image %>" alt="" />
+                        <img src="<%= eventObj.image %>" alt="" onerror="if (this.src != '/ui/img/rect-thumb-noimage.jpg') this.src = '/ui/img/rect-thumb-noimage.jpg';" />
                     </a>
                 </div>
                 <div class="item-info">
