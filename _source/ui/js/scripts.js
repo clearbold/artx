@@ -331,104 +331,189 @@ ArtX.favoriteStars = {
         if ($(".favorite-star").length > 0) {
             console.log("Initializing favorite stars");
 
-            var selectedEventID;
-
+            ArtX.favoriteStars.sync();
+            
             $(".favorite-star").click(function() {
 
-                console.log("The user clicked a star!");
+                if ($.cookie('token') === undefined) { 
+                    // The user is not logged in, we can't save a favorite
 
-                // Capture the Event ID from the data-attribute on the clicked link
-                selectedEventID = $(this).data("eventID");
+                    console.log("We can't toggle a favorite because the user is not logged in.");
+                    ArtX.signupModal.open();
 
-                // Is the click to set a favorite, or unset a favorite?
-                var $thisStarIcon = $(this).find(".icon");
-                var setterJsonUrl;
-                var getterJsonUrl;
+                } else { 
+                    // The user is logged in, so we can save or delete the favorite
 
-                if ($thisStarIcon.hasClass("icon-star")) {
-                    // The user wishes to make this event a favorite
+                    // Is the click to set a favorite, or unset a favorite?
+                    var $thisStarLink = $(this);
+                    var $thisStarIcon = $(this).find(".icon");
 
-                    /* We need to query a backend script -- we send it an eventID to tell it which event should be favorited. */
+                    if ($thisStarIcon.hasClass("icon-star")) {
+                        // The user wishes to make this event a favorite
 
-                    /*  DEV NOTE: When this is hooked up to a real JSON feed,
-                        we'll feed it the URL including the eventID like this:
+                        $.mobile.loading('show');
 
-                        jsonUrl = "/SetEventFavorite/" + selectedEventID;
+                        // Capture the Event ID from the data-attribute on the clicked link
+                        var selectedEventID = $(this).data("event-id");
 
-                        But since this is currently a demo with static files, we're putting in a temporary file for it here: */
+                        $.ajax({
+                            type: "POST",
+                            url: ArtX.var.jsonDomain + "/events/" + selectedEventID + "/favorite/",
+                            beforeSend: function (request) {
+                                request.setRequestHeader("authentication_token", $.cookie('token'));
+                            },
+                            success: function(data, textStatus, jqXHR) {
+                                console.log("New favorite successfully saved");
 
-                    setterJsonUrl = "/SetEventFavorite/";
-
-                    $.ajax({
-                        type: "GET",
-                        /* SMA: This is set to GET because POST was causing 412 errors on iPhone 
-                        (http://stackoverflow.com/questions/21616009/412-server-response-code-from-ajax-request) */
-                        url: setterJsonUrl,
-                        success: function(data) {
-                            // If it exists on the page, reload the favorites slider after the new item has been added
-
-                            if ($("#footer-slider").length > 0) {
-
-                                $("#footer-slider").fadeOut(400, function() {
-
-                                    /*  DEV NOTE: When this is hooked up to a real JSON feed,
-                                        we'll feed it the URL including the eventID like this:
-
-                                        getterJsonUrl = "/GetEventById/" + selectedEventID;
-
-                                        But since this is a demo with static JSON files, we're putting in a temporary file for it here: */
-
-                                    getterJsonUrl = "/GetEventById/";
-
-                                    $.getJSON(getterJsonUrl, function(data) {
-                                        var jsonArray = data;
-
-                                        // Format results with underscore.js template
-                                        var eventHtml = _.template($("#item-template").html(), {jsonArray:jsonArray});
-
-                                        //console.log("item template html" + $("#item-template").html());
-
-                                        $(eventHtml).prependTo($("#footer-slider"));
-
-                                        //ArtX.footerSlider.vars.footSlideInstance.reloadSlider(ArtX.footerSlider.vars.footSlideOptions);
-                                        ArtX.footerSlider.reload();
-
-                                    });
-                                });
+                                var selectedFavoriteID = data.favorite.id;
+                                ArtX.favoriteStars.highlightStar($thisStarLink, selectedFavoriteID);
+                                // If it exists on the page, reload the favorites slider after the new item has been added
+                                ArtX.favoriteStars.reloadFavoritesSlider();
+                            },
+                            error: function (jqXHR, error, errorThrown) {
+                                console.log("Error saving favorite");
+                                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                            },
+                            complete: function() {
+                                $.mobile.loading('hide');
                             }
+                        });
 
-                            // Swap the star icon
-                            $thisStarIcon.removeClass("icon-star").addClass("icon-star2");
-                        }
-                    });
+                    } else {
+                        // The user wishes to remove favorite status
+                        $.mobile.loading('show');
 
-                } else {
-                    // The user wishes to remove favorite status
+                        // Capture the User Favorite ID from the data-attribute on the clicked link
+                        var selectedUserEventID = $(this).attr("data-user-favorite-id");
 
-                    /*  DEV NOTE: When this is hooked up to a real JSON feed,
-                        we'll feed it the URL including the eventID like this:
+                        console.log("ID to delete: " + selectedUserEventID);
 
-                        jsonUrl = "/DeleteFavorite/" + selectedEventID;
+                        $.ajax({
+                            type: "POST",
+                            url: ArtX.var.jsonDomain + "/favorites/" + selectedUserEventID,
+                            data:  {
+                                "_method":"delete"
+                            },
+                            beforeSend: function (request) {
+                                request.setRequestHeader("authentication_token", $.cookie('token'));
+                            },
+                            success: function(data, textStatus, jqXHR) {
+                                console.log("Favorite successfully deleted");
+                                // Swap the star
+                                ArtX.favoriteStars.unhighlightStar($thisStarLink);
 
-                        But since this is a demo with static JSON files, we're putting in a temporary file for it here: */
-
-                    jsonUrl = "/DeleteFavorite/";
-
-                    $.ajax({
-                        type: "GET",
-                        /* SMA: This is set to GET because POST was causing 412 errors on iPhone 
-                        (http://stackoverflow.com/questions/21616009/412-server-response-code-from-ajax-request) */
-                        url: jsonUrl,
-                        success: function() {
-                            // Swap the star
-                            $thisStarIcon.removeClass("icon-star2").addClass("icon-star");
-                        }
-                    });
+                            },
+                            error: function (jqXHR, error, errorThrown) {
+                                console.log("Error deleting favorite");
+                                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                            },
+                            complete: function() {
+                                $.mobile.loading('hide');
+                            }
+                        });
+                    }
                 }
 
                 return false;
             });
+        }
+    },
+    destroy : function() {
+        if ($(".favorite-star").length > 0) {
+            console.log("Destroying favorite star click events");
+            $(".favorite-star").unbind("click");
+        }
+    },
+    sync : function() {
+        /* This function checks all favorite stars currently present in the page, and compares them against the current user's saved favorites (if logged in).  If there's a match, that star will be highlighted. */
 
+        if (($(".favorite-star").length > 0) && ($.cookie('token') !== undefined)) {
+            console.log("Syncing stars with user's favorites");
+
+            // Fetch the list of user's favorites to check against.
+            $.ajax({
+                type: "GET",
+                url: ArtX.var.jsonDomain + "/favorites/",
+                beforeSend: function (request) {
+                    request.setRequestHeader("authentication_token", $.cookie('token'));
+                },
+                success: function(data, textStatus, jqXHR) {
+                    console.log("Successfully fetched data for syncing stars");
+                    //console.log(JSON.stringify(data));
+
+                    var userFavorites = data.favorites;
+
+                    // We'll start by iterating through each favorite
+                    $.each(userFavorites, function(i, value) {
+                        var userFavorite = userFavorites[i];
+                        var userFavoriteEventID = userFavorite.event.id;
+                        var userFavoriteID = userFavorite.id;
+
+                        // Then let's compare that favorite ID to the corresponding ones on the page
+                        $(".favorite-star").each(function() {
+                            var pageFavoriteEventID = $(this).attr("data-event-id");
+
+                            // If they match, highlight the star
+                            if (pageFavoriteEventID == userFavoriteEventID) {
+                                ArtX.favoriteStars.highlightStar($(this), userFavoriteID);
+                            }
+                        });
+                    });
+                },
+                error: function (jqXHR, error, errorThrown) {
+                    console.log("Error fetching data to sync stars");
+                    ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                }
+            });
+        }
+    },
+    highlightStar : function(starLinkObj, userFavoriteID) {
+        var $thisStarLink = $(starLinkObj);
+        var $thisStarIcon = $thisStarLink.find(".icon");
+
+        console.log("User favorite ID: " + userFavoriteID);
+        
+        // Swap the star icon
+        $thisStarIcon.removeClass("icon-star").addClass("icon-star2");
+
+        // Give the star link a user favorite ID to use in deletion
+        $thisStarLink.attr("data-user-favorite-id", userFavoriteID);
+    },
+    unhighlightStar : function(starLinkObj) {
+        var $thisStarLink = $(starLinkObj);
+        var $thisStarIcon = $thisStarLink.find(".icon");
+
+        $thisStarIcon.removeClass("icon-star2").addClass("icon-star");
+        $thisStarLink.removeAttr("data-user-favorite-id");
+    },
+    reloadFavoritesSlider : function() {
+        if ($("#footer-slider").length > 0) {
+
+            $("#footer-slider").fadeOut(400, function() {
+
+                /*  DEV NOTE: When this is hooked up to a real JSON feed,
+                    we'll feed it the URL including the eventID like this:
+
+                    getterJsonUrl = "/GetEventById/" + selectedEventID;
+
+                    But since this is a demo with static JSON files, we're putting in a temporary file for it here: */
+
+                getterJsonUrl = "/GetEventById/";
+
+                $.getJSON(getterJsonUrl, function(data) {
+                    var jsonArray = data;
+
+                    // Format results with underscore.js template
+                    var eventHtml = _.template($("#item-template").html(), {jsonArray:jsonArray});
+
+                    //console.log("item template html" + $("#item-template").html());
+
+                    $(eventHtml).prependTo($("#footer-slider"));
+
+                    ArtX.footerSlider.reload();
+
+                });
+            });
         }
     }
 };
@@ -561,7 +646,7 @@ ArtX.calendar = {
             success: function( data ){
                 console.log("Initial calendar event fetch successful");
                 
-                console.log(JSON.stringify(data));
+                //console.log(JSON.stringify(data));
 
                 eventArray = data.events;
 
@@ -578,7 +663,7 @@ ArtX.calendar = {
                         click: function(target) {
                             // if we click on a day
                             if ($(target.element).hasClass("day")) {
-                                console.log("Day clicked!");
+                                //console.log("Day clicked!");
                                 // clear any existing selection states
                                 $(".day").removeClass("day-selected");
                                 // select the new day
@@ -586,12 +671,12 @@ ArtX.calendar = {
                                 // and display events for that day
                                 ArtX.calendar.displayEventList(target);
                             } else {
-                                console.log("Click target not a day.");
+                                //console.log("Click target not a day.");
                             }
                         },
                         onMonthChange: function(month) {
                             var chosenMonth = month.format("MM");
-                            console.log("Month change!  New month: " + chosenMonth);
+                            //console.log("Month change!  New month: " + chosenMonth);
                             var chosenYear = month.format("YYYY");
                             var jsonURL = ArtX.var.jsonDomain + "/events";
                             var newEventArray = [];
@@ -655,7 +740,9 @@ ArtX.calendar = {
         var eventArray = target.events;
         var eventTemplate = $('#template-eventlist').html();
         $("#event-list").fadeOut(400, function() {
+            ArtX.favoriteStars.destroy();
             $("#event-list").html(_.template(eventTemplate, {eventArray:eventArray}));
+            ArtX.favoriteStars.init();
             $("#event-list").fadeIn(400, function() {
                 // Re-do truncation once fade is complete
                 ArtX.setupTextTruncation();
@@ -1059,7 +1146,7 @@ ArtX.interests = {
                             userInterestID = interest.id;
                             console.log("Selected interest ID for this user: " + userInterestID);
                         });
-                        $myCheckbox.data("user-interest-id", userInterestID);
+                        $myCheckbox.attr("data-user-interest-id", userInterestID);
                     };
                 } else {
                     // We're not interested in this anymore, send a DELETE request
@@ -1077,7 +1164,7 @@ ArtX.interests = {
                     ArtX.interests.vars.ajaxCallback = function(checkboxObj) {
                         console.log("Callback for deleting an interest");
                         var $myCheckbox = checkboxObj;
-                        $myCheckbox.removeData("user-interest-id");
+                        $myCheckbox.removeAttr("data-user-interest-id");
                     };
                 }
 
