@@ -360,13 +360,13 @@ console.log(value.name);
                     $('#event').append('<li class="list-group-item">' + value.name + '</li>')
                     console.log(value.name);
                 })
-                //console.log(data.event.related);
+                console.log(data.event.related);
                 $.each(data.event.related, function (key, value) {
-                    console.log(JSON.stringify($(this)));
                     $.each(value.events, function (key, eventValue) {
                         $('#event').append('<li class="list-group-item">Tag: ' + value.tag.name + ', Event: ' + eventValue.name + '</li>')
+                        console.log(eventValue.name);
                     })
-                    //console.log(value.name);
+                    console.log(value.tag.name);
                 })
             },
             /*error: function( data ) {
