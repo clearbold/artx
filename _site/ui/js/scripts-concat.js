@@ -23050,7 +23050,7 @@ jQuery.validator.setDefaults({
     focusInvalid: false,
     rules: {
         "password": "required",
-        "confirmpassword": {
+        "password_confirmation": {
             equalTo: "#password"
         },
         "email": emailRuleSet,
@@ -23061,7 +23061,7 @@ jQuery.validator.setDefaults({
     messages: {
         "email": emailMsgSet,
         "password": passwordMsgSet,
-        "confirmpassword": confirmPasswordMsgSet,
+        "password_confirmation": confirmPasswordMsgSet,
         "signin-email": emailMsgSet,
         "signin-password": passwordMsgSet
     }
@@ -23427,6 +23427,7 @@ ArtX.signupModal = {
         });
     },
     ajaxSubmit: function() {
+        $.mobile.loading('show');
         $.ajax({
             type: "POST",
             dataType: "json",
@@ -23447,18 +23448,18 @@ ArtX.signupModal = {
                 console.log("User registration failed");
                 ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
                 ArtX.errors.showFormError(jqXHR.responseText);
+                $.mobile.loading('hide');
             }
         });
     },
     open: function() {
         // Make the ajax call to load up the form into the modal window
+        $.mobile.loading('show');
         $.ajax({
             type: "POST",
             dataType: "html",
             url: "/signup-form.html",
             success: function( data ){
-                console.log("Sign up form data: " + data);
-
                 // Insert the form fields into the form
                 $("#signup-form").html(data);
                 // Create the form for jQM
@@ -23474,6 +23475,9 @@ ArtX.signupModal = {
             error: function (jqXHR, error, errorThrown) {
                 console.log("Inserting the sign up form via Ajax failed");
                 ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
             }
         });
     },
@@ -23633,6 +23637,8 @@ ArtX.loadMore = {
         ArtX.loadMore.vars.loadMoreLink
             .removeClass("btn-hidden") // Show the Load More link
             .click(function() {
+                $.mobile.loading('show');
+
                 // Fade out the button, so that we don't get into a situation where a slow Ajax load
                 // leaves the button there, and a frustrated user clicks a million times and you
                 // get lots of multiple entries
@@ -23723,6 +23729,8 @@ ArtX.loadMore = {
                         }
                     );
 
+                    $.mobile.loading('hide');
+
                 });
             });
     },
@@ -23781,33 +23789,130 @@ ArtX.loadMore = {
 
 /* Setting up My Settings Ajax functionality
    ========================================================================== */
-ArtX.setupMySettings = function() {
-    var $mySettingsForm = $("#settings-form");
+ArtX.settings = {
+    init: function() {
+        if ($("#settings-form").length > 0) {
+            console.log("Initializing My Settings");
+     
+            // Preload the field values from the back-end API
+            ArtX.settings.fetchFieldValues();
 
-    if ($mySettingsForm.length > 0) {
-        console.log("Initializing Ajax for My Settings");
-
-        var $ajaxInputs = $mySettingsForm.find("input[type=checkbox]");
-        var isCheckboxChecked = false;
-        var checkboxID;
-
-        $ajaxInputs.click(function() {
-            isCheckboxChecked = $(this).prop("checked");
-            checkboxID = $(this).prop("id");
-
-            /* This stub Ajax call sends the checkbox ID and whether it's checked to the /SetOption/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc */
-
-            $.ajax({
-                type: "POST",
-                url: "/SetOption/",
-                data: {
-                    settingCheckbox: checkboxID,
-                    settingSelected: isCheckboxChecked
-                }
+            // Intercept the submission of the form, do Ajax submit instead
+            $("#settings-form").submit(function(event) {
+                event.preventDefault();
+                ArtX.settings.ajaxSubmit();
             });
+        }
+    },
+    fetchFieldValues: function() {
+        $.ajax({
+            type: "GET",
+            url: ArtX.var.jsonDomain + "/preferences/",
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function ( data, textStatus, jqXHR ) {
+                console.log("User preferences retrieved successfully.");
+                ArtX.settings.populateFieldValues(data);
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error retrieving user preferences");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            }
+        });
+    },
+    populateFieldValues: function(data) {
+        var userInfo = data.user;
+        var $allInputs = $("#settings-form").find("input");
+
+        $allInputs.each(function() {
+            var key = $(this).attr("id");
+            if (userInfo[key] !== undefined ) {
+                console.log(key + ": " + userInfo[key]);
+
+                if ($(this).attr("type") == "checkbox") {
+                    console.log("I'm a checkbox!");
+                    if (userInfo[key] === true) {
+                        console.log("This checkbox should be checked!");
+                        $(this).attr("checked", "checked").flipswitch("refresh");
+                    }
+                } else {
+                    console.log("I'm not a checkbox!");
+                    $(this).val(userInfo[key]);
+                }
+            }
+        });
+
+        // Set up change event handling for the flip-switches
+        var $ajaxInputs = $("#settings-form").find("input[type=checkbox]");
+        $ajaxInputs.change(function() {
+            ArtX.settings.toggleThisOption(this);
+        });
+    },
+    toggleThisOption: function(checkboxObj) {
+        console.log("Toggling checkbox value");
+
+        $thisCheckbox = $(checkboxObj);
+        var isCheckboxChecked = $thisCheckbox.prop("checked");
+        var checkboxID = $(checkboxObj).prop("id");
+        console.log("Value of property 'checked': " + isCheckboxChecked);
+
+        var result = { };
+        result[checkboxID] = isCheckboxChecked;
+
+        $.mobile.loading('show');
+        $.ajax({
+            type: "PATCH",
+            url: ArtX.var.jsonDomain + "/preferences/",
+            data: result,
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function(data, textStatus, jqXHR) {
+                console.log("Toggle change successfully saved");
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error sending toggle Ajax call");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
+        });
+    },
+    ajaxSubmit: function() {
+        console.log("Submitting the changes to the Settings form");
+        
+        var $this = $("#settings-form"), 
+            viewArr = $this.serializeArray(), 
+            formData = {};
+
+        for (var i in viewArr) {
+            formData[viewArr[i].name] = viewArr[i].value;
+        }
+
+        $.mobile.loading('show');
+        $.ajax({
+            type: "PATCH",
+            url: ArtX.var.jsonDomain + "/preferences/",
+            data: formData,
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function(data, textStatus, jqXHR) {
+                console.log("All user preferences successfully saved");
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error saving all user preferences");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
         });
     }
 };
+
 
 /* Setting up History Ajax functionality
    ========================================================================== */
@@ -23917,6 +24022,7 @@ ArtX.interests = {
                 /* Make the actual Ajax request to handle the interest  
                 TODO: add success/fail/error handling, etc.
                 No Load More functionality, possibly a future enhancement. */
+                $.mobile.loading('show');
 
                 $.ajax({
                     type: ArtX.interests.vars.ajaxType,
@@ -23932,6 +24038,9 @@ ArtX.interests = {
                     error: function (jqXHR, error, errorThrown) {
                         console.log(ArtX.interests.vars.ajaxErrorMsg);
                         ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                    },
+                    complete: function() {
+                        $.mobile.loading('hide');
                     }
                 });
             });
@@ -23961,6 +24070,8 @@ ArtX.interests = {
             success: function ( data, textStatus, jqXHR ) {
                 console.log(ArtX.interests.vars.ajaxSuccessMsg);
                 //console.log("User interests: " + JSON.stringify(data));
+
+                $.mobile.loading('show');
                 
                 if(data.interests && data.interests.length) {
                     console.log("User has interests!");
@@ -24009,11 +24120,13 @@ ArtX.interests = {
 
         console.log("Showing finished interest list");
         ArtX.setupCustomCheckboxes("#interest-form-list");
-
+        
+        $.mobile.loading('hide');
         $interestIntro.fadeIn(400);
         $("#interest-form-list").fadeIn(400);
     },
     getAllInterests: function() {
+        
         $.ajax({
             type: "GET",
             url: ArtX.var.jsonDomain + "/possible_interests/",
@@ -24139,6 +24252,7 @@ ArtX.login = {
         }
     },
     ajaxSubmit: function() {
+        $.mobile.loading('show');
         $.ajax({
             type: "POST",
             dataType: "json",
@@ -24159,8 +24273,40 @@ ArtX.login = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("User login submit failed");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
-                ArtX.errors.showFormError(jqXHR.responseText);
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown, true);
+
+                /* If authentication failed, it will return 403 Forbidden and we can't run it through the usual showFormError because the form field ID doesn't match up */
+
+                if (jqXHR.status == 403) {
+                    
+                    // Get results from JSON error
+                    var result = $.parseJSON(jqXHR.responseText);
+                    var errorText;
+                    var $errorSource;
+                    var errorLabelHTML;
+                    var $errorLabel;
+
+                    $.each(result, function(k, v) {
+                        errorText = v.capitalize();
+                        console.log("Error text: " + errorText);
+
+                        $errorLabel = $("<label>")
+                            .attr("id", "signin-password-error")
+                            .addClass("error")
+                            .html(errorText)
+                            .attr( "for", "signin-password");
+
+                        $("#signin-password").addClass("error");
+                        $errorLabel.insertAfter( $("#signin-password") );
+                    });
+
+                } else {
+                    ArtX.errors.showFormError(jqXHR.responseText);
+                }
+                
+            },
+            complete: function() {
+                $.mobile.loading('hide');
             }
         });
     }
@@ -24284,7 +24430,7 @@ ArtX.startup = {
         ArtX.footerSlider.init();
         ArtX.favoriteStars.init();
         ArtX.setupCustomCheckboxes();
-        ArtX.setupMySettings();
+        ArtX.settings.init();
         ArtX.setupHistory();
         ArtX.loadMore.init();
         ArtX.map.init();
