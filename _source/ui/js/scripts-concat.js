@@ -23022,7 +23022,7 @@ jQuery.validator.addMethod("zipcode", function(value, element) {
 
 /* Pass a boolean value and add the appropriate method to JQuery validator
  * Possible hack for passing results of Ajax requests to validator from inside success/failure calllbacks 
- */
+
 function addEmailValidation( isValid ){
 
     if ( isValid === true) {
@@ -23039,10 +23039,11 @@ function addEmailValidation( isValid ){
     } 
     
 }
+*/
 
 /*
  * Make the Ajax request for login email and attach the appropriate validation method on success or failure
- */
+
 function parseRemoteEmailResponse(){
     
     //TODO: Not getting called on form submit.  Another layer of nesting needed (an outer addMethod() and an inner addMethod()? Or attach to a click event?
@@ -23064,14 +23065,27 @@ function parseRemoteEmailResponse(){
             }
     });   
 }
-
-
-/*
- * Original (working) email validation method
-jQuery.validator.addMethod("remoteEmail", function(value, element) {
-    return true;  // TODO: implement actual remote email check
-}, "Email address not found in our system; please try another.");
 */
+
+jQuery.validator.addMethod("remoteEmail", function(value, element) {
+        $.ajax({
+        type: "POST",
+        data: {"_method":"head", "email": "angela.m.tosca@gmail.com"},
+        url: "/registration",
+        success: function(response){ 
+                return true;
+            },
+        error: function(jqXHR, status, text){
+                // 404 = Email not in system
+                if(jqXHR.status === 404){               
+                    return false;
+                    }
+                  //TODO: Handle other response codes?
+                  
+            }
+    }); 
+}, "Email address not found in our system; please try another.");
+
 
 var emailRuleSet = {
     required: true,
