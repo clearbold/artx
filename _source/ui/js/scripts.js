@@ -263,7 +263,8 @@ ArtX.var = {
     isInitialLoad: true,
     hasVisitedBefore: false,
     jsonDomain: "http://artx-staging.herokuapp.com",
-    eventDetailID: 1 // acts as a fallback in case for some reason the Events data doesn't load
+    eventDetailID: 1, // acts as a fallback in case for some reason the Events data doesn't load
+    venueDetailID: 1 // acts as a fallback in case for some reason the Venue data doesn't load
 };
 
 
@@ -684,7 +685,7 @@ ArtX.eventdetail = {
     },
     initPage : function() {
         $.mobile.loading('show');
-        console.log("Checking the passed eventDetailID: " + ArtX.var.eventDetailID);
+        //console.log("Checking the passed eventDetailID: " + ArtX.var.eventDetailID);
         $.ajax({
             type: "GET",
             dataType: "json",
@@ -720,7 +721,74 @@ ArtX.eventdetail = {
             ArtX.favoriteStars.destroy();
             $("#target-eventdetail").html(_.template(eventTemplate, {eventArray:eventArray}));
             ArtX.favoriteStars.init();
+            ArtX.venuedetail.initLinks();
             $("#target-eventdetail").fadeIn(400);
+        });
+    },
+    displayRelatedSlider: function(jsonData) {
+        console.log("Displaying related items slider -- TBD");
+    }
+};
+
+/* Set up Venue Detail
+   ========================================================================== */
+
+ArtX.venuedetail = {
+    init: function() {
+        if ($("#template-venuedetail").length > 0) {
+            ArtX.venuedetail.initPage();
+        }
+
+        if ($(".venue-detail-link").length > 0) {
+            ArtX.venuedetail.initLinks();
+        }
+        
+    },
+    initLinks : function() {
+        console.log("Setting up venue detail link click events");
+
+        $(".venue-detail-link").click(function() {
+            console.log("Venue detail link clicked!");
+            ArtX.var.venueDetailID = $(this).attr("data-venue-id");
+        });
+    },
+    initPage : function() {
+        $.mobile.loading('show');
+        console.log("Checking the passed venueDetailID: " + ArtX.var.venueDetailID);
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            data: {
+                related: true
+            },
+            url: ArtX.var.jsonDomain + "/locations/" + ArtX.var.venueDetailID,
+            success: function( data ){
+                console.log("Venue detail data fetch successful");
+                
+                //console.log(JSON.stringify(data));
+                var venueArray = data;
+                //var relatedArray = venueArray.event.related;  TODO: verify object structure
+
+                ArtX.venuedetail.displayPage(venueArray);
+                //ArtX.venuedetail.displayRelatedSlider(venueArray);
+
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Venue detail data fetch failed");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
+        });
+    },
+    displayPage: function(jsonData) {
+        console.log("Displaying venue detail page content");
+        var venueArray = jsonData;
+        var venueTemplate = $('#template-venuedetail').html();
+        $("#target-venuedetail").fadeOut(400, function() {
+            $("#target-venuedetail").html(_.template(venueTemplate, {venueArray:venueArray}));
+            $("#target-venuedetail").fadeIn(400);
         });
     },
     displayRelatedSlider: function(jsonData) {
@@ -1684,17 +1752,19 @@ ArtX.startup = {
         ArtX.login.init();
         ArtX.logout.init();
         ArtX.interests.init();
-        ArtX.setupTextTruncation();
         ArtX.calendar.init();
-        ArtX.setupPeekSlider();
-        ArtX.footerSlider.init();
-        ArtX.favoriteStars.init();
-        ArtX.setupCustomCheckboxes();
         ArtX.settings.init();
         ArtX.setupHistory();
-        ArtX.loadMore.init();
         ArtX.map.init();
         ArtX.eventdetail.init();
+        ArtX.venuedetail.init();
+
+        ArtX.loadMore.init();
+        ArtX.setupPeekSlider();
+        ArtX.footerSlider.init();
+        ArtX.setupCustomCheckboxes();
+        ArtX.setupTextTruncation();
+        ArtX.favoriteStars.init();
 
         console.log("**End of scripts initializing");
     },

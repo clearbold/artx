@@ -1,30 +1,40 @@
 ---
 layout: subpage
-title: Institute of Contemporary Art
+title: Venue details
 titlebar: Venue
 active: venue
 ---
 
         <div class="content layout-footer" role="main">
 
+            <div id="target-venuedetail">
+
+            </div>
+
+            <script type="text/template" id="template-venuedetail">
+            <% _.each(venueArray, function(venueObj, key){ %>
+
+            <% var fullURL = venueObj.url; %>
+            <% var trimmedURL = fullURL.replace(/.*?:\/\//g, ""); %>
+
             <div class="item-block item-detail venue-detail">
                 <div class="item-image">
-                    <img src="/ui/img/rect-venue-icaboston.jpg" alt="" />
-                    <!-- Dev Note - Optimal image size: 640px by 420px rectangular image -->
+                    <img src="<%= venueObj.image %>" alt="" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" />
                 </div>
                 <div class="item-info">
-                    <h2 class="item-title">Institute of Contemporary Art</h2>
-                    <p class="item-location"><a href="#"><span class="item-symbol"><i class="icon icon-location"></i></span>100 Northern Ave.</a></p>
+                    <h2 class="item-title"><%= venueObj.name %></h2>
+                    <p class="item-location"><a href="bydate.html" data-venue-id="<%= venueObj.id %>"><span class="item-symbol"><i class="icon icon-location"></i></span>Street address TBD</a></p>
                     <dl>
                         <dt>Hours:</dt>
-                        <dd>Tues + Wed 10-5</dd>
-                        <dd>Thurs + Fri 10-9</dd>
-                        <dd>Sat + Sun 10-5</dd>
+                        <dd>TBD</dd>
                     </dl>
-                    <p class="item-website"><a href="http://www.icaboston.org" target="_blank"><span class="item-symbol"><i class="icon icon-globe"></i></span>icaboston.org</a></p>
-                    
+                    <p class="item-website"><a href="<%= venueObj.url %>" target="_blank"><span class="item-symbol"><i class="icon icon-globe"></i></span><%= trimmedURL %></a></p>
+                    <p><%= venueObj.description %></p>
                 </div>
             </div>
+
+            <% }); %> 
+            </script>
                    
         </div> <!-- /content -->
 
