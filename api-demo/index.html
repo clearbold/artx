@@ -19,6 +19,8 @@
 
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
     <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+
+    <script src="./jquery.validate.js"></script>
 </head>
 <body>
     <div class="container">
@@ -78,8 +80,8 @@ $.ajax({
                     <div class="panel panel-default" id='login-panel'>
                         <div class="panel-heading">Log in</div>
                         <div class="panel-body">
-                            Email: <input type="text" name="login-email" id="login-email" value="" class="form-control" /><br>
-                            Password: <input type="password" name="login-password" id="login-password" value="" class="form-control" /><br>
+                            Email: <input type="text" name="login-email" id="login-email" value="jfolsom@mit.edu" class="form-control" /><br>
+                            Password ("password"): <input type="password" name="login-password" id="login-password" value="" class="form-control" /><br>
                             <button value="Log in" id='login-button' class="btn btn-default">Log in</button><br>
                             <div class="well" id="token-viewer"></div>
                             <pre class="prettyprint lang-js">
@@ -454,6 +456,13 @@ console.log(value.name);
                 $('div#main').data("token", $.cookie('token'));
                 $('div#registration-viewer').html("Authentication Token: " + $.cookie('token'));
                 console.log($('div#main').data("token"));
+            },
+            error: function( data ){
+                console.log("error");
+                console.log(data);
+                console.log(JSON.stringify(data));
+                console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+                console.log("jqXHR response: " + jqXHR.responseText);
             }
         });
     });
@@ -473,6 +482,11 @@ console.log(value.name);
                 $('div#main').data("token", $.cookie('token'));
                 $('div#token-viewer').html("Authentication Token: " + $.cookie('token'));
                 console.log($('div#main').data("token"));
+            },
+            error: function( data ){
+                console.log("error");
+                console.log(data);
+                $('div#token-viewer').html("Error: " + data.status + " " + data.responseText);
             }
         });
     });

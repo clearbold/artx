@@ -4487,6 +4487,67 @@ $.extend( $.validator, {
                 }
             }, param ) );
             return "pending";
+        },
+
+        // http://jqueryvalidation.org/remote-method/
+        restfulRemote: function( value, element, param ) {
+            if ( this.optional( element ) ) {
+                return "dependency-mismatch";
+            }
+
+
+
+            var previous = this.previousValue( element ),
+                validator, data;
+
+            if (!this.settings.messages[ element.name ] ) {
+                this.settings.messages[ element.name ] = {};
+            }
+            previous.originalMessage = this.settings.messages[ element.name ].remote;
+            this.settings.messages[ element.name ].remote = previous.message;
+
+            param = typeof param === "string" && { url: param } || param;
+
+            if ( previous.old === value ) {
+                return previous.valid;
+            }
+
+            previous.old = value;
+            validator = this;
+            this.startRequest( element );
+            data = {};
+            data[ element.name ] = value;
+            $.ajax( $.extend( true, {
+                url: param,
+                mode: "abort",
+                port: "validate" + element.name,
+                dataType: "json",
+                data: data,
+                context: validator.currentForm,
+                success: function( response ) {
+                    var valid = response === true || response === "true",
+                        errors, message, submitted;
+
+                    validator.settings.messages[ element.name ].remote = previous.originalMessage;
+                    if ( valid ) {
+                        submitted = validator.formSubmitted;
+                        validator.prepareElement( element );
+                        validator.formSubmitted = submitted;
+                        validator.successList.push( element );
+                        delete validator.invalid[ element.name ];
+                        validator.showErrors();
+                    } else {
+                        errors = {};
+                        message = response || validator.defaultMessage( element, "remote" );
+                        errors[ element.name ] = previous.message = $.isFunction( message ) ? message( value ) : message;
+                        validator.invalid[ element.name ] = true;
+                        validator.showErrors( errors );
+                    }
+                    previous.valid = valid;
+                    validator.stopRequest( element, valid );
+                }
+            }, param ) );
+            return "pending";
         }
 
     }
@@ -22984,9 +23045,9 @@ function handleAppCache() {
 Modernizr.addTest('touchcapable', function () {
     var bool;
     if (
-        ('ontouchstart' in window) || 
-        (window.DocumentTouch && document instanceof DocumentTouch) || 
-        (navigator.maxTouchPoints > 0) || 
+        ('ontouchstart' in window) ||
+        (window.DocumentTouch && document instanceof DocumentTouch) ||
+        (navigator.maxTouchPoints > 0) ||
         (navigator.msMaxTouchPoints > 0)
     ){
         // Secondary test to rule out some false positives
@@ -23032,14 +23093,14 @@ jQuery.validator.addMethod("remoteEmail", function(value, element) {
             "email": value
         },
         url: ArtX.var.jsonDomain + "/registrations",
-        success: function(response){ 
+        success: function(response){
             console.log("Checking: the user is in the system");
             return true;
         },
         error: function (jqXHR, error, errorThrown) {
             // 404 = Email not in system
-            if((jqXHR.responseText !== undefined) && (jqXHR.status === 404)){               
-                
+            if((jqXHR.responseText !== undefined) && (jqXHR.status === 404)){
+
                 var result = $.parseJSON(jqXHR.responseText);
                 var errorText;
                 $.each(result, function(k, v) {
@@ -23333,16 +23394,16 @@ ArtX.favoriteStars = {
             console.log("Initializing favorite stars");
 
             ArtX.favoriteStars.sync();
-            
+
             $(".favorite-star").click(function() {
 
-                if ($.cookie('token') === undefined) { 
+                if ($.cookie('token') === undefined) {
                     // The user is not logged in, we can't save a favorite
 
                     console.log("We can't toggle a favorite because the user is not logged in.");
                     ArtX.signupModal.open();
 
-                } else { 
+                } else {
                     // The user is logged in, so we can save or delete the favorite
 
                     // Is the click to set a favorite, or unset a favorite?
@@ -23473,7 +23534,7 @@ ArtX.favoriteStars = {
         var $thisStarIcon = $thisStarLink.find(".icon");
 
         console.log("User favorite ID: " + userFavoriteID);
-        
+
         // Swap the star icon
         $thisStarIcon.removeClass("icon-star").addClass("icon-star2");
 
@@ -23632,9 +23693,9 @@ ArtX.setupCustomCheckboxes = function(targetContainer) {
    ========================================================================== */
 ArtX.calendar = {
     getEvents: function(desiredMonth, desiredYear) {
-        
+
         var jsonURL = ArtX.var.jsonDomain + "/events";
-        
+
         $.mobile.loading('show');
         $.ajax({
             type: "GET",
@@ -23646,7 +23707,7 @@ ArtX.calendar = {
             url: jsonURL,
             success: function( data ){
                 console.log("Initial calendar event fetch successful");
-                
+
                 //console.log(JSON.stringify(data));
 
                 eventArray = data.events;
@@ -23892,7 +23953,7 @@ ArtX.loadMore = {
             // First, let's get the item container and assign it to a variable
             // Assumption: the load more link is always directly preceded by the item container
             ArtX.loadMore.vars.itemContainer = ArtX.loadMore.vars.loadMoreLink.prev();
-            
+
             var currentItemsCount = ArtX.util.getNumberOfChildItems(ArtX.loadMore.vars.itemContainer);
 
             if (currentItemsCount == ArtX.var.itemsPerPage) {
@@ -23940,7 +24001,7 @@ ArtX.settings = {
     init: function() {
         if ($("#settings-form").length > 0) {
             console.log("Initializing app settings");
-     
+
             // Preload the field values from the back-end API
             ArtX.settings.fetchFieldValues();
 
@@ -24032,9 +24093,9 @@ ArtX.settings = {
     },
     ajaxSubmit: function() {
         console.log("Submitting the changes to the Settings form");
-        
-        var $this = $("#settings-form"), 
-            viewArr = $this.serializeArray(), 
+
+        var $this = $("#settings-form"),
+            viewArr = $this.serializeArray(),
             formData = {};
 
         for (var i in viewArr) {
@@ -24084,7 +24145,7 @@ ArtX.setupHistory = function() {
 
             $.ajax({
                 type: "GET",
-                /* SMA: This is set to GET because POST was causing 412 errors on iPhone 
+                /* SMA: This is set to GET because POST was causing 412 errors on iPhone
                 (http://stackoverflow.com/questions/21616009/412-server-response-code-from-ajax-request) */
                 url: "/SetAttendance/",
                 data: {
@@ -24115,7 +24176,7 @@ ArtX.interests = {
             console.log("Initializing functionality for My Interests");
 
             ArtX.interests.checkForInterests();
-            
+
             var isCheckboxChecked = false;
             var checkboxID;
             var $thisCheckbox;
@@ -24142,7 +24203,7 @@ ArtX.interests = {
                     ArtX.interests.vars.ajaxCallback = function(checkboxObj, ajaxData) {
                         console.log("Callback for adding an interest");
                         var $myCheckbox = checkboxObj;
-                        var userInterestID; 
+                        var userInterestID;
                         $.each(ajaxData, function(index, interest) {
                             userInterestID = interest.id;
                             console.log("Selected interest ID for this user: " + userInterestID);
@@ -24169,7 +24230,7 @@ ArtX.interests = {
                     };
                 }
 
-                /* Make the actual Ajax request to handle the interest  
+                /* Make the actual Ajax request to handle the interest
                 TODO: add success/fail/error handling, etc.
                 No Load More functionality, possibly a future enhancement. */
                 $.mobile.loading('show');
@@ -24222,23 +24283,23 @@ ArtX.interests = {
                 //console.log("User interests: " + JSON.stringify(data));
 
                 $.mobile.loading('show');
-                
+
                 if(data.interests && data.interests.length) {
                     console.log("User has interests!");
 
                     ArtX.interests.vars.interestIntro = "#interest-normal-intro";
-                    
+
                     // Display user's list
                     $("#interest-form-list").fadeOut(400, function() {
                         ArtX.interests.getUserInterests();
                     });
-                    
+
                 } else {
                     console.log("User has no interests yet");
 
                     ArtX.interests.vars.interestIntro = "#interest-onboarding-intro";
 
-                    // Display all interests 
+                    // Display all interests
                     $("#interest-form-list").fadeOut(400, function() {
                         ArtX.interests.getAllInterests();
                     });
@@ -24270,13 +24331,13 @@ ArtX.interests = {
 
         console.log("Showing finished interest list");
         ArtX.setupCustomCheckboxes("#interest-form-list");
-        
+
         $.mobile.loading('hide');
         $interestIntro.fadeIn(400);
         $("#interest-form-list").fadeIn(400);
     },
     getAllInterests: function() {
-        
+
         $.ajax({
             type: "GET",
             url: ArtX.var.jsonDomain + "/possible_interests/",
@@ -24318,28 +24379,28 @@ ArtX.interests = {
                         console.log("Successfully retrieved list of user's interests for subsetting");
                         //console.log("User interests: " + JSON.stringify(userTagsData));
                         selectedInterests = userTagsData.interests;
-                        
+
                         // Circle through all possible tags
                         for(i = 0; i < allTags.length; i++) {
                             tag = allTags[i];
                             unchecked.tags.push(tag);
                             //console.log("Number of unchecked tags after push: " + unchecked.tags.length);
                             //console.log("Comparing: " + tag.id);
-                            
+
                             // Check against selected tags
                             for(j = 0; j < selectedInterests.length; j++){
-                                interest = selectedInterests[j];        
+                                interest = selectedInterests[j];
                                 //console.log("to " + interest.tag.id);
-                                
+
                                 if (tag.id === interest.tag.id) {
                                     //console.log("Removing " + tag.id + " from list");
                                     unchecked.tags.pop();
                                     selectedInterests.splice(j, 1);
                                     //console.log("Number of unchecked tags after splice: " + unchecked.tags.length);
-                                }   
-                                
+                                }
+
                             } //End loop over selected tags
-                            
+
                         } //End loop over all possible tags
 
                         // For testing: print results
@@ -24357,14 +24418,14 @@ ArtX.interests = {
                         console.log("Failed retrieving selected interests feed for subsetting");
                         ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
                     }
-                }); //End selected tags JSON call  
+                }); //End selected tags JSON call
             },
             error: function (jqXHR, error, errorThrown) {
-                console.log("Failed retrieving all tags feed for subsetting"); 
+                console.log("Failed retrieving all tags feed for subsetting");
                 ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         }); //End all tags JSON call
-      
+
         return unchecked;
     },
     getUserInterests: function() {
@@ -24428,7 +24489,7 @@ ArtX.login = {
                 /* If authentication failed, it will return 403 Forbidden and we can't run it through the usual showFormError because the form field ID doesn't match up */
 
                 if (jqXHR.status == 403) {
-                    
+
                     // Get results from JSON error
                     var result = $.parseJSON(jqXHR.responseText);
                     var errorText;
@@ -24453,7 +24514,7 @@ ArtX.login = {
                 } else {
                     ArtX.errors.showFormError(jqXHR.responseText);
                 }
-                
+
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -24480,12 +24541,12 @@ ArtX.logout = {
 ArtX.map = {
 
     vars : {
-   
+
         mapContainer : "event-map",
         locationUrl : "/ui/js/json/locations_temp.json",
         eventUrl : "/ui/js/json/events-all.json",
         openWithVenueID : "-1"
-    
+
     },
 
     init : function() {
@@ -24496,18 +24557,18 @@ ArtX.map = {
             // Set up map
             L.mapbox.accessToken = 'pk.eyJ1IjoiYXRvc2NhIiwiYSI6IlFSSDhOU0EifQ.8j2CBSsaQQmn-Ic7Vjx1bw';
             var map = L.mapbox.map( ArtX.map.vars.mapContainer, 'atosca.j55ofa87' );
-            
+
             // Fetch location feed
             var $locations = $.getJSON( ArtX.map.vars.locationUrl, function( data ){
-            
+
                 $.each( data, function(){
 
                     //Create a marker for each location
-                           
+
                     var name = this.name;
 
-                    var marker = L.marker( [ this.latitude, this.longitude ], { 
-                        icon : L.mapbox.marker.icon({ 
+                    var marker = L.marker( [ this.latitude, this.longitude ], {
+                        icon : L.mapbox.marker.icon({
                             'marker-color': '#f86767',
                         })
                     });
@@ -24518,30 +24579,30 @@ ArtX.map = {
                     marker.on( "click", function( e ){
                         var eventArray = [];
                         $.getJSON( ArtX.map.vars.eventUrl, function( data ) {
-                            $.each( data, function(){ 
+                            $.each( data, function(){
                                 //Save events with matching location name
                                 if ( this.location.name === name ) {
                                     console.log(this.location.name);
                                     if ( eventArray.length < ArtX.var.itemsPerPage ) {
                                         eventArray.push( this );
                                     }
-                                } 
+                                }
                             }); //End each
-                                                    
+
                             //Refresh event list
-                            $("#event-list").fadeOut( 400, function() {   
+                            $("#event-list").fadeOut( 400, function() {
                                 $("#event-list").html(_.template($('#template-eventlist').html(), {eventArray:eventArray}));
                                 ArtX.loadMore.init();
                                 $("#event-list").fadeIn(400, function() {
                                     // Re-do truncation once fade is complete
                                     ArtX.setupTextTruncation();
-                                });            
+                                });
                             }); //End fade out
-                                            
+
                         }); //End events getJON
-                                
+
                     }); //End click handler
-                            
+
                     marker.addTo( map );
 
                 }); //End each location
@@ -24556,7 +24617,7 @@ ArtX.map = {
                     // generic Boston map
                     map.setView([42.3581, -71.0636], 12);
                 }
-                
+
             }); //End locations getJSON
         }
 
@@ -24592,7 +24653,7 @@ ArtX.startup = {
 
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
-        
+
         // If it's a new visitor, pop the Sign Up window
         if (ArtX.var.hasVisitedBefore !== true) {
 
@@ -24608,7 +24669,7 @@ ArtX.startup = {
         }
 
         // If they're already logged in, let's add the CSS class for that
-        if ($.cookie('token') !== undefined) { 
+        if ($.cookie('token') !== undefined) {
             if (!ArtX.el.html.hasClass("is-logged-in")) {
                 ArtX.el.html.addClass("is-logged-in");
             }
@@ -24623,7 +24684,7 @@ $(document).ready(function() {
     handleAppCache();
 
     // Since the modal Signup popup is outside jQM's "pages", we need to instantiate it separately and only once
-    $("#signup-popup").enhanceWithin().popup({ 
+    $("#signup-popup").enhanceWithin().popup({
         history: false,
         positionTo: "window",
         afterclose: ArtX.signupModal.close
@@ -24634,7 +24695,7 @@ $(document).ready(function() {
 
 /*
  * ------------------------------------------------------
- * jQuery Mobile events (in the order in which they fire) 
+ * jQuery Mobile events (in the order in which they fire)
  * (reference: http://jqmtricks.wordpress.com/2014/03/26/jquery-mobile-page-events/)
  * ------------------------------------------------------
  */
@@ -24705,11 +24766,11 @@ $(document).on( "pagecontainershow", function( event ) {
     console.log("Cookie value: " + $.cookie('priorvisit'));
 
     // Check for a cookie that says that they've visited before.
-    if ($.cookie('priorvisit') === undefined) { 
+    if ($.cookie('priorvisit') === undefined) {
         console.log("Checking cookie -- new visitor");
     } else {
         console.log("Checking cookie -- they've been here before");
-        ArtX.var.hasVisitedBefore = true; 
+        ArtX.var.hasVisitedBefore = true;
     }
 
     if (typeof namespace.finalize === 'function') {
@@ -24717,7 +24778,7 @@ $(document).on( "pagecontainershow", function( event ) {
     }
 
     console.log("***End of new page load scripts");
-  
+
 });
 
 
