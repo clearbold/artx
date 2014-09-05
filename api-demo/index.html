@@ -32,6 +32,7 @@
                         <li><a href="#history-panel">History</a></li>
                         <li><a href="#attended-panel">Attended</a></li>
                         <li><a href="#location-panel">Location</a></li>
+                        <li><a href="#location-events-panel">Location Events</a></li>
                         <li><a href="#locations-panel">Locations</a></li>
                         <li><a href="#favorites-panel">Favorites</a></li>
                         <li><a href="#interests-panel">Interests</a></li>
@@ -257,6 +258,31 @@ $.ajax({
                         </div>
                     </div>
 
+                    <div class="panel panel-default" id='location-events-panel'>
+                        <div class="panel-heading">Get Location Events</div>
+                        <div class="panel-body">
+                            <button value="Get Location" id='location-events-button' class="btn btn-default">Get Location Events</button><br>
+                            <ul id="location-events" class="list-group"></ul>
+                            <pre class="prettyprint lang-js">
+                                <code class="javascript">
+$.ajax({
+    type: "GET",
+    dataType: "json",
+    url: "http://artx-staging.herokuapp.com/locations/1/events",
+    success: function( data ) {
+        console.log(data);
+        $('#location-events').empty();
+        $.each(data, function (key, value) {
+            $('#location-events').append('<li class="list-group-item">' + value.name + '</li>')
+            console.log(value.name);
+        })
+    }
+})
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+
                     <div class="panel panel-default" id='locations-panel'>
                         <div class="panel-heading">Get Locations</div>
                         <div class="panel-body">
@@ -270,9 +296,9 @@ $.ajax({
     url: "http://artx-staging.herokuapp.com/locations",
     success: function( data ) {
         console.log(data);
-        $('#location').empty();
-        $.each(data, function (key, value) {
-            $('#location').append('<li class="list-group-item">' + value.name + '</li>')
+        $('#locations').empty();
+        $.each(data.locations, function (key, value) {
+            $('#locations').append('<li class="list-group-item">' + value.name + '</li>')
             console.log(value.name);
         })
     }
@@ -567,6 +593,31 @@ console.log(value.name);
                 $('#location').empty();
                 $.each(data, function (key, value) {
                     $('#location').append('<li class="list-group-item">' + value.name + '</li>')
+                    console.log(value.name);
+                })
+            },
+            /*error: function( data ) {
+                console.log("error");
+                console.log(data);
+            }*/
+            error: function (jqXHR, error, errorThrown) {
+                console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+                console.log("jqXHR response: " + jqXHR.responseText);
+            }
+        })
+    })
+
+    $('#location-events-button').click(function(){
+        console.log("Start fetch single Location Events");
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "http://artx-staging.herokuapp.com/locations/1/events",
+            success: function( data ) {
+                console.log(data);
+                $('#location-events').empty();
+                $.each(data.events, function (key, value) {
+                    $('#location-events').append('<li class="list-group-item">' + value.name + '</li>')
                     console.log(value.name);
                 })
             },
