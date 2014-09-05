@@ -4487,67 +4487,6 @@ $.extend( $.validator, {
                 }
             }, param ) );
             return "pending";
-        },
-
-        // http://jqueryvalidation.org/remote-method/
-        restfulRemote: function( value, element, param ) {
-            if ( this.optional( element ) ) {
-                return "dependency-mismatch";
-            }
-
-
-
-            var previous = this.previousValue( element ),
-                validator, data;
-
-            if (!this.settings.messages[ element.name ] ) {
-                this.settings.messages[ element.name ] = {};
-            }
-            previous.originalMessage = this.settings.messages[ element.name ].remote;
-            this.settings.messages[ element.name ].remote = previous.message;
-
-            param = typeof param === "string" && { url: param } || param;
-
-            if ( previous.old === value ) {
-                return previous.valid;
-            }
-
-            previous.old = value;
-            validator = this;
-            this.startRequest( element );
-            data = {};
-            data[ element.name ] = value;
-            $.ajax( $.extend( true, {
-                url: param,
-                mode: "abort",
-                port: "validate" + element.name,
-                dataType: "json",
-                data: data,
-                context: validator.currentForm,
-                success: function( response ) {
-                    var valid = response === true || response === "true",
-                        errors, message, submitted;
-
-                    validator.settings.messages[ element.name ].remote = previous.originalMessage;
-                    if ( valid ) {
-                        submitted = validator.formSubmitted;
-                        validator.prepareElement( element );
-                        validator.formSubmitted = submitted;
-                        validator.successList.push( element );
-                        delete validator.invalid[ element.name ];
-                        validator.showErrors();
-                    } else {
-                        errors = {};
-                        message = response || validator.defaultMessage( element, "remote" );
-                        errors[ element.name ] = previous.message = $.isFunction( message ) ? message( value ) : message;
-                        validator.invalid[ element.name ] = true;
-                        validator.showErrors( errors );
-                    }
-                    previous.valid = valid;
-                    validator.stopRequest( element, valid );
-                }
-            }, param ) );
-            return "pending";
         }
 
     }
@@ -23285,7 +23224,8 @@ ArtX.var = {
     itemsPerPage : 5,
     isInitialLoad: true,
     hasVisitedBefore: false,
-    jsonDomain: "http://artx-staging.herokuapp.com"
+    jsonDomain: "http://artx-staging.herokuapp.com",
+    eventDetailID: 1 // acts as a fallback in case for some reason the Events data doesn't load
 };
 
 
@@ -23430,7 +23370,9 @@ ArtX.favoriteStars = {
                                 var selectedFavoriteID = data.favorite.id;
                                 ArtX.favoriteStars.highlightStar($thisStarLink, selectedFavoriteID);
                                 // If it exists on the page, reload the favorites slider after the new item has been added
-                                ArtX.favoriteStars.reloadFavoritesSlider();
+                                if ($("#favorites-slider").length > 0) {
+                                    ArtX.favoriteStars.reloadFavoritesSlider();
+                                }
                             },
                             error: function (jqXHR, error, errorThrown) {
                                 console.log("Error saving favorite");
@@ -23549,34 +23491,32 @@ ArtX.favoriteStars = {
         $thisStarLink.removeAttr("data-user-favorite-id");
     },
     reloadFavoritesSlider : function() {
-        if ($("#footer-slider").length > 0) {
+        
+        $("#footer-slider").fadeOut(400, function() {
 
-            $("#footer-slider").fadeOut(400, function() {
+            /*  DEV NOTE: When this is hooked up to a real JSON feed,
+                we'll feed it the URL including the eventID like this:
 
-                /*  DEV NOTE: When this is hooked up to a real JSON feed,
-                    we'll feed it the URL including the eventID like this:
+                getterJsonUrl = "/GetEventById/" + selectedEventID;
 
-                    getterJsonUrl = "/GetEventById/" + selectedEventID;
+                But since this is a demo with static JSON files, we're putting in a temporary file for it here: */
 
-                    But since this is a demo with static JSON files, we're putting in a temporary file for it here: */
+            getterJsonUrl = "/GetEventById/";
 
-                getterJsonUrl = "/GetEventById/";
+            $.getJSON(getterJsonUrl, function(data) {
+                var jsonArray = data;
 
-                $.getJSON(getterJsonUrl, function(data) {
-                    var jsonArray = data;
+                // Format results with underscore.js template
+                var eventHtml = _.template($("#item-template").html(), {jsonArray:jsonArray});
 
-                    // Format results with underscore.js template
-                    var eventHtml = _.template($("#item-template").html(), {jsonArray:jsonArray});
+                //console.log("item template html" + $("#item-template").html());
 
-                    //console.log("item template html" + $("#item-template").html());
+                $(eventHtml).prependTo($("#footer-slider"));
 
-                    $(eventHtml).prependTo($("#footer-slider"));
+                ArtX.footerSlider.reload();
 
-                    ArtX.footerSlider.reload();
-
-                });
             });
-        }
+        });
     }
 };
 
@@ -23637,15 +23577,14 @@ ArtX.signupModal = {
         });
     },
     open: function() {
-        // Make the ajax call to load up the form into the modal window
+        // Load up the form into the modal window
         $.mobile.loading('show');
-        $.ajax({
-            type: "POST",
-            dataType: "html",
-            url: "/signup-form.html",
-            success: function( data ){
-                // Insert the form fields into the form
-                $("#signup-form").html(data);
+        $("#signup-form").load("/signup-form.html", function(jqXHR, error, errorThrown) {
+            
+            if (status == "error") {
+                console.log("Failed to load the signup form into the modal");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            } else {
                 // Create the form for jQM
                 $("#signup-form").trigger('create');
                 // Open the popup
@@ -23655,14 +23594,9 @@ ArtX.signupModal = {
                 $("#signup-form").validate({
                     submitHandler: ArtX.signupModal.ajaxSubmit
                 });
-            },
-            error: function (jqXHR, error, errorThrown) {
-                console.log("Inserting the sign up form via Ajax failed");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
-            },
-            complete: function() {
-                $.mobile.loading('hide');
             }
+
+            $.mobile.loading('hide');
         });
     },
     close: function() {
@@ -23688,6 +23622,73 @@ ArtX.setupCustomCheckboxes = function(targetContainer) {
     }
 };
 
+/* Set up Event Detail
+   ========================================================================== */
+
+ArtX.eventdetail = {
+    init: function() {
+        if ($("#template-eventdetail").length > 0) {
+            ArtX.eventdetail.initPage();
+        }
+
+        if ($(".event-detail-link").length > 0) {
+            ArtX.eventdetail.initLinks();
+        }
+        
+    },
+    initLinks : function() {
+        console.log("Setting up event detail link click events");
+
+        $(".event-detail-link").click(function() {
+            console.log("Event detail link clicked!");
+            ArtX.var.eventDetailID = $(this).attr("data-event-id");
+        });
+    },
+    initPage : function() {
+        $.mobile.loading('show');
+        console.log("Checking the passed eventDetailID: " + ArtX.var.eventDetailID);
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            data: {
+                related: true
+            },
+            url: ArtX.var.jsonDomain + "/events/" + ArtX.var.eventDetailID,
+            success: function( data ){
+                console.log("Event detail data fetch successful");
+                
+                //console.log(JSON.stringify(data));
+                var eventArray = data;
+                //var relatedArray = eventArray.event.related;
+
+                ArtX.eventdetail.displayPage(eventArray);
+                //ArtX.eventdetail.displayRelatedSlider(eventArray);
+
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Event detail data fetch failed");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
+        });
+    },
+    displayPage: function(jsonData) {
+        console.log("Displaying event detail page content");
+        var eventArray = jsonData;
+        var eventTemplate = $('#template-eventdetail').html();
+        $("#target-eventdetail").fadeOut(400, function() {
+            ArtX.favoriteStars.destroy();
+            $("#target-eventdetail").html(_.template(eventTemplate, {eventArray:eventArray}));
+            ArtX.favoriteStars.init();
+            $("#target-eventdetail").fadeIn(400);
+        });
+    },
+    displayRelatedSlider: function(jsonData) {
+        console.log("Displaying related items slider -- TBD");
+    }
+};
 
 /* Set up By Date Event Calendar
    ========================================================================== */
@@ -23805,6 +23806,7 @@ ArtX.calendar = {
             ArtX.favoriteStars.destroy();
             $("#event-list").html(_.template(eventTemplate, {eventArray:eventArray}));
             ArtX.favoriteStars.init();
+            ArtX.eventdetail.initLinks();
             $("#event-list").fadeIn(400, function() {
                 // Re-do truncation once fade is complete
                 ArtX.setupTextTruncation();
@@ -24486,9 +24488,9 @@ ArtX.login = {
                 console.log("User login submit failed");
                 ArtX.errors.logAjaxError(jqXHR, error, errorThrown, true);
 
-                /* If authentication failed, it will return 403 Forbidden and we can't run it through the usual showFormError because the form field ID doesn't match up */
+                /* If authentication fails with a 403 or 404 error, it will return a generic error payload and we can't run it through the usual showFormError because there's no form field ID provided */
 
-                if (jqXHR.status == 403) {
+                if ((jqXHR.status == 403) || (jqXHR.status == 404)) { 
 
                     // Get results from JSON error
                     var result = $.parseJSON(jqXHR.responseText);
@@ -24499,17 +24501,26 @@ ArtX.login = {
 
                     $.each(result, function(k, v) {
                         errorText = v.capitalize();
-                        console.log("Error text: " + errorText);
+                        //console.log("Error text: " + errorText);
+                    });
 
+                    if (jqXHR.status == 403) { // Password wrong
                         $errorLabel = $("<label>")
                             .attr("id", "signin-password-error")
                             .addClass("error")
                             .html(errorText)
                             .attr( "for", "signin-password");
-
                         $("#signin-password").addClass("error");
                         $errorLabel.insertAfter( $("#signin-password") );
-                    });
+                    } else if (jqXHR.status == 404) { // Email doesn't exist
+                        $errorLabel = $("<label>")
+                            .attr("id", "signin-email-error")
+                            .addClass("error")
+                            .html(errorText)
+                            .attr( "for", "signin-email");
+                        $("#signin-email").addClass("error");
+                        $errorLabel.insertAfter( $("#signin-email") );
+                    }
 
                 } else {
                     ArtX.errors.showFormError(jqXHR.responseText);
@@ -24645,6 +24656,7 @@ ArtX.startup = {
         ArtX.setupHistory();
         ArtX.loadMore.init();
         ArtX.map.init();
+        ArtX.eventdetail.init();
 
         console.log("**End of scripts initializing");
     },
