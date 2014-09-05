@@ -96,6 +96,11 @@ $.ajax({
     },
     success: function( data ){
         $.cookie('token', data.authentication_token);
+    },
+    error: function( data ){
+        console.log("error");
+        console.log(data);
+        $('div#token-viewer').html("Error: " + data.status + " " + data.responseText);
     }
 });
                                 </code>
