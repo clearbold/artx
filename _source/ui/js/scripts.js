@@ -1526,9 +1526,9 @@ ArtX.login = {
                 console.log("User login submit failed");
                 ArtX.errors.logAjaxError(jqXHR, error, errorThrown, true);
 
-                /* If authentication failed, it will return 403 Forbidden and we can't run it through the usual showFormError because the form field ID doesn't match up */
+                /* If authentication fails with a 403 or 404 error, it will return a generic error payload and we can't run it through the usual showFormError because there's no form field ID provided */
 
-                if (jqXHR.status == 403) {
+                if ((jqXHR.status == 403) || (jqXHR.status == 404)) { 
 
                     // Get results from JSON error
                     var result = $.parseJSON(jqXHR.responseText);
@@ -1539,17 +1539,26 @@ ArtX.login = {
 
                     $.each(result, function(k, v) {
                         errorText = v.capitalize();
-                        console.log("Error text: " + errorText);
+                        //console.log("Error text: " + errorText);
+                    });
 
+                    if (jqXHR.status == 403) { // Password wrong
                         $errorLabel = $("<label>")
                             .attr("id", "signin-password-error")
                             .addClass("error")
                             .html(errorText)
                             .attr( "for", "signin-password");
-
                         $("#signin-password").addClass("error");
                         $errorLabel.insertAfter( $("#signin-password") );
-                    });
+                    } else if (jqXHR.status == 404) { // Email doesn't exist
+                        $errorLabel = $("<label>")
+                            .attr("id", "signin-email-error")
+                            .addClass("error")
+                            .html(errorText)
+                            .attr( "for", "signin-email");
+                        $("#signin-email").addClass("error");
+                        $errorLabel.insertAfter( $("#signin-email") );
+                    }
 
                 } else {
                     ArtX.errors.showFormError(jqXHR.responseText);
