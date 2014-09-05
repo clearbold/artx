@@ -29,6 +29,7 @@
                         <li><a href="#login-panel">Log in</a></li>
                         <li><a href="#discover-panel">Discover</a></li>
                         <li><a href="#event-panel">Event</a></li>
+                        <li><a href="#history-panel">History</a></li>
                         <li><a href="#favorites-panel">Favorites</a></li>
                         <li><a href="#interests-panel">Interests</a></li>
                         <li><a href="#events-location-panel">Events by location</a></li>
@@ -158,6 +159,33 @@ $.ajax({
         })
     }
 })
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default" id='history-panel'>
+                        <div class="panel-heading">Get History</div>
+                        <div class="panel-body">
+                            <button value="Get History" id='history-button' class="btn btn-default" />Get History</button><br>
+                            <ul id="history" class="list-group"></ul>
+                            <pre class="prettyprint lang-js">
+                                <code class="javascript">
+$.ajax({
+    type: "GET",
+    dataType: "json",
+    url: "http://artx-staging.herokuapp.com/favorites",
+    beforeSend: function (request) {
+        request.setRequestHeader("authentication_token", $.cookie('token'));
+    },
+    success: function( data ) {
+        $('#history').empty();
+        $.each(data.favorites, function (key, value) {
+            $('#favorites').append('&lt;li class="list-group-item"&gt;' + value.event.name+ '&lt;/li&gt;')
+            console.log(value.event);
+        });
+    }
+});
                                 </code>
                             </pre>
                         </div>
@@ -350,6 +378,26 @@ console.log(value.name);
                 })
             }
         })
+    })
+
+    $('#history-button').click(function(){
+        console.log("Start fetch history");
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "http://artx-staging.herokuapp.com/favorites/history",
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function( data ) {
+                $('#history').empty();
+                console.log(data);
+                $.each(data.favorites, function (key, value) {
+                    $('#history').append('<li class="list-group-item">Attended: ' + value.attended + ' - ' +  value.event.name + '</li>')
+                    console.log(value.event);
+                });
+            }
+        });
     })
 
     $('#event-button').click(function(){
