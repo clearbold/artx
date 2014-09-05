@@ -1,31 +1,37 @@
 ---
 layout: subpage
-title: Workshop with artist Jason Middlebrook
+title: Event detail
 titlebar: Event
 active: event
 ---
 
         <div class="content layout-footer" role="main">
 
+            <div id="target-eventdetail">
+
+            </div>
+
+            <script type="text/template" id="template-eventdetail">
+            <% _.each(eventArray, function(eventObj, key){ %>
+
             <div class="item-block item-detail">
                 <div class="item-image">
-                    <img src="/ui/img/rect-middlebrook.jpg" alt="" />
-                    <!-- Dev Note - Optimal image size: 640px by 420px rectangular image -->
+                    <img src="<%= eventObj.image %>" alt="" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" />
                 </div>
                 <div class="item-info">
                     <h2 class="item-title">
-                        Workshop with artist Jason Middlebrook
-                        <a href="#" class="favorite-star item-symbol" data-event-id="1" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
+                        <%= eventObj.name %>
+                        <a href="#" class="favorite-star item-symbol" data-event-id="<%= eventObj.id %>" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
                     </h2>
-                    <p class="item-venue"><a href="venue.html"><span class="item-symbol"><i class="icon icon-location"></i></span>ICA Boston</a></p>
-                    <p class="item-date"><span class="item-symbol"><i class="icon icon-calendar"></i></span>Sat, May 3, 10:15-1:15</p>
+                    <p class="item-venue"><a href="venue.html" data-venue-id="<%= eventObj.location.id %>" class="venue-detail-link"><span class="item-symbol"><i class="icon icon-location"></i></span><%= eventObj.location.name %></a></p>
+                    <p class="item-date"><span class="item-symbol"><i class="icon icon-calendar"></i></span><%= eventObj.dates %></p>
                     <div class="item-description">
-                        <p>A featured artist in the ICA&rsquo;s collection, Jason Middlebrook commonly uses organic motifs and materials to explore the relationship between nature and culture. Join him for this special introduction to his creative process, tools, and materials; working with wood planks provided by the artist, participants will prepare works to take home at a later date. All skill levels welcome.</p>
-
-                        <p><i>A limited number of full scholarships are available for Boston Public School teachers with advance registration. For information, contact Leah Kandel at lkandel@icaboston.org.</i></p>
+                        <%= eventObj.description %>
                     </div>
                 </div>
             </div>
+            <% }); %> 
+            </script>
                    
         </div> <!-- /content -->
 
