@@ -23020,22 +23020,47 @@ jQuery.validator.addMethod("zipcode", function(value, element) {
 }, "Please provide a valid zip code.");
 
 jQuery.validator.addMethod("remoteEmail", function(value, element) {
+    // Temp return so things don't break while we work things out
+    return true;
+
+    // Comment out the above and uncomment the below to test the validator method
+    /*
+    $.mobile.loading('show');
     $.ajax({
-        type: "POST",
-        data: {"_method":"head", "email": "angela.m.tosca@gmail.com"},
-        url: "/registration",
+        type: "GET",
+        data: {
+            "email": value
+        },
+        url: ArtX.var.jsonDomain + "/registrations",
         success: function(response){ 
+            console.log("Checking: the user is in the system");
             return true;
         },
-        error: function(jqXHR, status, text){
+        error: function (jqXHR, error, errorThrown) {
             // 404 = Email not in system
-            if(jqXHR.status === 404){               
+            if((jqXHR.responseText !== undefined) && (jqXHR.status === 404)){               
+                
+                var result = $.parseJSON(jqXHR.responseText);
+                var errorText;
+                $.each(result, function(k, v) {
+                    errorText = v;
+                    console.log(errorText);
+                });
+                return false;
+            } else {
+                console.log("Error checking if the user is in the system");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
                 return false;
             }
-            //TODO: Handle other response codes?      
+        },
+        complete: function() {
+            $.mobile.loading('hide');
         }
-    }); 
-}, "Email address not found in our system; please try another.");
+    }); */
+}, "User does not exist");
+// Dev note: We unfortunately cannot set the error message based on the returned error payload because we cannot do cross-domain asynchronous Ajax calls. We are hardcoding the "User does not exist" message instead.
+
+
 
 var emailRuleSet = {
     required: true,
@@ -23043,8 +23068,8 @@ var emailRuleSet = {
 };
 var existingEmailRuleSet = {
     required: true,
-    email: true/*,
-    "remoteEmail": "remoteEmail"*/
+    email: true,
+    "remoteEmail": "remoteEmail"
 };
 var emailMsgSet = {
     required: "This field is required.",
