@@ -97,10 +97,12 @@
                 </div>
                 <div class="item-info">
                     <h2 class="item-title"><%= venueObj.name %></h2>
-                    <p class="item-location"><a href="bydate.html" data-venue-id="<%= venueObj.id %>"><span class="item-symbol"><i class="icon icon-location"></i></span>Street address TBD</a></p>
+                    <p class="item-location"><a href="bydate.html" data-venue-id="<%= venueObj.id %>"><span class="item-symbol"><i class="icon icon-location"></i></span><%= venueObj.address %></a></p>
+                    <% /* Originally the address was only showing the street address, rather than the whole thing */ %>
                     <dl>
                         <dt>Hours:</dt>
-                        <dd>TBD</dd>
+                        <dd><%= venueObj.hours %></dd>
+                        <% /* Originally each line of the hours had its own DD tag */ %>
                     </dl>
                     <p class="item-website"><a href="<%= venueObj.url %>" target="_blank"><span class="item-symbol"><i class="icon icon-globe"></i></span><%= trimmedURL %></a></p>
                     <p><%= venueObj.description %></p>
