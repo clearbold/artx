@@ -30,6 +30,7 @@
                         <li><a href="#discover-panel">Discover</a></li>
                         <li><a href="#event-panel">Event</a></li>
                         <li><a href="#history-panel">History</a></li>
+                        <li><a href="#attended-panel">Attended</a></li>
                         <li><a href="#favorites-panel">Favorites</a></li>
                         <li><a href="#interests-panel">Interests</a></li>
                         <li><a href="#events-location-panel">Events by location</a></li>
@@ -189,6 +190,39 @@ $.ajax({
             $('#history').append('&lt;li class="list-group-item"&gt;Attended: ' + value.attended + ' - ' +  value.event.name + '&lt;/li&gt;')
             console.log(value.event);
         });
+    }
+});
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default" id='attended-panel'>
+                        <div class="panel-heading">Set Attended</div>
+                        <div class="panel-body">
+                            <button value="Set Attended" id='attended-button' class="btn btn-default" />Set Attended</button><br>
+                            <ul id="attended" class="list-group"></ul>
+                            <pre class="prettyprint lang-js">
+                                <code class="javascript">
+$.ajax({
+    type: "POST",
+    dataType: "json",
+    url: "http://artx-staging.herokuapp.com/favorites/1",
+    data: {
+        attended: true,
+        _method: "PUT"
+    },
+    beforeSend: function (request) {
+        request.setRequestHeader("authentication_token", $.cookie('token'));
+    },
+    success: function( data ) {
+        console.log("success")
+    },
+    error: function( data ) {
+        console.log("error");
+        console.log(data);
+        console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+        console.log("jqXHR response: " + jqXHR.responseText);
     }
 });
                                 </code>
@@ -407,6 +441,31 @@ console.log(value.name);
                 });
             }
         });
+    })
+
+    $('#attended-button').click(function(){
+        console.log("Start PUT Favorites/Attended");
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "http://artx-staging.herokuapp.com/favorites/1",
+            data: {
+                attended: true,
+                _method: "PUT"
+            },
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function( data ) {
+                console.log("success")
+            },
+            error: function( data ) {
+                console.log("error");
+                console.log(data);
+                console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+                console.log("jqXHR response: " + jqXHR.responseText);
+            }
+        })
     })
 
     $('#event-button').click(function(){
