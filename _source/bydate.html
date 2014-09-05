@@ -54,13 +54,13 @@ active: bydate
                     
             <div class="item-block cf">
                 <div class="item-image">
-                    <a href="exhibition.html">
+                    <a href="exhibition.html" data-event-id="<%= eventObj.id %>" class="event-detail-link">
                         <img src="<%= eventObj.image %>" alt="" onerror="if (this.src != '/ui/img/rect-thumb-noimage.jpg') this.src = '/ui/img/rect-thumb-noimage.jpg';" />
                     </a>
                 </div>
                 <div class="item-info">
                     <h2 class="item-title">
-                        <a href="exhibition.html" class="truncate"><%= eventObj.name %></a>
+                        <a href="exhibition.html" data-event-id="<%= eventObj.id %>" class="truncate" class="event-detail-link"><%= eventObj.name %></a>
                     </h2>
                     <p class="item-date">
                     <% if (compareStartDate != compareEndDate) { %>
@@ -71,7 +71,7 @@ active: bydate
                     <% } %>
                     </p>
 
-                    <a href="#" class="favorite-star item-symbol" data-eventID="1" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
+                    <a href="#" class="favorite-star item-symbol" data-event-id="<%= eventObj.id %>" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
                 </div>
             </div>
 
