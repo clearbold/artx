@@ -255,7 +255,7 @@ $.ajax({
         console.log(data);
         $('#location').empty();
         $.each(data, function (key, value) {
-            $('#location').append('<li class="list-group-item">' + value.name + '</li>')
+            $('#location').append('&lt;li class="list-group-item"&gt;' + value.name + '&lt;/li&gt;')
             console.log(value.name);
         })
     }
@@ -280,7 +280,7 @@ $.ajax({
         console.log(data);
         $('#location-events').empty();
         $.each(data, function (key, value) {
-            $('#location-events').append('<li class="list-group-item">' + value.name + '</li>')
+            $('#location-events').append('&lt;li class="list-group-item"&gt;' + value.name + '&lt;/li&gt;')
             console.log(value.name);
         })
     }
@@ -305,7 +305,7 @@ $.ajax({
         console.log(data);
         $('#locations').empty();
         $.each(data.locations, function (key, value) {
-            $('#locations').append('<li class="list-group-item">' + value.name + '</li>')
+            $('#locations').append('&lt;li class="list-group-item"&gt;' + value.name + '&lt;/li&gt;')
             console.log(value.name);
         })
     }
