@@ -1,70 +1,6 @@
-            <div class="discover-slider slider-style-peek">
+            <div id="discover-slider" class="discover-slider slider-style-peek">
 
-                <ul id="discover-slider" class="bxslider cf">
-                    <li>
-                        <div class="item-block">
-                            <div class="item-image">
-                                <a href="event.html">
-                                    <img src="/ui/img/rect-quilts.jpg" alt="" />
-                                    <!-- Dev Note - Optimal image size: 640px by 420px rectangular image -->
-                                </a>
-                            </div>
-                            <div class="item-info">
-                                <h2 class="item-title"><a href="event.html">Quilts and Color: The Roy Pilgrim Collection</a></h2>
-                                <p class="item-venue">Museum of Fine Arts</p>
-
-                                <a href="#" class="favorite-star item-symbol" data-event-id="1" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="item-block">
-                            <div class="item-image">
-                                <a href="event.html">
-                                    <img src="/ui/img/rect-middlebrook.jpg" alt="" />
-                                    <!-- Dev Note - Optimal image size: 640px by 420px rectangular image -->
-                                </a>
-                            </div>
-                            <div class="item-info">
-                                <h2 class="item-title"><a href="event.html">Workshop with artist Jason Middlebrook</a></h2>
-                                <p class="item-venue">ICA Boston</p>
-
-                                <a href="#" class="favorite-star item-symbol" data-event-id="1" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="item-block">
-                            <div class="item-image">
-                                <a href="#">
-                                    <img src="/ui/img/rect-knights.jpg" alt="" />
-                                    <!-- Dev Note - Optimal image size: 640px by 420px rectangular image -->
-                                </a>
-                            </div>
-                            <div class="item-info">
-                                <h2 class="item-title"><a href="#">Knights: Arms and Armor Throughout History</a></h2>
-                                <p class="item-venue">Worcester Art Museum</p>
-
-                                <a href="#" class="favorite-star item-symbol" data-event-id="1" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="item-block">
-                            <div class="item-image">
-                                <a href="#">
-                                    <img src="/ui/img/rect-bamboo.jpg" alt="" />
-                                    <!-- Dev Note - Optimal image size: 640px by 420px rectangular image -->
-                                </a>
-                            </div>
-                            <div class="item-info">
-                                <h2 class="item-title"><a href="#">Fired Earth, Woven Bamboo: Contemporary Japanese Ceramics and Bamboo Art</a></h2>
-                                <p class="item-venue">Museum of Fine Arts Boston</p>
-
-                                <a href="#" class="favorite-star item-symbol" data-event-id="1" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
-                            </div>
-                        </div>
-                    </li>
+                <ul class="bxslider cf">
                     
                 </ul>
 
@@ -72,3 +8,23 @@
                 <a href="#" id="peek-slider-next" class="peek-slider-next" title="Next"><span class="visuallyhidden">Next</span></a>
 
             </div> <!-- /discover-slider -->
+
+            <script type="text/template" id="template-discoverslider">
+            <% _.each(eventArray, function(eventObj, key){ %>
+                <li>
+                    <div class="item-block">
+                        <div class="item-image">
+                            <a href="event.html" data-event-id="<%= eventObj.id %>" class="event-detail-link">
+                                <img src="<%= eventObj.image %>" alt="" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" />
+                            </a>
+                        </div>
+                        <div class="item-info">
+                            <h2 class="item-title"><a href="event.html" data-event-id="<%= eventObj.id %>" class="event-detail-link"><%= eventObj.name %></a></h2>
+                            <p class="item-venue"><%= eventObj.location.name %></p>
+
+                            <a href="#" class="favorite-star item-symbol" data-event-id="<%= eventObj.id %>" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
+                        </div>
+                    </div>
+                </li>
+            <% }); %>
+            </script>

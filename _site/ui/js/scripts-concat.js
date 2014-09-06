@@ -23230,44 +23230,89 @@ ArtX.var = {
 };
 
 
-/* Set up Peeking slider
+/* Set up Peeking slider on Discover Page
    ========================================================================== */
-ArtX.setupPeekSlider = function() {
-    // Assumption -- there will only ever be one peek-style slider per page/screen
-    if ($(".slider-style-peek").find("ul").length > 0) {
-
-        if ($(".slider-style-peek").find("ul").children().length > 1) { // there's more than one slide to show
-            console.log("Initializing peeking slider");
-
-            var peekSlideInstance = $(".slider-style-peek").find("ul").bxSlider({
-                oneToOneTouch:false,
-                pager:false,
-                auto:false,
-                onSliderLoad: function(currentIndex) {
-                    //console.log("currentIndex: " + currentIndex);
-                    $(".slider-style-peek").find("ul").find("li").eq(currentIndex).addClass("slide-prev");
-                    $(".slider-style-peek").find("ul").find("li").eq(currentIndex+2).addClass("slide-next");
-                },
-                onSlideBefore: function($slideElement, oldIndex, newIndex) {
-                    //console.log("oldIndex: " + oldIndex);
-                    //console.log("newIndex: " + newIndex);
-                    $(".slide-prev").removeClass("slide-prev");
-                    $(".slide-next").removeClass("slide-next");
-                    $(".slider-style-peek").find("ul").find("li").eq(newIndex).addClass("slide-prev");
-                    $(".slider-style-peek").find("ul").find("li").eq(newIndex+2).addClass("slide-next");
-                }
-            });
-
-            $('#peek-slider-next').click(function(){
-              peekSlideInstance.goToNextSlide();
-              return false;
-            });
-
-            $('#peek-slider-previous').click(function(){
-              peekSlideInstance.goToPrevSlide();
-              return false;
-            });
+ArtX.discoverSlider = {
+    init: function() {
+        // Assumption -- there will only ever be one peek-style slider per page/screen
+        if ($("#discover-slider").find("ul").length > 0) {
+            ArtX.discoverSlider.populateSlider();
         }
+    },
+    populateSlider: function() {
+        var beforeSendFunction = function() {}; // blank function for now
+
+        if ($.cookie('token') !== undefined) {
+            beforeSendFunction = function(request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            };
+        }
+
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: ArtX.var.jsonDomain + "/discoveries/",
+            beforeSend: beforeSendFunction,
+            success: function( data ) {
+                console.log("Discover slider data successfully fetched");
+                //console.log(JSON.stringify(data.events));
+                ArtX.discoverSlider.buildSlider(data);
+
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error fetching Discover slider data");
+                console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+                console.log("jqXHR response: " + jqXHR.responseText);
+            }
+        });
+    },
+    buildSlider: function(data) {
+        console.log("Building discover slider");
+        var eventArray = data.events;
+        var slideTemplate = $('#template-discoverslider').html();
+        
+        $("#discover-slider").find("ul").html(_.template(slideTemplate, {eventArray:eventArray}));
+
+        var numberOfSlides = $("#discover-slider").find("ul").children().length;
+
+        if (numberOfSlides > 1) { // there's more than one slide to show
+            ArtX.discoverSlider.initSlider();
+        }
+
+        // Initialize favorite stars and event detail links
+        ArtX.favoriteStars.init();
+        ArtX.eventdetail.initLinks();
+    },
+    initSlider: function() {
+        console.log("More than one slide -- initializing slider functionality");
+        var peekSlideInstance = $("#discover-slider").find("ul").bxSlider({
+            oneToOneTouch:false,
+            pager:false,
+            auto:false,
+            onSliderLoad: function(currentIndex) {
+                //console.log("currentIndex: " + currentIndex);
+                $("#discover-slider").find("ul").find("li").eq(currentIndex).addClass("slide-prev");
+                $("#discover-slider").find("ul").find("li").eq(currentIndex+2).addClass("slide-next");
+            },
+            onSlideBefore: function($slideElement, oldIndex, newIndex) {
+                //console.log("oldIndex: " + oldIndex);
+                //console.log("newIndex: " + newIndex);
+                $(".slide-prev").removeClass("slide-prev");
+                $(".slide-next").removeClass("slide-next");
+                $("#discover-slider").find("ul").find("li").eq(newIndex).addClass("slide-prev");
+                $("#discover-slider").find("ul").find("li").eq(newIndex+2).addClass("slide-next");
+            }
+        });
+
+        $('#peek-slider-next').click(function(){
+          peekSlideInstance.goToNextSlide();
+          return false;
+        });
+
+        $('#peek-slider-previous').click(function(){
+          peekSlideInstance.goToPrevSlide();
+          return false;
+        });
     }
 };
 
@@ -24711,6 +24756,7 @@ ArtX.startup = {
 
         $('a[href="#"]').click(function(e){e.preventDefault();});
 
+        ArtX.discoverSlider.init();
         ArtX.login.init();
         ArtX.logout.init();
         ArtX.interests.init();
@@ -24722,7 +24768,6 @@ ArtX.startup = {
         ArtX.venuedetail.init();
 
         ArtX.loadMore.init();
-        ArtX.setupPeekSlider();
         ArtX.footerSlider.init();
         ArtX.setupCustomCheckboxes();
         ArtX.setupTextTruncation();
