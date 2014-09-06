@@ -30,6 +30,7 @@
                     <ul class="nav">
                         <li><a href="#login-panel">Log in</a></li>
                         <li><a href="#discover-panel">Discover</a></li>
+                        <li><a href="#discover-panel-guest">Discover (not logged in)</a></li>
                         <li><a href="#event-panel">Event</a></li>
                         <li><a href="#history-panel">History</a></li>
                         <li><a href="#attended-panel">Attended</a></li>
@@ -126,9 +127,38 @@ $.ajax({
         $('#discoveries').empty();
         console.log(JSON.stringify(data.events);
         $.each(data.events, function (key, value) {
-            $('#discoveries').append('&lt;li class="list-group-item"&gt;'+value.name +'&lt;/li&gt;')
+            $('#discoveries').append('&lt;li class="list-group-item"&gt;'+value.name +'&lt;/li&gt;');
             console.log(value.name);
         })
+    }
+})
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default" id='discover-panel-guest'>
+                        <div class="panel-heading">Get Discover</div>
+                        <div class="panel-body">
+                            <button value="Get Discover (as guest)" id='discover-button-guest' class="btn btn-default">Get Discover (guest)</button><br>
+                            <ul id="discoveries-guest" class="list-group"></ul>
+                            <pre class="prettyprint lang-js">
+                                <code class="javascript">
+$.ajax({
+    type: "GET",
+    dataType: "json",
+    url: "http://artx-staging.herokuapp.com/discoveries",
+    success: function( data ) {
+        $('#discoveries-guest').empty();
+        console.log(JSON.stringify(data.events));
+        $.each(data.events, function (key, value) {
+            $('#discoveries-guest').append('&lt;li class="list-group-item"&gt;' + value.name + '&lt;/li&gt;');
+            console.log(value.name);
+        })
+    },
+    error: function (jqXHR, error, errorThrown) {
+        console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+        console.log("jqXHR response: " + jqXHR.responseText);
     }
 })
                                 </code>
@@ -514,7 +544,29 @@ console.log(value.name);
                 })
             }
         })
-    })
+    });
+
+    $('#discover-button-guest').click(function(){
+        console.log("Start fetch Discover (as guest)");
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "http://artx-staging.herokuapp.com/discoveries",
+            success: function( data ) {
+                $('#discoveries-guest').empty();
+                console.log(JSON.stringify(data.events));
+                $.each(data.events, function (key, value) {
+                    $('#discoveries-guest').append('<li class="list-group-item">' + value.name + '</li>')
+                    console.log(value.name);
+                })
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+                console.log("jqXHR response: " + jqXHR.responseText);
+            }
+        })
+    });
+
 
     $('#history-button').click(function(){
         console.log("Start fetch history");
