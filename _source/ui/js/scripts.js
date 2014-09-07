@@ -1023,7 +1023,8 @@ ArtX.calendar = {
             dataType: "json",
             data: {
                 year: desiredYear,
-                month: desiredMonth
+                month: desiredMonth,
+                per_page: 1000
             },
             url: jsonURL,
             success: function( data ){
@@ -1032,6 +1033,7 @@ ArtX.calendar = {
                 //console.log(JSON.stringify(data));
 
                 eventArray = data.events;
+                //console.log("Number of events returned: " + data.events.length);
 
                 // Create a Clndr and save the instance as myCalendar
                 ArtX.el.eventCalendar = $("#event-calendar").clndr({
@@ -1071,7 +1073,8 @@ ArtX.calendar = {
                                 url: jsonURL,
                                 data: {
                                     year: chosenYear,
-                                    month: chosenMonth
+                                    month: chosenMonth,
+                                    per_page: 1000
                                 },
                                 success: function( data ){
                                     console.log("Events for " + chosenMonth + " " + chosenYear + " retrieved successfully");
@@ -1532,7 +1535,7 @@ ArtX.favoriteList = {
         console.log("Building favorites list");
         var jsonArray = data.favorites;
 
-        console.log(JSON.stringify(jsonArray));
+        //console.log(JSON.stringify(jsonArray));
 
         var itemTemplate = $("#template-favoritelist").html();
         var favoritesHtml;
