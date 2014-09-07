@@ -23254,11 +23254,15 @@ ArtX.discoverSlider = {
         $.ajax({
             type: "GET",
             dataType: "json",
+            data: {
+                per_page: 10
+            },
             url: ArtX.var.jsonDomain + "/discoveries/",
             beforeSend: beforeSendFunction,
             success: function( data ) {
                 console.log("Discover slider data successfully fetched");
                 //console.log(JSON.stringify(data.events));
+                console.log("Number of discover events fetched: " + data.events.length);
                 ArtX.discoverSlider.buildSlider(data);
 
             },
@@ -24411,34 +24415,104 @@ ArtX.settings = {
 };
 
 
-/* Setting up History Ajax functionality
+/* Setting up History list functionality
    ========================================================================== */
-ArtX.setupHistory = function() {
-    var $myHistoryForm = $("#history-form");
+ArtX.historyList = {
+    init: function() {
+        if ($("#target-historylist").length > 0) {
+            console.log("Initializing History list");
+            ArtX.historyList.fetchData();
+        }
+    },
+    fetchData: function() {
+        $.mobile.loading('show');
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: ArtX.var.jsonDomain + "/favorites/history/",
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function( data ) {
+                console.log("Successfully fetched History data");
+                
+                jsonDataString = JSON.stringify(data.favorites);
 
-    if ($myHistoryForm.length > 0) {
-        console.log("Initializing Ajax for History");
+                //console.log(jsonDataString);
 
-        var $ajaxInputs = $myHistoryForm.find("input[type=checkbox]");
-        var isCheckboxChecked = false;
-        var checkboxID;
+                if (jsonDataString.length > 2) {
+                    // There are favorites, build the list
+                    
+                    ArtX.historyList.hideErrorMsg();
 
-        $ajaxInputs.click( function() {
-            isCheckboxChecked = $(this).prop("checked");
-            checkboxID = $(this).prop("id");
+                    $("#target-historylist").fadeOut(400, function() {
+                        ArtX.historyList.buildList(data);
+                        ArtX.historyList.showList();
+                    });
 
-            /* This stub Ajax call sends the checkbox ID and whether it's checked to the /SetAttendance/ URL (currently a placeholder file).  Eventually, we should add success/fail/error handling, etc */
-
-            $.ajax({
-                type: "GET",
-                /* SMA: This is set to GET because POST was causing 412 errors on iPhone
-                (http://stackoverflow.com/questions/21616009/412-server-response-code-from-ajax-request) */
-                url: "/SetAttendance/",
-                data: {
-                    eventCheckbox: checkboxID,
-                    eventAttended: isCheckboxChecked
+                } else {
+                    // Empty set, no favorites yet
+                    ArtX.historyList.showErrorMsg();
                 }
-            });
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error fetching History data");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
+        });
+    },
+    buildList: function(data) {
+        console.log("Building history list");
+        var jsonArray = data.favorites;
+
+        //console.log(JSON.stringify(jsonArray));
+
+        var itemTemplate = $("#template-historylist").html();
+        var historyHtml;
+
+        historyHtml = _.template(itemTemplate, {jsonArray:jsonArray});
+
+        $(historyHtml).appendTo($("#target-historylist"));
+
+        ArtX.historyList.addEventHandlers();
+    },
+    addEventHandlers: function() {
+        // Initialize favorite stars and event detail links
+        ArtX.favoriteStars.init();
+        ArtX.eventdetail.initLinks();
+    },
+    showList: function() {
+        $("#target-historylist").fadeIn(400);
+    },
+    showErrorMsg: function() {
+        $("#error-historylist").find("p").fadeIn(400);
+    },
+    hideErrorMsg: function() {
+        $("#error-historylist").find("p").fadeOut(400);
+    },
+    removeFavorite: function(selectedEventID) {
+        // Remove a favorite from the Favorites list, if the user unhighlights it there
+        // The event ID to delete is passed into the function
+
+        $("#target-historylist").fadeOut(400, function() {
+
+            //Find the link with the matching event ID, grab the parent .item-block and .remove() it
+            $("#target-historylist").find("a[data-event-id=" + selectedEventID + "]").parents(".item-block").remove();
+
+            // Count how many items the now has
+            var numberOfFavorites = $("#target-historylist").children(".item-block").length;
+            console.log("Number of history items left: " + numberOfFavorites);
+
+            if (numberOfFavorites === 0) {
+                // We removed all the favorites; show the "no favorites yet" message
+                ArtX.historyList.showErrorMsg();
+            }
+
+            ArtX.historyList.showList();
+
         });
     }
 };
