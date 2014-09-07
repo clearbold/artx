@@ -24409,14 +24409,12 @@ ArtX.settings = {
         var checkboxID = $(checkboxObj).prop("id");
         console.log("Value of property 'checked': " + isCheckboxChecked);
 
-        var ajaxDataToSend = {
-            _method: "PUT"
-        };
+        var ajaxDataToSend = {};
         ajaxDataToSend[checkboxID] = isCheckboxChecked;
 
         $.mobile.loading('show');
         $.ajax({
-            type: "POST",
+            type: "PUT",
             url: ArtX.var.jsonDomain + "/preferences/",
             data: ajaxDataToSend,
             beforeSend: function (request) {
