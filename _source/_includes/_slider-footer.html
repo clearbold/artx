@@ -1,0 +1,42 @@
+<div class="footer-slider-messages">
+
+    <p id="footer-slider-msg-favoritesignup" class="footer-slider-msg">You have no favorites yet &mdash; you'll need to <a href="#" class="signup-trigger">sign up</a> to save your favorite events for&nbsp;later!</p>
+
+    <p id="footer-slider-msg-nofavorites" class="footer-slider-msg">You have no favorites yet &mdash; click on a star to add an event to your favorites.</p>
+
+</div>
+
+<div id="{{ page.footerslidertype }}" class="footer-slider">
+
+    <ul id="footer-slider" class="bxslider cf">
+
+    </ul>
+
+    <a href="#" id="footer-slider-previous" class="btn btn-round footer-slider-previous" title="Previous"><i class="icon icon-rewind"></i><span class="visuallyhidden">Previous</span></a>
+    <a href="#" id="footer-slider-next" class="btn btn-round footer-slider-next" title="Next"><i class="icon icon-fast-forward"></i><span class="visuallyhidden">Next</span></a>
+   
+</div> <!-- /favorite-slider -->
+
+<script type="text/template" id="template-favoriteslider">
+    <% _.each(itemArray, function(favoriteObj, key){ %>
+
+    <li><a href="event.html" data-event-id="<%= favoriteObj.event.id %>" class="event-detail-link"><img src="<%= favoriteObj.event.image %>" alt="<%= favoriteObj.event.name %>" /></a></li>
+
+    <% }); %>
+</script>
+
+<script type="text/template" id="template-venueeventslider">
+    <% _.each(itemArray, function(eventObj, key){ %>
+
+    <li><a href="event.html" data-event-id="<%= eventObj.id %>" class="event-detail-link"><img src="<%= eventObj.image %>" alt="<%= eventObj.name %>" /></a></li>
+
+    <% }); %>
+</script>
+
+<script type="text/template" id="template-relatedinterestslider">
+    <% _.each(itemArray, function(eventObj, key){ %>
+
+    <li><a href="event.html" data-event-id="<%= eventObj.id %>" class="event-detail-link"><img src="<%= eventObj.image %>" alt="<%= eventObj.name %>" /></a></li>
+
+    <% }); %>
+</script>

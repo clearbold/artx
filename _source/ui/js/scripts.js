@@ -278,6 +278,7 @@ ArtX.discoverSlider = {
         }
     },
     populateSlider: function() {
+
         var beforeSendFunction = function() {}; // blank function for now
 
         if ($.cookie('token') !== undefined) {
@@ -285,6 +286,8 @@ ArtX.discoverSlider = {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
             };
         }
+
+        $.mobile.loading('show');
 
         $.ajax({
             type: "GET",
@@ -301,6 +304,9 @@ ArtX.discoverSlider = {
                 console.log("Error fetching Discover slider data");
                 console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
                 console.log("jqXHR response: " + jqXHR.responseText);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
             }
         });
     },
@@ -322,7 +328,7 @@ ArtX.discoverSlider = {
         ArtX.eventdetail.initLinks();
     },
     initSlider: function() {
-        console.log("More than one slide -- initializing slider functionality");
+        console.log("More than one slide -- initializing Discover slider functionality");
         var peekSlideInstance = $("#discover-slider").find("ul").bxSlider({
             oneToOneTouch:false,
             pager:false,
@@ -360,54 +366,234 @@ ArtX.footerSlider = {
     vars: {
         footSlideInstance: "",
         footSlideOptions: {
-            minSlides:3,
+            minSlides:2,
             maxSlides:4,
-            slideWidth:300,
+            slideWidth:200,
             slideMargin:5,
             oneToOneTouch:false,
             pager:false
         },
-        itemTemplate : $("#item-template").html()
+        slideTemplate: ""
     },
     init: function() {
         if ($("#footer-slider").length > 0) {
-            console.log("Initializing footer slider");
+            
+            // Set up some variables
+            if ($("#favorites-slider").length > 0) {
+                /* Favorites slider */
+                
+                ArtX.footerSlider.vars.slideTemplate = $('#template-favoriteslider').html();
 
-            var numberOfSlides = $("#footer-slider").children().length;
+            } else if ($("#venue-events-slider").length > 0) {
+                /* Related Events slider for Venue pages */
 
-            console.log("Number of footer slides: " + numberOfSlides);
+                ArtX.footerSlider.vars.slideTemplate = $('#template-venueeventslider').html();
 
-            ArtX.footerSlider.vars.footSlideInstance = $("#footer-slider").bxSlider(ArtX.footerSlider.vars.footSlideOptions);
+            } else if ($("#related-interest-slider").length > 0) {
+                /* Related Interest slider for Event Detail pages */
 
-            if (numberOfSlides > 3) {
-                $('#footer-slider-next').click(function(){
-                  ArtX.footerSlider.vars.footSlideInstance.goToNextSlide();
-                  return false;
-                });
-
-                $('#footer-slider-previous').click(function(){
-                  ArtX.footerSlider.vars.footSlideInstance.goToPrevSlide();
-                  return false;
-                });
-            } else {
-                $(".footer-slider").addClass("not-enough-slides");
+                ArtX.footerSlider.vars.slideTemplate = $('#template-relatedinterestslider').html();
             }
+
+            // Populate the slider with data
+            ArtX.footerSlider.populateSlider();
         }
     },
+    populateSlider: function() {
+    
+        var ajaxURL;
+        var beforeSendFunction = function() {}; // blank function for now
+
+        // First, which footer slider is it?
+
+        if ($("#favorites-slider").length > 0) {
+            /* Favorites slider */
+
+            console.log("Initializing Favorites slider");
+            
+            // Check if the user is logged in
+            if ($.cookie('token') !== undefined) {
+                
+                // User is logged in, so we can fetch the favorites
+
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: ArtX.var.jsonDomain + "/favorites/",
+                    beforeSend: function(request) {
+                        request.setRequestHeader("authentication_token", $.cookie('token'));
+                    },
+                    success: function( data ) {
+                        console.log("Footer slider data successfully fetched");
+                        
+                        jsonString = JSON.stringify(data.favorites);
+
+                        // Hide any existing messages
+                        $(".footer-slider-msg").hide();
+
+                        if (jsonString.length > 2) {
+                            // Favorites were returned, make the slider
+                            // console.log(jsonString);
+                            ArtX.footerSlider.buildSlider(data);
+                            ArtX.footerSlider.initSlider();
+                        } else {
+                            // No favorites returned, show the "no favorites yet" message
+                            $("#footer-slider-msg-nofavorites").fadeIn(400);
+                        }
+                    },
+                    error: function (jqXHR, error, errorThrown) {
+                        console.log("Error fetching footer slider data");
+                        console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+                        console.log("jqXHR response: " + jqXHR.responseText);
+                    }
+                });
+
+            } else {
+                
+                // User is not logged in, show the appropriate message
+                $("#footer-slider-msg-favoritesignup").fadeIn(400);
+
+            }
+        } else if ($("#venue-events-slider").length > 0) {
+            /* Related Events slider for Venue pages */
+
+            console.log("Initializing Related Events slider");
+
+        } else if ($("#related-interest-slider").length > 0) {
+            /* Related Interest slider for Event Detail pages */
+
+            console.log("Initializing Related Interest slider");
+        }
+    },
+    buildSlider: function(data) {
+
+        console.log("Building footer slider");
+        var itemArray;
+        var slideTemplate;
+
+        if ($("#favorites-slider").length > 0) {
+            /* Favorites slider */
+            
+            console.log("Initializing Favorites slider");
+            itemArray = data.favorites;  
+
+        } else if ($("#venue-events-slider").length > 0) {
+            /* Related Events slider for Venue pages */
+
+            console.log("Initializing Related Events slider");
+            itemArray = data; // TODO: Get the correct data structure
+
+        } else if ($("#related-interest-slider").length > 0) {
+            /* Related Interest slider for Event Detail pages */
+
+            console.log("Initializing Related Interest slider");
+            itemArray = data; // TODO: Get the correct data structure
+        }
+
+        $("#footer-slider").html(_.template(ArtX.footerSlider.vars.slideTemplate, {itemArray:itemArray}));
+        
+    },
+    initSlider: function() {
+        
+        ArtX.footerSlider.vars.footSlideInstance = $("#footer-slider").bxSlider(ArtX.footerSlider.vars.footSlideOptions);
+
+        ArtX.footerSlider.initSliderNav();
+
+        // Initialize event detail links
+        ArtX.eventdetail.initLinks();
+    },
+    initSliderNav: function() {
+        var numberOfSlides = $("#footer-slider").children("li:not(.bx-clone)").length;
+        console.log("Number of footer slides: " + numberOfSlides);
+
+        $('#footer-slider-next').unbind("click");
+        $('#footer-slider-previous').unbind("click");
+
+        if (numberOfSlides > 3) {
+            $('#footer-slider-next').click(function(){
+              ArtX.footerSlider.vars.footSlideInstance.goToNextSlide();
+              return false;
+            });
+
+            $('#footer-slider-previous').click(function(){
+              ArtX.footerSlider.vars.footSlideInstance.goToPrevSlide();
+              return false;
+            });
+        } else {
+            $(".footer-slider").addClass("not-enough-slides");
+        }
+    },
+    addFavorite: function(favoriteData) {
+        // Add a new favorite to the slider    
+
+        // Hide any existing messages
+        $(".footer-slider-msg").hide();
+
+        $("#footer-slider").fadeOut(400, function() {
+
+            var itemArray = favoriteData;
+
+            // Format results with underscore.js template
+            var eventHtml = _.template(ArtX.footerSlider.vars.slideTemplate, {itemArray:itemArray});
+
+            $(eventHtml).prependTo($("#footer-slider"));
+
+            ArtX.footerSlider.reload();
+
+            $("#footer-slider").fadeIn(400);
+
+        });
+    },
+    removeFavorite: function(selectedEventID) {
+        // Remove a favorite from the slider, if we're on the homepage
+        // The event ID to delete is passed into the function
+
+        $("#footer-slider").fadeOut(400, function() {
+
+            //Find the link with the matching event ID, grab the parent LI and .remove() it
+            $("#footer-slider").find("a[data-event-id=" + selectedEventID + "]").parent("li").remove();
+
+            // Count how many non-cloned children the footer slider now has
+            var numberOfSlides = $("#footer-slider").children("li:not(.bx-clone)").length;
+            console.log("Number of non-cloned children: " + numberOfSlides);
+
+            if (numberOfSlides > 0) {
+                // Reload the slider
+                ArtX.footerSlider.reload();
+
+            } else {
+                // We removed all the favorites; show the "no favorites yet" message
+                $("#footer-slider-msg-nofavorites").fadeIn(400);
+            }
+
+            $("#footer-slider").fadeIn(400);
+
+        });
+    },
     reload: function() {
-        if ($(".ui-page-active #footer-slider").length > 0) {
+        if (($("#footer-slider").length > 0) && (ArtX.footerSlider.vars.footSlideInstance !== "")) {
+            
             console.log("Reloading footer slider");
+  
             ArtX.footerSlider.vars.footSlideInstance.reloadSlider(ArtX.footerSlider.vars.footSlideOptions);
+            ArtX.footerSlider.initSliderNav();
+
         }
     },
     destroy: function() {
-        if ($(".ui-page-active #footer-slider").length > 0) {
+        if (($("#footer-slider").length > 0) && (ArtX.footerSlider.vars.footSlideInstance !== "")) {
             console.log("Destroying footer slider");
-            ArtX.footerSlider.vars.footSlideInstance.destroySlider();
-            ArtX.footerSlider.vars.footSlideInstance = "";
+            $("#footer-slider").fadeOut(400, function() {
+                ArtX.footerSlider.vars.footSlideInstance.destroySlider();
+                ArtX.footerSlider.vars.footSlideInstance = "";
+                $("#footer-slider").empty();
+
+                $("#footer-slider").fadeIn(400);
+            });
         }
     }
 };
+
 
 /* Set up Favorite stars
    ========================================================================== */
@@ -434,6 +620,9 @@ ArtX.favoriteStars = {
                 } else {
                     // The user is logged in, so we can save or delete the favorite
 
+                    // Capture the Event ID from the data-attribute on the clicked link
+                    var selectedEventID = $(this).data("event-id");
+
                     // Is the click to set a favorite, or unset a favorite?
                     var $thisStarLink = $(this);
                     var $thisStarIcon = $(this).find(".icon");
@@ -442,9 +631,6 @@ ArtX.favoriteStars = {
                         // The user wishes to make this event a favorite
 
                         $.mobile.loading('show');
-
-                        // Capture the Event ID from the data-attribute on the clicked link
-                        var selectedEventID = $(this).data("event-id");
 
                         $.ajax({
                             type: "POST",
@@ -456,10 +642,11 @@ ArtX.favoriteStars = {
                                 console.log("New favorite successfully saved");
 
                                 var selectedFavoriteID = data.favorite.id;
+                                // Swap the star
                                 ArtX.favoriteStars.highlightStar($thisStarLink, selectedFavoriteID);
-                                // If it exists on the page, reload the favorites slider after the new item has been added
-                                if ($("#favorites-slider").length > 0) {
-                                    ArtX.favoriteStars.reloadFavoritesSlider();
+                                // If it exists on the page, reload the favorites slider with the new favorite
+                                if (($("#favorites-slider").length > 0) && (ArtX.footerSlider.vars.footSlideInstance !== "")) {
+                                    ArtX.footerSlider.addFavorite(data);
                                 }
                             },
                             error: function (jqXHR, error, errorThrown) {
@@ -493,7 +680,10 @@ ArtX.favoriteStars = {
                                 console.log("Favorite successfully deleted");
                                 // Swap the star
                                 ArtX.favoriteStars.unhighlightStar($thisStarLink);
-
+                                // If it exists on the page, reload the favorites slider with the new favorite
+                                if (($("#favorites-slider").length > 0) && (ArtX.footerSlider.vars.footSlideInstance !== "")) {
+                                    ArtX.footerSlider.removeFavorite(selectedEventID);
+                                }
                             },
                             error: function (jqXHR, error, errorThrown) {
                                 console.log("Error deleting favorite");
@@ -577,34 +767,6 @@ ArtX.favoriteStars = {
 
         $thisStarIcon.removeClass("icon-star2").addClass("icon-star");
         $thisStarLink.removeAttr("data-user-favorite-id");
-    },
-    reloadFavoritesSlider : function() {
-        
-        $("#footer-slider").fadeOut(400, function() {
-
-            /*  DEV NOTE: When this is hooked up to a real JSON feed,
-                we'll feed it the URL including the eventID like this:
-
-                getterJsonUrl = "/GetEventById/" + selectedEventID;
-
-                But since this is a demo with static JSON files, we're putting in a temporary file for it here: */
-
-            getterJsonUrl = "/GetEventById/";
-
-            $.getJSON(getterJsonUrl, function(data) {
-                var jsonArray = data;
-
-                // Format results with underscore.js template
-                var eventHtml = _.template($("#item-template").html(), {jsonArray:jsonArray});
-
-                //console.log("item template html" + $("#item-template").html());
-
-                $(eventHtml).prependTo($("#footer-slider"));
-
-                ArtX.footerSlider.reload();
-
-            });
-        });
     }
 };
 
@@ -725,11 +887,10 @@ ArtX.eventdetail = {
         
     },
     initLinks : function() {
-        console.log("Setting up event detail link click events");
-
         // First, destroy any current links so that we don't get duplicates
         ArtX.eventdetail.destroyLinks();
 
+        console.log("Setting up event detail link click events");
         $(".event-detail-link").click(function() {
             console.log("Event detail link clicked!");
             ArtX.var.eventDetailID = $(this).attr("data-event-id");
