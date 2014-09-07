@@ -3149,43 +3149,69 @@ if (typeof define !== 'undefined' && define.amd) {
  * Author: Maggie Costello Wachs maggie@filamentgroup.com, Scott Jehl, scott@filamentgroup.com
  * Copyright (c) 2009 Filament Group 
  * licensed under MIT (filamentgroup.com/examples/mit-license.txt)
+ *
+ * ~'~'~'~'~
+ * Edited by Sherri Alexander (sherri@sherri-alexander.com) 9/7/2014 to allow for a "destroy" action
  * --------------------------------------------------------------------
  */
 
 (function ($) {
 
-    $.fn.customInput = function(){
-        return $(this).each(function(){ 
-            if($(this).is('[type=checkbox],[type=radio]')){
-                var input = $(this);
-                
-                // get the associated label using the input's id
-                var label = $('label[for="'+input.attr('id')+'"]');
-                
-                // wrap the input + label in a div 
-                input.add(label).wrapAll('<div class="custom-'+ input.attr('type') +'"></div>');
-                
-                // necessary for browsers that don't support the :hover pseudo class on labels
-                label.hover(
-                    function(){ $(this).addClass('hover'); },
-                    function(){ $(this).removeClass('hover'); }
-                );
-                
-                //bind custom event, trigger it, bind click,focus,blur events                   
-                input.bind('updateState', function(){   
-                    input.is(':checked') ? label.addClass('checked') : label.removeClass('checked checkedHover checkedFocus'); 
-                })
-                .trigger('updateState')
-                .click(function(){ 
-                    $('input[name="'+ $(this).attr('name') +'"]').trigger('updateState'); 
-                })
-                .focus(function(){ 
-                    label.addClass('focus'); 
-                    if(input.is(':checked')){  $(this).addClass('checkedFocus'); } 
-                })
-                .blur(function(){ label.removeClass('focus checkedFocus'); });
-            }
-        });
+    $.fn.customInput = function( action ){
+        
+        if (action === "destroy") {
+
+            // We need to undo all the bindings
+            return $(this).each(function(){ 
+                if($(this).is('[type=checkbox],[type=radio]')){
+                    var input = $(this);
+                    
+                    // get the associated label using the input's id
+                    var label = $('label[for="'+input.attr('id')+'"]');
+                    
+                    // Remove the "custom-foo" div
+                    if (input.parent().hasClass("custom-checkbox")) {
+                        input.unwrap();
+                    }
+                    
+                    // Unbind all events on the label and input
+                    label.unbind()
+                    input.unbind();
+                }
+            });
+        } else {
+            return $(this).each(function(){ 
+                if($(this).is('[type=checkbox],[type=radio]')){
+                    var input = $(this);
+                    
+                    // get the associated label using the input's id
+                    var label = $('label[for="'+input.attr('id')+'"]');
+                    
+                    // wrap the input + label in a div 
+                    input.add(label).wrapAll('<div class="custom-'+ input.attr('type') +'"></div>');
+                    
+                    // necessary for browsers that don't support the :hover pseudo class on labels
+                    label.hover(
+                        function(){ $(this).addClass('hover'); },
+                        function(){ $(this).removeClass('hover'); }
+                    );
+                    
+                    //bind custom event, trigger it, bind click,focus,blur events                   
+                    input.bind('updateState', function(){   
+                        input.is(':checked') ? label.addClass('checked') : label.removeClass('checked checkedHover checkedFocus'); 
+                    })
+                    .trigger('updateState')
+                    .click(function(){ 
+                        $('input[name="'+ $(this).attr('name') +'"]').trigger('updateState'); 
+                    })
+                    .focus(function(){ 
+                        label.addClass('focus'); 
+                        if(input.is(':checked')){  $(this).addClass('checkedFocus'); } 
+                    })
+                    .blur(function(){ label.removeClass('focus checkedFocus'); });
+                }
+            });
+        }
     };
 
 }(jQuery));
@@ -23658,6 +23684,10 @@ ArtX.favoriteStars = {
                                 if ($("#target-favoritelist").length > 0) {
                                     ArtX.favoriteList.removeFavorite(selectedEventID);
                                 }
+                                // If we're on the History page, remove the favorite from the page
+                                if ($("#target-historylist").length > 0) {
+                                    ArtX.historyList.removeFavorite(selectedEventID);
+                                }
                             },
                             error: function (jqXHR, error, errorThrown) {
                                 console.log("Error deleting favorite");
@@ -23831,20 +23861,37 @@ ArtX.signupModal = {
 
 /* Set up custom checkboxes
    ========================================================================== */
-ArtX.setupCustomCheckboxes = function(targetContainer) {
-    var $checkboxes;
+ArtX.customCheckboxes = {
+    init: function(targetContainer) {
+        var $checkboxes;
 
-    if (targetContainer !== undefined && targetContainer !== null) {
-        $checkboxes = $(targetContainer).find(".customize-checkbox");
-    } else {
-        $checkboxes = $(".customize-checkbox");
-    }
+        if (targetContainer !== undefined && targetContainer !== null) {
+            $checkboxes = $(targetContainer).find(".customize-checkbox");
+        } else {
+            $checkboxes = $(".customize-checkbox");
+        }
 
-    if ($checkboxes.length > 0) {
-        console.log("Setting up custom checkboxes");
-        $checkboxes.customInput();
+        if ($checkboxes.length > 0) {
+            console.log("Setting up custom checkboxes");
+            $checkboxes.customInput();
+        }
+    },
+    destroy: function(targetContainer) {
+        var $checkboxes;
+
+        if (targetContainer !== undefined && targetContainer !== null) {
+            $checkboxes = $(targetContainer).find(".customize-checkbox");
+        } else {
+            $checkboxes = $(".customize-checkbox");
+        }
+
+        if ($checkboxes.length > 0) {
+            console.log("Destroying custom checkboxes");
+            $checkboxes.customInput("destroy");
+        }
     }
 };
+
 
 /* Set up Event Detail
    ========================================================================== */
@@ -24358,14 +24405,16 @@ ArtX.settings = {
         var checkboxID = $(checkboxObj).prop("id");
         console.log("Value of property 'checked': " + isCheckboxChecked);
 
-        var result = { };
-        result[checkboxID] = isCheckboxChecked;
+        var ajaxDataToSend = {
+            _method: "PUT"
+        };
+        ajaxDataToSend[checkboxID] = isCheckboxChecked;
 
         $.mobile.loading('show');
         $.ajax({
-            type: "PATCH",
+            type: "POST",
             url: ArtX.var.jsonDomain + "/preferences/",
-            data: result,
+            data: ajaxDataToSend,
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
             },
@@ -24483,6 +24532,7 @@ ArtX.historyList = {
         // Initialize favorite stars and event detail links
         ArtX.favoriteStars.init();
         ArtX.eventdetail.initLinks();
+        ArtX.historyList.bindAttendanceCheckboxes();
     },
     showList: function() {
         $("#target-historylist").fadeIn(400);
@@ -24513,6 +24563,56 @@ ArtX.historyList = {
 
             ArtX.historyList.showList();
 
+        });
+    },
+    bindAttendanceCheckboxes: function() {
+        ArtX.historyList.unbindAttendanceCheckboxes();
+
+        ArtX.customCheckboxes.init("#history-form");
+
+        // Set up click event for History Attendance checkboxes
+        $("#history-form").find("input[type=checkbox]").click(function() {
+            ArtX.historyList.toggleAttended($(this));
+        });
+    },
+    unbindAttendanceCheckboxes: function() {
+        
+        ArtX.customCheckboxes.destroy("#history-form");
+
+        // Remove click event for History Attendance checkboxes
+        //$("#history-form").find("input[type=checkbox]").unbind("click");
+    },
+    toggleAttended: function(checkboxObj) {
+        console.log("Toggling 'Attended?' checkbox value");
+
+        $thisCheckbox = $(checkboxObj);
+        var isCheckboxChecked = $thisCheckbox.prop("checked");
+        console.log("Value of property 'checked': " + isCheckboxChecked);
+        var eventID = $(checkboxObj).attr("data-event-id");
+
+        var ajaxDataToSend = {
+            _method: "PUT",
+            attended: isCheckboxChecked
+        };
+
+        $.mobile.loading('show');
+        $.ajax({
+            type: "POST",
+            url: ArtX.var.jsonDomain + "/favorites/" + eventID,
+            data: ajaxDataToSend,
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function(data, textStatus, jqXHR) {
+                console.log("Attendance data successfully saved");
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error sending Attendance Ajax call");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
         });
     }
 };
@@ -24794,7 +24894,7 @@ ArtX.interests = {
         var $interestIntro = $(ArtX.interests.vars.interestIntro);
 
         console.log("Showing finished interest list");
-        ArtX.setupCustomCheckboxes("#interest-form-list");
+        ArtX.customCheckboxes.init("#interest-form-list");
 
         $.mobile.loading('hide');
         $interestIntro.fadeIn(400);
@@ -25111,15 +25211,15 @@ ArtX.startup = {
         ArtX.interests.init();
         ArtX.calendar.init();
         ArtX.settings.init();
-        ArtX.setupHistory();
         ArtX.map.init();
         ArtX.eventdetail.init();
         ArtX.venuedetail.init();
         ArtX.favoriteList.init();
+        ArtX.historyList.init();
 
         ArtX.loadMore.init();
         ArtX.footerSlider.init();
-        ArtX.setupCustomCheckboxes();
+        ArtX.customCheckboxes.init();
         ArtX.setupTextTruncation();
         ArtX.favoriteStars.init();
 
