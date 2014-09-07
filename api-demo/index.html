@@ -218,7 +218,7 @@ $.ajax({
     url: "http://artx-staging.herokuapp.com/favorites/history",
     data: {
         page: 1,
-        per_page: 1
+        per_page: 5
     },
     beforeSend: function (request) {
         request.setRequestHeader("authentication_token", $.cookie('token'));
@@ -576,7 +576,7 @@ console.log(value.name);
             url: "http://artx-staging.herokuapp.com/favorites/history",
             data: {
                 page: 1,
-                per_page: 1
+                per_page: 5
             },
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", $.cookie('token'));

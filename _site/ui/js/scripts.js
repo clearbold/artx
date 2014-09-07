@@ -1103,6 +1103,10 @@ ArtX.calendar = {
                                 },
                                 success: function( data ){
                                     console.log("Events for " + chosenMonth + " " + chosenYear + " retrieved successfully");
+
+                                    //console.log(JSON.stringify(data));
+                                    //console.log("Number of events returned: " + data.events.length);
+
                                     newEventArray = data.events;
                                     ArtX.el.eventCalendar.setEvents(newEventArray);
                                 },
@@ -1539,6 +1543,7 @@ ArtX.historyList = {
         $(historyHtml).appendTo($("#target-historylist"));
 
         ArtX.historyList.addEventHandlers();
+        ArtX.historyList.syncAttended();
     },
     addEventHandlers: function() {
         // Initialize favorite stars and event detail links
@@ -1547,7 +1552,10 @@ ArtX.historyList = {
         ArtX.historyList.bindAttendanceCheckboxes();
     },
     showList: function() {
-        $("#target-historylist").fadeIn(400);
+        $("#target-historylist").fadeIn(400, function() {
+            // Re-do truncation once fade is complete
+            ArtX.setupTextTruncation();
+        });
     },
     showErrorMsg: function() {
         $("#error-historylist").find("p").fadeIn(400);
@@ -1603,13 +1611,12 @@ ArtX.historyList = {
         var eventID = $(checkboxObj).attr("data-event-id");
 
         var ajaxDataToSend = {
-            _method: "PUT",
             attended: isCheckboxChecked
         };
 
         $.mobile.loading('show');
         $.ajax({
-            type: "POST",
+            type: "PUT",
             url: ArtX.var.jsonDomain + "/favorites/" + eventID,
             data: ajaxDataToSend,
             beforeSend: function (request) {
@@ -1626,7 +1633,74 @@ ArtX.historyList = {
                 $.mobile.loading('hide');
             }
         });
-    }
+    },
+    syncAttended : function() {
+        /* This function checks all attended checkboxes currently present in the page, and compares them against the current user's saved favorites (if logged in).  If there's a match, that star will be highlighted. */
+
+        if (($(".favorite-star").length > 0) && ($.cookie('token') !== undefined)) {
+            console.log("Syncing stars with user's favorites");
+
+            // Fetch the list of user's history to check against.
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: ArtX.var.jsonDomain + "/favorites/history/",
+                beforeSend: function (request) {
+                    request.setRequestHeader("authentication_token", $.cookie('token'));
+                },
+                success: function( data ) {
+                    console.log("Successfully fetched History data for syncing");
+                    
+                    jsonDataString = JSON.stringify(data.favorites);
+
+                    //console.log(jsonDataString);
+
+                    if (jsonDataString.length > 2) {
+                        // There are history items, so we may need to sync them up
+
+                        var userHistoryItems = data.favorites;
+
+                        // Iterate through each history item
+                        $.each(userHistoryItems, function(i, value) {
+                            var thisItem = userHistoryItems[i];
+                            var thisEventAttended;
+                            if (thisItem.attended === null) {
+                                thisEventAttended = false;
+                            } else {
+                                thisEventAttended = true;
+                            }
+                            console.log("This event attended? " + thisEventAttended);
+                            /*
+                            var userFavoriteID = userFavorite.id;
+
+                            // Then let's compare that favorite ID to the corresponding ones on the page
+                            $(".favorite-star").each(function() {
+                                var pageFavoriteEventID = $(this).attr("data-event-id");
+
+                                // If they match, highlight the star
+                                if (pageFavoriteEventID == userFavoriteEventID) {
+                                    ArtX.favoriteStars.highlightStar($(this), userFavoriteID);
+                                }
+                            });
+                            */
+                        });
+
+                        
+
+                    } 
+                },
+                error: function (jqXHR, error, errorThrown) {
+                    console.log("Error fetching History data");
+                    ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                },
+                complete: function() {
+                    $.mobile.loading('hide');
+                }
+            });
+
+            
+        }
+    },
 };
 
 

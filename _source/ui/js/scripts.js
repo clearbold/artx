@@ -769,7 +769,7 @@ ArtX.favoriteStars = {
         var $thisStarLink = $(starLinkObj);
         var $thisStarIcon = $thisStarLink.find(".icon");
 
-        console.log("User favorite ID: " + userFavoriteID);
+        // console.log("User favorite ID: " + userFavoriteID);
 
         // Swap the star icon
         $thisStarIcon.removeClass("icon-star").addClass("icon-star2");
@@ -1103,6 +1103,10 @@ ArtX.calendar = {
                                 },
                                 success: function( data ){
                                     console.log("Events for " + chosenMonth + " " + chosenYear + " retrieved successfully");
+
+                                    //console.log(JSON.stringify(data));
+                                    //console.log("Number of events returned: " + data.events.length);
+
                                     newEventArray = data.events;
                                     ArtX.el.eventCalendar.setEvents(newEventArray);
                                 },
@@ -1508,7 +1512,6 @@ ArtX.historyList = {
 
                     $("#target-historylist").fadeOut(400, function() {
                         ArtX.historyList.buildList(data);
-                        ArtX.historyList.showList();
                     });
 
                 } else {
@@ -1544,10 +1547,13 @@ ArtX.historyList = {
         // Initialize favorite stars and event detail links
         ArtX.favoriteStars.init();
         ArtX.eventdetail.initLinks();
-        ArtX.historyList.bindAttendanceCheckboxes();
+        ArtX.historyList.syncAttended();
     },
     showList: function() {
-        $("#target-historylist").fadeIn(400);
+        $("#target-historylist").fadeIn(400, function() {
+            // Re-do truncation once fade is complete
+            ArtX.setupTextTruncation();
+        });
     },
     showErrorMsg: function() {
         $("#error-historylist").find("p").fadeIn(400);
@@ -1592,7 +1598,7 @@ ArtX.historyList = {
         ArtX.customCheckboxes.destroy("#history-form");
 
         // Remove click event for History Attendance checkboxes
-        //$("#history-form").find("input[type=checkbox]").unbind("click");
+        $("#history-form").find("input[type=checkbox]").unbind("click");
     },
     toggleAttended: function(checkboxObj) {
         console.log("Toggling 'Attended?' checkbox value");
@@ -1601,16 +1607,16 @@ ArtX.historyList = {
         var isCheckboxChecked = $thisCheckbox.prop("checked");
         console.log("Value of property 'checked': " + isCheckboxChecked);
         var eventID = $(checkboxObj).attr("data-event-id");
+        var userFavoriteID = $(checkboxObj).attr("data-user-favorite-id");
 
         var ajaxDataToSend = {
-            _method: "PUT",
             attended: isCheckboxChecked
         };
 
         $.mobile.loading('show');
         $.ajax({
-            type: "POST",
-            url: ArtX.var.jsonDomain + "/favorites/" + eventID,
+            type: "PUT",
+            url: ArtX.var.jsonDomain + "/favorites/" + userFavoriteID,
             data: ajaxDataToSend,
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
@@ -1626,7 +1632,76 @@ ArtX.historyList = {
                 $.mobile.loading('hide');
             }
         });
-    }
+    },
+    syncAttended : function() {
+        /* This function checks all attended checkboxes currently present in the page, and compares them against the current user's saved favorites (if logged in).  If there's a match, that box will be checked. */
+
+        if (($("#history-form").find("input[type=checkbox]").length > 0) && ($.cookie('token') !== undefined)) {
+            console.log("Syncing attendance checkboxes with user's attended records");
+
+            // Fetch the list of user's history to check against.
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: ArtX.var.jsonDomain + "/favorites/history/",
+                beforeSend: function (request) {
+                    request.setRequestHeader("authentication_token", $.cookie('token'));
+                },
+                success: function( data ) {
+                    console.log("Successfully fetched History data for syncing");
+                    
+                    jsonDataString = JSON.stringify(data.favorites);
+
+                    //console.log(jsonDataString);
+
+                    if (jsonDataString.length > 2) {
+                        // There are history items, so we may need to sync them up
+
+                        var userHistoryItems = data.favorites;
+
+                        // Iterate through each history item
+                        $.each(userHistoryItems, function(i, value) {
+                            var thisItem = userHistoryItems[i];
+                            var thisEventAttended;
+                            
+                            if (thisItem.attended === true) {
+                                thisEventAttended = true;
+                            } else {
+                                thisEventAttended = false;
+                            }
+                            //console.log("This event attended? " + thisEventAttended);
+
+                            if (thisEventAttended) {
+                                var userFavoriteID = thisItem.id;
+                                //console.log("User favorite ID: " + userFavoriteID);
+
+                                // Toggle the checkbox with the appropriate data attribute
+                                var $thisCheckbox = $("#history-form").find("input[data-user-favorite-id=" + userFavoriteID + "]");
+
+                                if (!$thisCheckbox.attr("checked")) {
+                                    $thisCheckbox.trigger("click");
+                                }
+                            }
+
+                        });
+
+                        ArtX.historyList.bindAttendanceCheckboxes();
+
+                    } 
+                },
+                error: function (jqXHR, error, errorThrown) {
+                    console.log("Error fetching History data");
+                    ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                },
+                complete: function() {
+                    ArtX.historyList.showList();
+                    $.mobile.loading('hide');
+                }
+            });
+
+            
+        }
+    },
 };
 
 

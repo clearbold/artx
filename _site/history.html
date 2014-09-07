@@ -107,7 +107,7 @@
                         <p class="item-venue"><%= favoriteObj.event.location.name %></p>
 
                         <label for="attended-<%= favoriteObj.event.id %>">Did you attend?</label>
-                        <input type="checkbox" name="attended-<%= favoriteObj.event.id %>" id="attended-<%= favoriteObj.event.id %>" value="attended" class="customize-checkbox" data-role="none" data-event-id="<%= favoriteObj.event.id %>" />
+                        <input type="checkbox" name="attended-<%= favoriteObj.event.id %>" id="attended-<%= favoriteObj.event.id %>" value="attended" class="customize-checkbox" data-role="none" data-event-id="<%= favoriteObj.event.id %>" data-user-favorite-id="<%= favoriteObj.id %>" />
 
                         <a href="#" class="favorite-star item-symbol" data-event-id="<%= favoriteObj.event.id %>" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
                     </div>
