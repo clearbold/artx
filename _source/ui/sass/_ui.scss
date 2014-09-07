@@ -514,6 +514,11 @@ button, .ui-page-theme-a button.ui-btn {
         line-height:33px;
         text-align:left;
         margin-bottom:0;
+        
+        &.related,
+        &.if-not-loggedin {
+            padding:7px $spacing-unit;
+        }
 
         a {
             display:block;
@@ -529,7 +534,6 @@ button, .ui-page-theme-a button.ui-btn {
 
     h2.related {
         float:left;
-        padding:7px $spacing-unit;
 
         a {
             display:inline;
@@ -1186,6 +1190,7 @@ div#event-map {
     }
 }
 
+/* Toggling some logged-in/logged-out differences */
 .is-logged-in .menu-panel ul {
     .menu-settings,
     .menu-interests,
@@ -1193,6 +1198,21 @@ div#event-map {
         display:block;
     }
     .menu-signin {
+        display:none;
+    }
+}
+
+.if-loggedin {
+    display:none;
+    
+    .is-logged-in & {
+        display:block;
+    }
+}
+.if-not-loggedin {
+    display:block;
+    
+    .is-logged-in & {
         display:none;
     }
 }

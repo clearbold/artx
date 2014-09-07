@@ -509,7 +509,7 @@ ArtX.footerSlider = {
         $('#footer-slider-next').unbind("click");
         $('#footer-slider-previous').unbind("click");
 
-        if (numberOfSlides > 3) {
+        if (numberOfSlides > 2) {
             $('#footer-slider-next').click(function(){
               ArtX.footerSlider.vars.footSlideInstance.goToNextSlide();
               return false;
@@ -527,23 +527,25 @@ ArtX.footerSlider = {
         // Add a new favorite to the slider 
         console.log("Adding a new favorite to the footer slider");   
 
-        // Hide any existing messages
-        $(".footer-slider-msg").hide();
-
         $("#footer-slider").fadeOut(400, function() {
 
-            var itemArray = favoriteData;
+            if (ArtX.footerSlider.vars.footSlideInstance === "") {
+                // There were no favorites before, so we need to initialize the slider
+                
+                $(".footer-slider-msg").hide();
+                ArtX.footerSlider.init();
 
-            // Format results with underscore.js template
-            var eventHtml = _.template(ArtX.footerSlider.vars.slideTemplate, {itemArray:itemArray});
-
-            $(eventHtml).prependTo($("#footer-slider"));
-
-            ArtX.footerSlider.reload();
+            } else {
+                // Slider is already initialized, add our new favorite to the existing slider
+                
+                var itemArray = favoriteData;
+                var eventHtml = _.template(ArtX.footerSlider.vars.slideTemplate, {itemArray:itemArray});
+                $(eventHtml).prependTo($("#footer-slider"));
+                ArtX.footerSlider.reload();
+            }
 
             $("#footer-slider").fadeIn(400);
-
-        });
+        });     
     },
     removeFavorite: function(selectedEventID) {
         // Remove a favorite from the slider, if we're on the homepage
@@ -646,7 +648,8 @@ ArtX.favoriteStars = {
                                 // Swap the star
                                 ArtX.favoriteStars.highlightStar($thisStarLink, selectedFavoriteID);
                                 // If it exists on the page, reload the favorites slider with the new favorite
-                                if (($("#favorites-slider").length > 0)) {
+                                //if (($("#favorites-slider").length > 0) && (ArtX.footerSlider.vars.footSlideInstance !== "")) {
+                                if ($("#favorites-slider").length > 0) {
                                     ArtX.footerSlider.addFavorite(data);
                                 }
                             },
@@ -681,8 +684,8 @@ ArtX.favoriteStars = {
                                 console.log("Favorite successfully deleted");
                                 // Swap the star
                                 ArtX.favoriteStars.unhighlightStar($thisStarLink);
-                                // If it exists on the page, reload the favorites slider with the new favorite
-                                if (($("#favorites-slider").length > 0) && (ArtX.footerSlider.vars.footSlideInstance !== "")) {
+                                // If favorites slider exists, remove favorite from slider
+                                if (($("#favorites-slider").length > 0)) {
                                     ArtX.footerSlider.removeFavorite(selectedEventID);
                                 }
                                 // If we're on the Favorites page, remove the favorite from the page
