@@ -23471,7 +23471,7 @@ ArtX.footerSlider = {
         $('#footer-slider-next').unbind("click");
         $('#footer-slider-previous').unbind("click");
 
-        if (numberOfSlides > 3) {
+        if (numberOfSlides > 2) {
             $('#footer-slider-next').click(function(){
               ArtX.footerSlider.vars.footSlideInstance.goToNextSlide();
               return false;
@@ -23486,25 +23486,28 @@ ArtX.footerSlider = {
         }
     },
     addFavorite: function(favoriteData) {
-        // Add a new favorite to the slider    
-
-        // Hide any existing messages
-        $(".footer-slider-msg").hide();
+        // Add a new favorite to the slider 
+        console.log("Adding a new favorite to the footer slider");   
 
         $("#footer-slider").fadeOut(400, function() {
 
-            var itemArray = favoriteData;
+            if (ArtX.footerSlider.vars.footSlideInstance === "") {
+                // There were no favorites before, so we need to initialize the slider
+                
+                $(".footer-slider-msg").hide();
+                ArtX.footerSlider.init();
 
-            // Format results with underscore.js template
-            var eventHtml = _.template(ArtX.footerSlider.vars.slideTemplate, {itemArray:itemArray});
-
-            $(eventHtml).prependTo($("#footer-slider"));
-
-            ArtX.footerSlider.reload();
+            } else {
+                // Slider is already initialized, add our new favorite to the existing slider
+                
+                var itemArray = favoriteData;
+                var eventHtml = _.template(ArtX.footerSlider.vars.slideTemplate, {itemArray:itemArray});
+                $(eventHtml).prependTo($("#footer-slider"));
+                ArtX.footerSlider.reload();
+            }
 
             $("#footer-slider").fadeIn(400);
-
-        });
+        });     
     },
     removeFavorite: function(selectedEventID) {
         // Remove a favorite from the slider, if we're on the homepage
@@ -23607,7 +23610,8 @@ ArtX.favoriteStars = {
                                 // Swap the star
                                 ArtX.favoriteStars.highlightStar($thisStarLink, selectedFavoriteID);
                                 // If it exists on the page, reload the favorites slider with the new favorite
-                                if (($("#favorites-slider").length > 0) && (ArtX.footerSlider.vars.footSlideInstance !== "")) {
+                                //if (($("#favorites-slider").length > 0) && (ArtX.footerSlider.vars.footSlideInstance !== "")) {
+                                if ($("#favorites-slider").length > 0) {
                                     ArtX.footerSlider.addFavorite(data);
                                 }
                             },
@@ -23642,9 +23646,13 @@ ArtX.favoriteStars = {
                                 console.log("Favorite successfully deleted");
                                 // Swap the star
                                 ArtX.favoriteStars.unhighlightStar($thisStarLink);
-                                // If it exists on the page, reload the favorites slider with the new favorite
-                                if (($("#favorites-slider").length > 0) && (ArtX.footerSlider.vars.footSlideInstance !== "")) {
+                                // If favorites slider exists, remove favorite from slider
+                                if (($("#favorites-slider").length > 0)) {
                                     ArtX.footerSlider.removeFavorite(selectedEventID);
+                                }
+                                // If we're on the Favorites page, remove the favorite from the page
+                                if ($("#target-favoritelist").length > 0) {
+                                    ArtX.favoriteList.removeFavorite(selectedEventID);
                                 }
                             },
                             error: function (jqXHR, error, errorThrown) {
@@ -23877,10 +23885,8 @@ ArtX.eventdetail = {
                 
                 //console.log(JSON.stringify(data));
                 var eventArray = data;
-                //var relatedArray = eventArray.event.related;
 
                 ArtX.eventdetail.displayPage(eventArray);
-                //ArtX.eventdetail.displayRelatedSlider(eventArray);
 
             },
             error: function (jqXHR, error, errorThrown) {
@@ -23902,9 +23908,6 @@ ArtX.eventdetail = {
             ArtX.venuedetail.initLinks();
             $("#target-eventdetail").fadeIn(400);
         });
-    },
-    displayRelatedSlider: function(jsonData) {
-        console.log("Displaying related items slider -- TBD");
     }
 };
 
@@ -23945,10 +23948,8 @@ ArtX.venuedetail = {
                 
                 //console.log(JSON.stringify(data));
                 var venueArray = data;
-                //var relatedArray = venueArray.event.related;  TODO: verify object structure
 
                 ArtX.venuedetail.displayPage(venueArray);
-                //ArtX.venuedetail.displayRelatedSlider(venueArray);
 
             },
             error: function (jqXHR, error, errorThrown) {
@@ -23968,9 +23969,6 @@ ArtX.venuedetail = {
             $("#target-venuedetail").html(_.template(venueTemplate, {venueArray:venueArray}));
             $("#target-venuedetail").fadeIn(400);
         });
-    },
-    displayRelatedSlider: function(jsonData) {
-        console.log("Displaying related items slider -- TBD");
     }
 };
 
@@ -24441,6 +24439,110 @@ ArtX.setupHistory = function() {
         });
     }
 };
+
+
+/* Setting up Favorites list functionality
+   ========================================================================== */
+ArtX.favoriteList = {
+    init: function() {
+        if ($("#target-favoritelist").length > 0) {
+            console.log("Initializing Favorites list");
+            ArtX.favoriteList.fetchData();
+        }
+    },
+    fetchData: function() {
+        $.mobile.loading('show');
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: ArtX.var.jsonDomain + "/favorites/",
+            beforeSend: function (request) {
+                request.setRequestHeader("authentication_token", $.cookie('token'));
+            },
+            success: function( data ) {
+                console.log("Successfully fetched Favorites data");
+                
+                jsonDataString = JSON.stringify(data.favorites);
+
+                //console.log(jsonDataString);
+
+                if (jsonDataString.length > 2) {
+                    // There are favorites, build the list
+                    
+                    ArtX.favoriteList.hideErrorMsg();
+
+                    $("#target-favoritelist").fadeOut(400, function() {
+                        ArtX.favoriteList.buildList(data);
+                        ArtX.favoriteList.showList();
+                    });
+
+                } else {
+                    // Empty set, no favorites yet
+                    ArtX.favoriteList.showErrorMsg();
+                }
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error fetching Favorites data");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
+        });
+    },
+    buildList: function(data) {
+        console.log("Building favorites list");
+        var jsonArray = data.favorites;
+
+        console.log(JSON.stringify(jsonArray));
+
+        var itemTemplate = $("#template-favoritelist").html();
+        var favoritesHtml;
+
+        favoritesHtml = _.template(itemTemplate, {jsonArray:jsonArray});
+
+        $(favoritesHtml).appendTo($("#target-favoritelist"));
+
+        ArtX.favoriteList.addEventHandlers();
+    },
+    addEventHandlers: function() {
+        // Initialize favorite stars and event detail links
+        ArtX.favoriteStars.init();
+        ArtX.eventdetail.initLinks();
+    },
+    showList: function() {
+        $("#target-favoritelist").fadeIn(400);
+    },
+    showErrorMsg: function() {
+        $("#error-favoritelist").find("p").fadeIn(400);
+    },
+    hideErrorMsg: function() {
+        $("#error-favoritelist").find("p").fadeOut(400);
+    },
+    removeFavorite: function(selectedEventID) {
+        // Remove a favorite from the Favorites list, if the user unhighlights it there
+        // The event ID to delete is passed into the function
+
+        $("#target-favoritelist").fadeOut(400, function() {
+
+            //Find the link with the matching event ID, grab the parent .item-block and .remove() it
+            $("#target-favoritelist").find("a[data-event-id=" + selectedEventID + "]").parents(".item-block").remove();
+
+            // Count how many items the now has
+            var numberOfFavorites = $("#target-favoritelist").children(".item-block").length;
+            console.log("Number of favorites left: " + numberOfFavorites);
+
+            if (numberOfFavorites === 0) {
+                // We removed all the favorites; show the "no favorites yet" message
+                ArtX.favoriteList.showErrorMsg();
+            }
+
+            ArtX.favoriteList.showList();
+
+        });
+    }
+};
+
 
 /* Setting up Interests functionality
    ========================================================================== */
@@ -24936,6 +25038,7 @@ ArtX.startup = {
         ArtX.map.init();
         ArtX.eventdetail.init();
         ArtX.venuedetail.init();
+        ArtX.favoriteList.init();
 
         ArtX.loadMore.init();
         ArtX.footerSlider.init();

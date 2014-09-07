@@ -780,6 +780,7 @@ div#event-map {
     }
     .item-venue {
         @include font-size(12px, false);
+        margin-bottom:.25em;
 
         @include mq($lap-start) {
             @include font-size(14px, false);
@@ -947,7 +948,6 @@ div#event-map {
     margin:0 (-$spacing-unit) -7px;
 
     p {
-        display:none;
         min-height:100px;
         max-width:640px;
         margin:0 auto;
@@ -956,6 +956,11 @@ div#event-map {
         .lt-ie9 & {
             min-height:(100px - ($spacing-unit*2));
         }
+    }
+}
+.error-messages {
+    p {
+        display:none;
     }
 }
 .footer-slider {

@@ -119,7 +119,7 @@
                 <h2 class="h3 related">Events &amp; Exhibitions</h2>
             </div>
 
-            <div class="footer-slider-messages">
+            <div class="footer-slider-messages error-messages">
 
     <p id="footer-slider-msg-favoritesignup" class="footer-slider-msg">You have no favorites yet &mdash; you'll need to <a href="#" class="signup-trigger">sign up</a> to save your favorite events for&nbsp;later!</p>
 
@@ -141,7 +141,7 @@
 <script type="text/template" id="template-favoriteslider">
     <% _.each(itemArray, function(favoriteObj, key){ %>
 
-    <li><a href="event.html" data-event-id="<%= favoriteObj.event.id %>" class="event-detail-link"><img src="<%= favoriteObj.event.image %>" alt="<%= favoriteObj.event.name %>" /></a></li>
+    <li><a href="event.html" data-event-id="<%= favoriteObj.event.id %>" class="event-detail-link"><img src="<%= favoriteObj.event.image %>" alt="<%= favoriteObj.event.name %>" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" /></a></li>
 
     <% }); %>
 </script>
