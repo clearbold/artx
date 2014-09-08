@@ -18,13 +18,13 @@ footerslidertype: venue-events-slider
             <% var fullURL = venueObj.url; %>
             <% var trimmedURL = fullURL.replace(/.*?:\/\//g, ""); %>
 
-            <div class="item-block item-detail venue-detail">
+            <div class="item-block item-detail venue-detail" data-venue-id="<%= venueObj.id %>">
                 <div class="item-image">
                     <img src="<%= venueObj.image %>" alt="" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" />
                 </div>
                 <div class="item-info">
                     <h2 class="item-title"><%= venueObj.name %></h2>
-                    <p class="item-location"><a href="bydate.html" data-venue-id="<%= venueObj.id %>"><span class="item-symbol"><i class="icon icon-location"></i></span><%= venueObj.address %></a></p>
+                    <p class="item-location"><a href="bylocation.html" data-venue-id="<%= venueObj.id %>"><span class="item-symbol"><i class="icon icon-location"></i></span><%= venueObj.address %></a></p>
                     <% /* Originally the address was only showing the street address, rather than the whole thing */ %>
                     <dl>
                         <dt>Hours:</dt>

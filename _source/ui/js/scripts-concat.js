@@ -23290,7 +23290,6 @@ ArtX.discoverSlider = {
                 //console.log(JSON.stringify(data.events));
                 console.log("Number of discover events fetched: " + data.events.length);
                 ArtX.discoverSlider.buildSlider(data);
-
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Error fetching Discover slider data");
@@ -23318,6 +23317,8 @@ ArtX.discoverSlider = {
         // Initialize favorite stars and event detail links
         ArtX.favoriteStars.init();
         ArtX.eventdetail.initLinks();
+
+        ArtX.footerSlider.init();
     },
     initSlider: function() {
         console.log("More than one slide -- initializing Discover slider functionality");
@@ -23418,7 +23419,7 @@ ArtX.footerSlider = {
                     success: function( data ) {
                         console.log("Footer slider data successfully fetched");
                         
-                        jsonString = JSON.stringify(data.favorites);
+                        var jsonString = JSON.stringify(data.favorites);
 
                         // Hide any existing messages
                         $(".footer-slider-msg").hide();
@@ -23451,6 +23452,39 @@ ArtX.footerSlider = {
 
             console.log("Initializing Related Events slider");
 
+            // Get the Venue ID from the .venue-detail div
+            var venueID = $(".venue-detail").attr("data-venue-id");
+            console.log("Venue ID: " + venueID);
+
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: ArtX.var.jsonDomain + "/locations/" + venueID + "/events",
+                success: function( data ) {
+                    console.log("Footer slider data successfully fetched");
+                    
+                    var jsonString = JSON.stringify(data.events);
+
+                    // Hide any existing messages
+                    $(".footer-slider-msg").hide();
+
+                    if (jsonString.length > 2) {
+                        // Events were returned, make the slider
+                        // console.log(jsonString);
+                        ArtX.footerSlider.buildSlider(data);
+                        ArtX.footerSlider.initSlider();
+                    } else {
+                        // No events returned, show the "no events" message
+                        $("#footer-slider-msg-noevents").fadeIn(400);
+                    }
+                },
+                error: function (jqXHR, error, errorThrown) {
+                    console.log("Error fetching footer slider data");
+                    console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+                    console.log("jqXHR response: " + jqXHR.responseText);
+                }
+            });
+
         } else if ($("#related-interest-slider").length > 0) {
             /* Related Interest slider for Event Detail pages */
 
@@ -23473,7 +23507,7 @@ ArtX.footerSlider = {
             /* Related Events slider for Venue pages */
 
             console.log("Initializing Related Events slider");
-            itemArray = data; // TODO: Get the correct data structure
+            itemArray = data.events;
 
         } else if ($("#related-interest-slider").length > 0) {
             /* Related Interest slider for Event Detail pages */
@@ -23938,7 +23972,6 @@ ArtX.eventdetail = {
                 var eventArray = data;
 
                 ArtX.eventdetail.displayPage(eventArray);
-
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Event detail data fetch failed");
@@ -23958,6 +23991,8 @@ ArtX.eventdetail = {
             ArtX.favoriteStars.init();
             ArtX.venuedetail.initLinks();
             $("#target-eventdetail").fadeIn(400);
+
+            ArtX.footerSlider.init();
         });
     }
 };
@@ -23999,9 +24034,7 @@ ArtX.venuedetail = {
                 
                 //console.log(JSON.stringify(data));
                 var venueArray = data;
-
                 ArtX.venuedetail.displayPage(venueArray);
-
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Venue detail data fetch failed");
@@ -24019,6 +24052,9 @@ ArtX.venuedetail = {
         $("#target-venuedetail").fadeOut(400, function() {
             $("#target-venuedetail").html(_.template(venueTemplate, {venueArray:venueArray}));
             $("#target-venuedetail").fadeIn(400);
+            console.log("Venue page content finished displaying");
+
+            ArtX.footerSlider.init();
         });
     }
 };
@@ -25291,7 +25327,6 @@ ArtX.startup = {
         ArtX.historyList.init();
 
         ArtX.loadMore.init();
-        ArtX.footerSlider.init();
         ArtX.customCheckboxes.init();
         ArtX.setupTextTruncation();
         ArtX.favoriteStars.init();

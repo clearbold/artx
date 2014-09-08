@@ -302,7 +302,6 @@ ArtX.discoverSlider = {
                 //console.log(JSON.stringify(data.events));
                 console.log("Number of discover events fetched: " + data.events.length);
                 ArtX.discoverSlider.buildSlider(data);
-
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Error fetching Discover slider data");
@@ -330,6 +329,8 @@ ArtX.discoverSlider = {
         // Initialize favorite stars and event detail links
         ArtX.favoriteStars.init();
         ArtX.eventdetail.initLinks();
+
+        ArtX.footerSlider.init();
     },
     initSlider: function() {
         console.log("More than one slide -- initializing Discover slider functionality");
@@ -430,7 +431,7 @@ ArtX.footerSlider = {
                     success: function( data ) {
                         console.log("Footer slider data successfully fetched");
                         
-                        jsonString = JSON.stringify(data.favorites);
+                        var jsonString = JSON.stringify(data.favorites);
 
                         // Hide any existing messages
                         $(".footer-slider-msg").hide();
@@ -463,6 +464,39 @@ ArtX.footerSlider = {
 
             console.log("Initializing Related Events slider");
 
+            // Get the Venue ID from the .venue-detail div
+            var venueID = $(".venue-detail").attr("data-venue-id");
+            console.log("Venue ID: " + venueID);
+
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: ArtX.var.jsonDomain + "/locations/" + venueID + "/events",
+                success: function( data ) {
+                    console.log("Footer slider data successfully fetched");
+                    
+                    var jsonString = JSON.stringify(data.events);
+
+                    // Hide any existing messages
+                    $(".footer-slider-msg").hide();
+
+                    if (jsonString.length > 2) {
+                        // Events were returned, make the slider
+                        // console.log(jsonString);
+                        ArtX.footerSlider.buildSlider(data);
+                        ArtX.footerSlider.initSlider();
+                    } else {
+                        // No events returned, show the "no events" message
+                        $("#footer-slider-msg-noevents").fadeIn(400);
+                    }
+                },
+                error: function (jqXHR, error, errorThrown) {
+                    console.log("Error fetching footer slider data");
+                    console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+                    console.log("jqXHR response: " + jqXHR.responseText);
+                }
+            });
+
         } else if ($("#related-interest-slider").length > 0) {
             /* Related Interest slider for Event Detail pages */
 
@@ -485,7 +519,7 @@ ArtX.footerSlider = {
             /* Related Events slider for Venue pages */
 
             console.log("Initializing Related Events slider");
-            itemArray = data; // TODO: Get the correct data structure
+            itemArray = data.events;
 
         } else if ($("#related-interest-slider").length > 0) {
             /* Related Interest slider for Event Detail pages */
@@ -769,7 +803,7 @@ ArtX.favoriteStars = {
         var $thisStarLink = $(starLinkObj);
         var $thisStarIcon = $thisStarLink.find(".icon");
 
-        console.log("User favorite ID: " + userFavoriteID);
+        // console.log("User favorite ID: " + userFavoriteID);
 
         // Swap the star icon
         $thisStarIcon.removeClass("icon-star").addClass("icon-star2");
@@ -950,7 +984,6 @@ ArtX.eventdetail = {
                 var eventArray = data;
 
                 ArtX.eventdetail.displayPage(eventArray);
-
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Event detail data fetch failed");
@@ -970,6 +1003,8 @@ ArtX.eventdetail = {
             ArtX.favoriteStars.init();
             ArtX.venuedetail.initLinks();
             $("#target-eventdetail").fadeIn(400);
+
+            ArtX.footerSlider.init();
         });
     }
 };
@@ -1011,9 +1046,7 @@ ArtX.venuedetail = {
                 
                 //console.log(JSON.stringify(data));
                 var venueArray = data;
-
                 ArtX.venuedetail.displayPage(venueArray);
-
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Venue detail data fetch failed");
@@ -1031,6 +1064,9 @@ ArtX.venuedetail = {
         $("#target-venuedetail").fadeOut(400, function() {
             $("#target-venuedetail").html(_.template(venueTemplate, {venueArray:venueArray}));
             $("#target-venuedetail").fadeIn(400);
+            console.log("Venue page content finished displaying");
+
+            ArtX.footerSlider.init();
         });
     }
 };
@@ -1421,14 +1457,12 @@ ArtX.settings = {
         var checkboxID = $(checkboxObj).prop("id");
         console.log("Value of property 'checked': " + isCheckboxChecked);
 
-        var ajaxDataToSend = {
-            _method: "PUT"
-        };
+        var ajaxDataToSend = {};
         ajaxDataToSend[checkboxID] = isCheckboxChecked;
 
         $.mobile.loading('show');
         $.ajax({
-            type: "POST",
+            type: "PUT",
             url: ArtX.var.jsonDomain + "/preferences/",
             data: ajaxDataToSend,
             beforeSend: function (request) {
@@ -1512,7 +1546,6 @@ ArtX.historyList = {
 
                     $("#target-historylist").fadeOut(400, function() {
                         ArtX.historyList.buildList(data);
-                        ArtX.historyList.showList();
                     });
 
                 } else {
@@ -1543,13 +1576,12 @@ ArtX.historyList = {
         $(historyHtml).appendTo($("#target-historylist"));
 
         ArtX.historyList.addEventHandlers();
-        ArtX.historyList.syncAttended();
     },
     addEventHandlers: function() {
         // Initialize favorite stars and event detail links
         ArtX.favoriteStars.init();
         ArtX.eventdetail.initLinks();
-        ArtX.historyList.bindAttendanceCheckboxes();
+        ArtX.historyList.syncAttended();
     },
     showList: function() {
         $("#target-historylist").fadeIn(400, function() {
@@ -1600,7 +1632,7 @@ ArtX.historyList = {
         ArtX.customCheckboxes.destroy("#history-form");
 
         // Remove click event for History Attendance checkboxes
-        //$("#history-form").find("input[type=checkbox]").unbind("click");
+        $("#history-form").find("input[type=checkbox]").unbind("click");
     },
     toggleAttended: function(checkboxObj) {
         console.log("Toggling 'Attended?' checkbox value");
@@ -1609,6 +1641,7 @@ ArtX.historyList = {
         var isCheckboxChecked = $thisCheckbox.prop("checked");
         console.log("Value of property 'checked': " + isCheckboxChecked);
         var eventID = $(checkboxObj).attr("data-event-id");
+        var userFavoriteID = $(checkboxObj).attr("data-user-favorite-id");
 
         var ajaxDataToSend = {
             attended: isCheckboxChecked
@@ -1617,7 +1650,7 @@ ArtX.historyList = {
         $.mobile.loading('show');
         $.ajax({
             type: "PUT",
-            url: ArtX.var.jsonDomain + "/favorites/" + eventID,
+            url: ArtX.var.jsonDomain + "/favorites/" + userFavoriteID,
             data: ajaxDataToSend,
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
@@ -1635,10 +1668,10 @@ ArtX.historyList = {
         });
     },
     syncAttended : function() {
-        /* This function checks all attended checkboxes currently present in the page, and compares them against the current user's saved favorites (if logged in).  If there's a match, that star will be highlighted. */
+        /* This function checks all attended checkboxes currently present in the page, and compares them against the current user's saved favorites (if logged in).  If there's a match, that box will be checked. */
 
-        if (($(".favorite-star").length > 0) && ($.cookie('token') !== undefined)) {
-            console.log("Syncing stars with user's favorites");
+        if (($("#history-form").find("input[type=checkbox]").length > 0) && ($.cookie('token') !== undefined)) {
+            console.log("Syncing attendance checkboxes with user's attended records");
 
             // Fetch the list of user's history to check against.
             $.ajax({
@@ -1664,28 +1697,29 @@ ArtX.historyList = {
                         $.each(userHistoryItems, function(i, value) {
                             var thisItem = userHistoryItems[i];
                             var thisEventAttended;
-                            if (thisItem.attended === null) {
-                                thisEventAttended = false;
-                            } else {
+                            
+                            if (thisItem.attended === true) {
                                 thisEventAttended = true;
+                            } else {
+                                thisEventAttended = false;
                             }
-                            console.log("This event attended? " + thisEventAttended);
-                            /*
-                            var userFavoriteID = userFavorite.id;
+                            //console.log("This event attended? " + thisEventAttended);
 
-                            // Then let's compare that favorite ID to the corresponding ones on the page
-                            $(".favorite-star").each(function() {
-                                var pageFavoriteEventID = $(this).attr("data-event-id");
+                            if (thisEventAttended) {
+                                var userFavoriteID = thisItem.id;
+                                //console.log("User favorite ID: " + userFavoriteID);
 
-                                // If they match, highlight the star
-                                if (pageFavoriteEventID == userFavoriteEventID) {
-                                    ArtX.favoriteStars.highlightStar($(this), userFavoriteID);
+                                // Toggle the checkbox with the appropriate data attribute
+                                var $thisCheckbox = $("#history-form").find("input[data-user-favorite-id=" + userFavoriteID + "]");
+
+                                if (!$thisCheckbox.attr("checked")) {
+                                    $thisCheckbox.trigger("click");
                                 }
-                            });
-                            */
+                            }
+
                         });
 
-                        
+                        ArtX.historyList.bindAttendanceCheckboxes();
 
                     } 
                 },
@@ -1694,6 +1728,7 @@ ArtX.historyList = {
                     ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
                 },
                 complete: function() {
+                    ArtX.historyList.showList();
                     $.mobile.loading('hide');
                 }
             });
@@ -2304,7 +2339,6 @@ ArtX.startup = {
         ArtX.historyList.init();
 
         ArtX.loadMore.init();
-        ArtX.footerSlider.init();
         ArtX.customCheckboxes.init();
         ArtX.setupTextTruncation();
         ArtX.favoriteStars.init();

@@ -121,6 +121,10 @@
 
     <p id="footer-slider-msg-nofavorites" class="footer-slider-msg">You have no favorites yet &mdash; click on a star to add an event to your favorites.</p>
 
+    <p id="footer-slider-msg-noevents" class="footer-slider-msg">No events found for this venue.</p>
+
+    <p id="footer-slider-msg-generalerror" class="footer-slider-msg">An error occurred, please reload the page and try again.</p>
+
 </div>
 
 <div id="favorites-slider" class="footer-slider">
@@ -145,7 +149,7 @@
 <script type="text/template" id="template-venueeventslider">
     <% _.each(itemArray, function(eventObj, key){ %>
 
-    <li><a href="event.html" data-event-id="<%= eventObj.id %>" class="event-detail-link"><img src="<%= eventObj.image %>" alt="<%= eventObj.name %>" /></a></li>
+    <li><a href="event.html" data-event-id="<%= eventObj.id %>" class="event-detail-link"><img src="<%= eventObj.image %>" alt="<%= eventObj.name %>" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" /></a></li>
 
     <% }); %>
 </script>
@@ -153,7 +157,7 @@
 <script type="text/template" id="template-relatedinterestslider">
     <% _.each(itemArray, function(eventObj, key){ %>
 
-    <li><a href="event.html" data-event-id="<%= eventObj.id %>" class="event-detail-link"><img src="<%= eventObj.image %>" alt="<%= eventObj.name %>" /></a></li>
+    <li><a href="event.html" data-event-id="<%= eventObj.id %>" class="event-detail-link"><img src="<%= eventObj.image %>" alt="<%= eventObj.name %>" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" /></a></li>
 
     <% }); %>
 </script>
