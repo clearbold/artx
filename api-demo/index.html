@@ -225,7 +225,7 @@ $.ajax({
         console.log(data);
         $('#geolocation').empty();
         $.each(data.events, function (key, value) {
-            $('#geolocation').append('<li class="list-group-item">' + value.name + '</li>')
+            $('#geolocation').append('&lt;li class="list-group-item"&gt;' + value.name + '&lt;/li&gt;')
             console.log(value.name);
         })
     }
