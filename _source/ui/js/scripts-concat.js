@@ -24142,6 +24142,11 @@ ArtX.venuedetail = {
             $("#target-venuedetail").fadeIn(400);
             console.log("Venue page content finished displaying");
 
+            $(".venue-location-link").click(function() {
+                console.log("Venue location link clicked: " + $(this).attr("data-venue-id"));
+                ArtX.byLocation.vars.openWithVenueID = $(this).attr("data-venue-id");
+            });
+
             ArtX.footerSlider.init();
         });
     }
@@ -25317,7 +25322,8 @@ ArtX.byLocation = {
         openWithVenueID : "-1",
         accessToken: "pk.eyJ1IjoiYXRvc2NhIiwiYSI6IlFSSDhOU0EifQ.8j2CBSsaQQmn-Ic7Vjx1bw",
         mapInstance: "",
-        boundsArray: []
+        boundsArray: [],
+        markers: []
     },
 
     init : function() {
@@ -25359,6 +25365,39 @@ ArtX.byLocation = {
             }
         });
     },
+    fetchSingleLocation: function(locationID) {
+        // Fetch the event data for this location
+        $.mobile.loading('show');
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            data: {
+                "per_page": 10
+            },
+            url: ArtX.var.jsonDomain + "/locations/" + locationID + "/events",
+            success: function( data ){
+                console.log("Event data successfully fetched");
+                var eventData = JSON.stringify(data.events);
+                console.log(eventData);
+
+                if (eventData.length > 2) {
+                    console.log("This venue has events");
+                    ArtX.byLocation.showEventList(data.events);
+                } else {
+                    // No events returned, show the "no events" message
+                    console.log("No events at this venue");
+                    ArtX.byLocation.showErrorMsg("noevents");
+                }
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Fetch of event data failed");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown, true);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
+        });
+    },
     buildMap: function() {
 
         $.each( ArtX.byLocation.vars.locationData , function(locationIndex){
@@ -25372,71 +25411,27 @@ ArtX.byLocation = {
 
             ArtX.byLocation.vars.boundsArray[locationIndex] = [ this.latitude, this.longitude ];
 
-            var marker = L.marker( [ this.latitude, this.longitude ], {
+            ArtX.byLocation.vars.markers[locationID] = L.marker( [ this.latitude, this.longitude ], {
                 icon : L.mapbox.marker.icon({
-                    //'marker-color': '#009715',
                     'marker-color': '#20a9b3'
                 })
             });
 
-            //marker.bindPopup( name ).openPopup();
-            marker.bindPopup( name ).openPopup();
+            ArtX.byLocation.vars.markers[locationID].bindPopup( name ).openPopup();
 
-            //Fetch event data when marker is clicked
-            marker.on( "click", function( e ){
-                
-                // Get the name of the venue from the marker's popup
-                // We'll use it to match with the data
-                var myPopup = this.getPopup();
-                var myVenueName = myPopup.getContent();
-                var myVenueID;
+            // Fetch event data when marker is clicked
+            ArtX.byLocation.vars.markers[locationID].on( "click", function( e ){
+
                 console.log("LatLong: " + this.getLatLng());
 
-                // Get the corresponding location ID by matching up the name
-                $.each( ArtX.byLocation.vars.locationData , function(index, location){
-                    if (location.name == myVenueName) {
-                        myVenueID = location.id;
-                    }
-                });
-
-                // Fetch the event data for our location
-                $.mobile.loading('show');
-                $.ajax({
-                    type: "GET",
-                    dataType: "json",
-                    data: {
-                        "per_page": 10
-                    },
-                    url: ArtX.var.jsonDomain + "/locations/" + myVenueID + "/events",
-                    success: function( data ){
-                        console.log("Event data successfully fetched");
-                        var eventData = JSON.stringify(data.events);
-                        console.log(eventData);
-
-                        if (eventData.length > 2) {
-                            console.log("This venue has events");
-                            ArtX.byLocation.showEventList(data.events);
-                        } else {
-                            // No events returned, show the "no events" message
-                            console.log("No events at this venue");
-                            ArtX.byLocation.showErrorMsg("noevents");
-                        }
-                    },
-                    error: function (jqXHR, error, errorThrown) {
-                        console.log("Fetch of event data failed");
-                        ArtX.errors.logAjaxError(jqXHR, error, errorThrown, true);
-                    },
-                    complete: function() {
-                        $.mobile.loading('hide');
-                    }
-                });
+                ArtX.byLocation.fetchSingleLocations(locationID);
 
                 // Zoom the map on this marker
                 ArtX.byLocation.vars.mapInstance.setView(this.getLatLng(), 16, {animate: true});
 
             }); //End click handler
 
-            marker.addTo( ArtX.byLocation.vars.mapInstance );
+            ArtX.byLocation.vars.markers[locationID].addTo( ArtX.byLocation.vars.mapInstance );
 
         }); //End each location
     },
@@ -25468,16 +25463,36 @@ ArtX.byLocation = {
         //ArtX.loadMore.init();
     },
     showMap: function() {
-        // After locations are all loaded, we either need to display a specifically-requested venue + its list of events, or all venues. We might want to split out the event list creation into its own item, like ArtX.map.createList.
-        // TODO: actually hook this up and test for real
+        // After locations are all loaded, we either need to display a specifically-requested venue + its list of events, or all venues.
         
-        var foo = false; // this should be a test to see if it's a single location or not, using the ArtX.byLocation.vars.openWithVenueID variable
-        
-        if (foo) {
-            // Specific location map needs to be displayed
-            // TBD
+        if (ArtX.byLocation.vars.openWithVenueID != -1) {
+            // Specific location map
+            console.log("Show a map for venue ID " + ArtX.byLocation.vars.openWithVenueID);
+
+            // Set some fallback lat/long coordinates in case anything goes wrong getting the real ones
+            var myVenueLatitude = 42.3581;
+            var myVenueLongitude = -71.0636;
+
+            // Get the corresponding lat/long data by matching up the ID
+            $.each( ArtX.byLocation.vars.locationData , function(index, location){
+                if (location.id == ArtX.byLocation.vars.openWithVenueID) {
+                    myVenueLatitude = location.latitude;
+                    myVenueLongitude = location.longitude;
+                }
+            });
+
+            // Set the map view to this location, zoomed in
+            ArtX.byLocation.vars.mapInstance.setView([myVenueLatitude, myVenueLongitude], 16, {animate: true});
+
+            // Trigger the popup
+            ArtX.byLocation.vars.markers[ArtX.byLocation.vars.openWithVenueID].openPopup();
+            
+            // Build and show the event list
+            ArtX.byLocation.fetchSingleLocation(ArtX.byLocation.vars.openWithVenueID);
+
         } else {
-            // generic Boston map
+            // Multi-location map
+            console.log("Show map zoomed to show all locations");
             ArtX.byLocation.vars.mapInstance.setView([42.3581, -71.0636], 12);
             ArtX.byLocation.vars.mapInstance.fitBounds(ArtX.byLocation.vars.boundsArray);
         }

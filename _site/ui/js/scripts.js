@@ -2480,10 +2480,11 @@ ArtX.byLocation = {
         //ArtX.loadMore.init();
     },
     showMap: function() {
-        // After locations are all loaded, we either need to display a specifically-requested venue + its list of events, or all venues. We might want to split out the event list creation into its own item, like ArtX.map.createList.
-        // TODO: actually hook this up and test for real
+        // After locations are all loaded, we either need to display a specifically-requested venue + its list of events, or all venues.
         
-        var foo = false; // this should be a test to see if it's a single location or not, using the ArtX.byLocation.vars.openWithVenueID variable
+        console.log("Before showing the map, should we open with a venue ID? " + ArtX.byLocation.vars.openWithVenueID);
+
+        var foo = false; // Is it a single location requested? or not, using the ArtX.byLocation.vars.openWithVenueID variable
         
         if (foo) {
             // Specific location map needs to be displayed
