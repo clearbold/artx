@@ -680,6 +680,10 @@ div#event-map {
     width: 100%;
 }
 
+.leaflet-control-attribution {
+    font-size:10px !important;
+}
+
 .item-image {
     display:block;
     border-bottom:none;

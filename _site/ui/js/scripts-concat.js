@@ -23500,17 +23500,21 @@ ArtX.footerSlider = {
             if (jsonString.length > 2) {
                 // There are related interests
 
+                // TODO: Pull the totalRelatedInterests variable from the actual data
+                // For now, we'll keep it hardcoded at 3
+
                 // Create click event to trigger cycleRelatedInterests
+                $("#cycle-relatedinterest").click(function(){
+                    ArtX.footerSlider.cycleRelatedInterests(ArtX.var.relatedInterests);
+                    return false;
+                });
 
                 // Trigger cycleRelatedInterests
                 ArtX.footerSlider.cycleRelatedInterests(ArtX.var.relatedInterests);
 
-                // TODO: Pull the totalRelatedInterests variable from the actual data
-                // For now, we'll keep it hardcoded at 3
-
             } else {
                 // TODO: Show error for no results
-                
+                $("#footer-slider-msg-noevents").fadeIn(400);
             }
 
         } else if ($("#near-you-slider").length > 0) {
@@ -23530,14 +23534,14 @@ ArtX.footerSlider = {
         // Show spinner
         $.mobile.loading('show');
 
-        // Destroy slider if it already exists
-        ArtX.footerSlider.destroy();
+        // Remove any existing contents of the slider
+        $("#footer-slider").empty();
 
         // Change the text of slider header (#target-relatedinterest)
         $("#target-relatedinterest").text(currentInterest.tag.name);
 
         // Fade out slider
-        $("#footer-slider").fadeOut(400, function() {
+        //$("#footer-slider").fadeOut(400, function() {
 
             $(".footer-slider-msg").hide();
 
@@ -23545,15 +23549,22 @@ ArtX.footerSlider = {
             var itemArray = currentInterest.events;
             ArtX.footerSlider.buildSlider(itemArray);
 
-            // Init slider
-            ArtX.footerSlider.initSlider();
+            if (ArtX.footerSlider.vars.footSlideInstance === "") {
+                // There were no favorites before, so we need to initialize the slider
+                ArtX.footerSlider.initSlider();
+
+            } else {
+                // Slider is already initialized, we need to reload it
+                ArtX.footerSlider.reload();
+                ArtX.eventdetail.initLinks();
+            }
 
             // Hide spinner
             $.mobile.loading('hide');
 
             // Show slider
-            $("#footer-slider").fadeIn(400);
-        }); 
+        //    $("#footer-slider").fadeIn(400);
+        //}); 
 
         // Iterate the counter variable
         if(ArtX.footerSlider.vars.relatedInterestCounter < ArtX.footerSlider.vars.totalRelatedInterests) {
@@ -23601,6 +23612,8 @@ ArtX.footerSlider = {
         ArtX.eventdetail.initLinks();
     },
     initSliderNav: function() {
+        $(".footer-slider").removeClass("not-enough-slides");
+
         var numberOfSlides = $("#footer-slider").children("li:not(.bx-clone)").length;
         console.log("Number of footer slides: " + numberOfSlides);
 
@@ -23625,7 +23638,7 @@ ArtX.footerSlider = {
         // Add a new favorite to the slider 
         console.log("Adding a new favorite to the footer slider");   
 
-        $("#footer-slider").fadeOut(400, function() {
+        //$("#footer-slider").fadeOut(400, function() {
 
             if (ArtX.footerSlider.vars.footSlideInstance === "") {
                 // There were no favorites before, so we need to initialize the slider
@@ -23642,8 +23655,8 @@ ArtX.footerSlider = {
                 ArtX.footerSlider.reload();
             }
 
-            $("#footer-slider").fadeIn(400);
-        });     
+        //    $("#footer-slider").fadeIn(400);
+        //});     
     },
     removeFavorite: function(selectedEventID) {
         // Remove a favorite from the slider, if we're on the homepage
@@ -25295,15 +25308,16 @@ ArtX.logout = {
     }
 };
 
-ArtX.map = {
+ArtX.byLocation = {
 
     vars : {
 
         mapContainer : "event-map",
-        locationUrl : "/ui/js/json/locations_temp.json",
-        eventUrl : "/ui/js/json/events-all.json",
-        openWithVenueID : "-1"
-
+        locationData: {},
+        openWithVenueID : "-1",
+        accessToken: "pk.eyJ1IjoiYXRvc2NhIiwiYSI6IlFSSDhOU0EifQ.8j2CBSsaQQmn-Ic7Vjx1bw",
+        mapInstance: "",
+        boundsArray: []
     },
 
     init : function() {
@@ -25312,74 +25326,163 @@ ArtX.map = {
             console.log( "Initializing map" );
 
             // Set up map
-            L.mapbox.accessToken = 'pk.eyJ1IjoiYXRvc2NhIiwiYSI6IlFSSDhOU0EifQ.8j2CBSsaQQmn-Ic7Vjx1bw';
-            var map = L.mapbox.map( ArtX.map.vars.mapContainer, 'atosca.j55ofa87' );
+            L.mapbox.accessToken = ArtX.byLocation.vars.accessToken;
+            ArtX.byLocation.vars.mapInstance = L.mapbox.map( ArtX.byLocation.vars.mapContainer, 'sherrialexander.jepo6la8' );
 
-            // Fetch location feed
-            var $locations = $.getJSON( ArtX.map.vars.locationUrl, function( data ){
+            ArtX.byLocation.fetchLocations();
 
-                $.each( data, function(){
+        }
+    },
+    fetchLocations: function() {
+        $.mobile.loading('show');
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            data: {
+                "per_page": 1000
+            },
+            url: ArtX.var.jsonDomain + "/locations/",
+            success: function( data ){
+                console.log("Map data successfully fetched");
+                console.log(JSON.stringify(data));
 
-                    //Create a marker for each location
+                ArtX.byLocation.vars.locationData = data.locations;
+                ArtX.byLocation.buildMap();
+                ArtX.byLocation.showMap();
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("User login submit failed");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown, true);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
+        });
+    },
+    buildMap: function() {
 
-                    var name = this.name;
+        $.each( ArtX.byLocation.vars.locationData , function(locationIndex){
 
-                    var marker = L.marker( [ this.latitude, this.longitude ], {
-                        icon : L.mapbox.marker.icon({
-                            'marker-color': '#f86767',
-                        })
-                    });
+            //Create a marker for each location
 
-                    marker.bindPopup( name ).openPopup();
+            var name = this.name;
+            var locationID = this.id;
+            console.log("This location's name: " + name);
+            console.log("This location's ID: " + locationID);
 
-                    //Fetch event feed when marker is clicked
-                    marker.on( "click", function( e ){
-                        var eventArray = [];
-                        $.getJSON( ArtX.map.vars.eventUrl, function( data ) {
-                            $.each( data, function(){
-                                //Save events with matching location name
-                                if ( this.location.name === name ) {
-                                    console.log(this.location.name);
-                                    if ( eventArray.length < ArtX.var.itemsPerPage ) {
-                                        eventArray.push( this );
-                                    }
-                                }
-                            }); //End each
+            ArtX.byLocation.vars.boundsArray[locationIndex] = [ this.latitude, this.longitude ];
 
-                            //Refresh event list
-                            $("#event-list").fadeOut( 400, function() {
-                                $("#event-list").html(_.template($('#template-eventlist').html(), {eventArray:eventArray}));
-                                ArtX.loadMore.init();
-                                $("#event-list").fadeIn(400, function() {
-                                    // Re-do truncation once fade is complete
-                                    ArtX.setupTextTruncation();
-                                });
-                            }); //End fade out
+            var marker = L.marker( [ this.latitude, this.longitude ], {
+                icon : L.mapbox.marker.icon({
+                    //'marker-color': '#009715',
+                    'marker-color': '#20a9b3'
+                })
+            });
 
-                        }); //End events getJON
+            //marker.bindPopup( name ).openPopup();
+            marker.bindPopup( name ).openPopup();
 
-                    }); //End click handler
+            //Fetch event data when marker is clicked
+            marker.on( "click", function( e ){
+                
+                // Get the name of the venue from the marker's popup
+                // We'll use it to match with the data
+                var myPopup = this.getPopup();
+                var myVenueName = myPopup.getContent();
+                var myVenueID;
+                console.log("LatLong: " + this.getLatLng());
 
-                    marker.addTo( map );
+                // Get the corresponding location ID by matching up the name
+                $.each( ArtX.byLocation.vars.locationData , function(index, location){
+                    if (location.name == myVenueName) {
+                        myVenueID = location.id;
+                    }
+                });
 
-                }); //End each location
+                // Fetch the event data for our location
+                $.mobile.loading('show');
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        "per_page": 10
+                    },
+                    url: ArtX.var.jsonDomain + "/locations/" + myVenueID + "/events",
+                    success: function( data ){
+                        console.log("Event data successfully fetched");
+                        var eventData = JSON.stringify(data.events);
+                        console.log(eventData);
 
-                // After locations are all loaded, we either need to display a specifically-requested venue + its list of events, or all venues. We might want to split out the event list creation into its own item, like ArtX.map.createList.
-                // TODO: actually hook this up and test for real
-                var foo = false; // this should be a test to see if it's a single location or not, using the ArtX.map.vars.openWithVenueID variable
-                if (foo) {
-                    // Specific location map needs to be displayed
-                    // TBD
-                } else {
-                    // generic Boston map
-                    map.setView([42.3581, -71.0636], 12);
-                }
+                        if (eventData.length > 2) {
+                            console.log("This venue has events");
+                            ArtX.byLocation.showEventList(data.events);
+                        } else {
+                            // No events returned, show the "no events" message
+                            console.log("No events at this venue");
+                            ArtX.byLocation.showErrorMsg("noevents");
+                        }
+                    },
+                    error: function (jqXHR, error, errorThrown) {
+                        console.log("Fetch of event data failed");
+                        ArtX.errors.logAjaxError(jqXHR, error, errorThrown, true);
+                    },
+                    complete: function() {
+                        $.mobile.loading('hide');
+                    }
+                });
 
-                ArtX.footerSlider.init();
+                // Zoom the map on this marker
+                ArtX.byLocation.vars.mapInstance.setView(this.getLatLng(), 16, {animate: true});
 
-            }); //End locations getJSON
+            }); //End click handler
+
+            marker.addTo( ArtX.byLocation.vars.mapInstance );
+
+        }); //End each location
+    },
+    showErrorMsg: function(errorID) {
+        // Hide event list
+        $("#event-list").fadeOut( 400, function() {
+            $("#event-list").empty().show();
+        });
+        $("#event-list-msg-"+errorID).fadeIn(400);
+    },
+    showEventList: function(eventArray) {
+        // Hide any current error messages
+        $("#event-list-messages").find("p").fadeOut(400);
+
+        //Refresh event list
+        $("#event-list").fadeOut( 400, function() {
+            $("#event-list").empty().html(_.template($('#template-eventlist').html(), {eventArray:eventArray}));
+            
+            ArtX.byLocation.addEventHandlers();
+
+            $("#event-list").fadeIn(400, function() {
+                ArtX.setupTextTruncation();
+            });
+        }); //End fade out
+    },
+    addEventHandlers: function() {
+        ArtX.favoriteStars.init();
+        ArtX.eventdetail.initLinks();
+        //ArtX.loadMore.init();
+    },
+    showMap: function() {
+        // After locations are all loaded, we either need to display a specifically-requested venue + its list of events, or all venues. We might want to split out the event list creation into its own item, like ArtX.map.createList.
+        // TODO: actually hook this up and test for real
+        
+        var foo = false; // this should be a test to see if it's a single location or not, using the ArtX.byLocation.vars.openWithVenueID variable
+        
+        if (foo) {
+            // Specific location map needs to be displayed
+            // TBD
+        } else {
+            // generic Boston map
+            ArtX.byLocation.vars.mapInstance.setView([42.3581, -71.0636], 12);
+            ArtX.byLocation.vars.mapInstance.fitBounds(ArtX.byLocation.vars.boundsArray);
         }
 
+        ArtX.footerSlider.init();
     }
 };
 
@@ -25397,7 +25500,7 @@ ArtX.startup = {
         ArtX.interests.init();
         ArtX.calendar.init();
         ArtX.settings.init();
-        ArtX.map.init();
+        ArtX.byLocation.init();
         ArtX.eventdetail.init();
         ArtX.venuedetail.init();
         ArtX.favoriteList.init();

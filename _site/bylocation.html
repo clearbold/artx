@@ -33,11 +33,11 @@
     <meta name="msapplication-TileColor" content="#ffffff" />
     
     <!-- Styles -->
+    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.0.0/mapbox.css' rel='stylesheet' />
     <link rel="stylesheet" href="ui/css/styles.css" />
 
     <script src="ui/js/standalone/modernizr-2.7.1.min.js"></script>
 
-    
     <!--[if (lt IE 9) & (!IEMobile)]>
     <script src="/ui/js/standalone/respond.min.js"></script>
     <![endif]-->
@@ -62,10 +62,6 @@
     })();
     </script>
     
-    <!-- Developer note: Angela put MapBox here -->
-    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.0.0/mapbox.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.0.0/mapbox.css' rel='stylesheet' />
-
 </head>
 <body id="page--bylocation" class="page--bylocation ui-page-theme-a">
 
@@ -80,6 +76,11 @@
                 <div class="content layout-footer" role="main">
 
             <div id="event-map" class="map">
+            </div>
+
+            <div id="event-list-messages" class="event-list-messages error-messages">
+                <p id="event-list-msg-noevents" class="event-list-msg">No events found for this venue.</p>
+                <p id="event-list-msg-generalerror" class="event-list-msg">An error occurred, please reload the page and try again.</p>
             </div>
 
             <div id="event-list" class="thumb-list">
@@ -101,13 +102,13 @@
                     
             <div class="item-block cf">
                 <div class="item-image">
-                    <a href="event.html">
-                        <img src="<%= eventObj.image %>" alt="" />
+                    <a href="event.html" data-event-id="<%= eventObj.id %>" class="event-detail-link">
+                        <img src="<%= eventObj.image %>" alt="" onerror="if (this.src != '/ui/img/rect-thumb-noimage.jpg') this.src = '/ui/img/rect-thumb-noimage.jpg';" />
                     </a>
                 </div>
                 <div class="item-info">
                     <h2 class="item-title">
-                        <a href="event.html" class="truncate"><%= eventObj.name %></a>
+                        <a href="event.html" data-event-id="<%= eventObj.id %>" class="event-detail-link truncate"><%= eventObj.name %></a>
                     </h2>
                     <p class="item-date">
                     <% if (compareStartDate != compareEndDate) { %>
@@ -118,7 +119,7 @@
                     <% } %>
                     </p>
 
-                    <a href="#" class="favorite-star item-symbol" data-event-id="1" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
+                    <a href="#" class="favorite-star item-symbol" data-event-id="<%= eventObj.id %>" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
                 </div>
             </div>
 
@@ -250,6 +251,7 @@
     <!-- Javascript -->
     <script src="ui/js/jquery/jquery-1.10.2.min.js"></script>
     <script src="ui/js/jquery/jquery.migrate.1.2.1.min.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.0.0/mapbox.js'></script>
     <script src="ui/js/scripts-concat.min.js"></script>
     <script src="ui/js/jquery/jquery.mobile-1.4.3.min.js"></script>
 
