@@ -32,6 +32,7 @@
                         <li><a href="#discover-panel">Discover</a></li>
                         <li><a href="#discover-panel-guest">Discover (not logged in)</a></li>
                         <li><a href="#event-panel">Event</a></li>
+                        <li><a href="#geolocation-panel">Events Near Me</a></li>
                         <li><a href="#history-panel">History</a></li>
                         <li><a href="#attended-panel">Attended</a></li>
                         <li><a href="#location-panel">Location</a></li>
@@ -197,6 +198,37 @@ $.ajax({
                 console.log(eventValue.name);
             })
             console.log(value.tag.name);
+        })
+    }
+})
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default" id='geolocation-panel'>
+                        <div class="panel-heading">Get Events Near Me</div>
+                        <div class="panel-body">
+                            <button value="Get Events Near Me" id='geolocation-button' class="btn btn-default">Get Events Near Me</button><br>
+                            <ul id="geolocation" class="list-group"></ul>
+                            <pre class="prettyprint lang-js">
+                                <code class="javascript">
+$.ajax({
+    type: "GET",
+    dataType: "json",
+    url: "http://artx-staging.herokuapp.com/events",
+    data: {
+        latitude: 42.3415178,
+        longitude: -71.1213209,
+        radius: 1,
+        per_page: 1000
+    },
+    success: function( data ) {
+        console.log(data);
+        $('#geolocation').empty();
+        $.each(data.events, function (key, value) {
+            $('#geolocation').append('&lt;li class="list-group-item"&gt;' + value.name + '&lt;/li&gt;')
+            console.log(value.name);
         })
     }
 })
@@ -649,6 +681,29 @@ console.log(value.name);
             error: function (jqXHR, error, errorThrown) {
                 console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
                 console.log("jqXHR response: " + jqXHR.responseText);
+            }
+        })
+    })
+
+    $('#geolocation-button').click(function(){
+        console.log("Start fetch Events Near Me");
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "http://artx-staging.herokuapp.com/events",
+            data: {
+                latitude: 42.3415178,
+                longitude: -71.1213209,
+                radius: 2,
+                per_page: 1000
+            },
+            success: function( data ) {
+                console.log(data);
+                $('#geolocation').empty();
+                $.each(data.events, function (key, value) {
+                    $('#geolocation').append('<li class="list-group-item">' + value.name + '</li>')
+                    console.log(value.name);
+                })
             }
         })
     })
