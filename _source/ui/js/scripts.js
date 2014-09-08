@@ -264,7 +264,8 @@ ArtX.var = {
     hasVisitedBefore: false,
     jsonDomain: "http://artx-staging.herokuapp.com",
     eventDetailID: 1, // acts as a fallback in case for some reason the Events data doesn't load
-    venueDetailID: 1 // acts as a fallback in case for some reason the Venue data doesn't load
+    venueDetailID: 1, // acts as a fallback in case for some reason the Venue data doesn't load
+    relatedInterests: {} // empty object placeholder, used by Event detail to pass info to footer slider
 };
 
 
@@ -378,7 +379,9 @@ ArtX.footerSlider = {
             oneToOneTouch:false,
             pager:false
         },
-        slideTemplate: ""
+        slideTemplate: "",
+        relatedInterestCounter: 0,
+        totalRelatedInterests: 2  // it's really 3, but it's 0-index-based
     },
     init: function() {
         if ($("#footer-slider").length > 0) {
@@ -389,8 +392,8 @@ ArtX.footerSlider = {
                 
                 ArtX.footerSlider.vars.slideTemplate = $('#template-favoriteslider').html();
 
-            } else if ($("#venue-events-slider").length > 0) {
-                /* Related Events slider for Venue pages */
+            } else if (($("#venue-events-slider").length > 0) || ($("#near-you-slider").length > 0)) {
+                /* Related Events slider for Venue pages AND Near You slider */
 
                 ArtX.footerSlider.vars.slideTemplate = $('#template-venueeventslider').html();
 
@@ -501,7 +504,87 @@ ArtX.footerSlider = {
             /* Related Interest slider for Event Detail pages */
 
             console.log("Initializing Related Interest slider");
+
+            var jsonString = JSON.stringify(ArtX.var.relatedInterests);
+
+            //console.log(jsonString);
+
+            if (jsonString.length > 2) {
+                // There are related interests
+
+                // TODO: Pull the totalRelatedInterests variable from the actual data
+                // For now, we'll keep it hardcoded at 3
+
+                // Create click event to trigger cycleRelatedInterests
+                $("#cycle-relatedinterest").click(function(){
+                    ArtX.footerSlider.cycleRelatedInterests(ArtX.var.relatedInterests);
+                    return false;
+                });
+
+                // Trigger cycleRelatedInterests
+                ArtX.footerSlider.cycleRelatedInterests(ArtX.var.relatedInterests);
+
+            } else {
+                // TODO: Show error for no results
+                $("#footer-slider-msg-noevents").fadeIn(400);
+            }
+
+        } else if ($("#near-you-slider").length > 0) {
+            /* Near You slider for map page */
+
+            console.log("Initializing Near You slider");
+
         }
+    },
+    cycleRelatedInterests: function(data) {
+        var currentInterest = data[ArtX.footerSlider.vars.relatedInterestCounter];
+
+        console.log("Interest counter going into the function: " + ArtX.footerSlider.vars.relatedInterestCounter);
+        console.log("Here's the current interest:");
+        console.log(JSON.stringify(currentInterest));
+
+        // Show spinner
+        $.mobile.loading('show');
+
+        // Remove any existing contents of the slider
+        $("#footer-slider").empty();
+
+        // Change the text of slider header (#target-relatedinterest)
+        $("#target-relatedinterest").text(currentInterest.tag.name);
+
+        // Fade out slider
+        //$("#footer-slider").fadeOut(400, function() {
+
+            $(".footer-slider-msg").hide();
+
+            // Build slider with events via _.template
+            var itemArray = currentInterest.events;
+            ArtX.footerSlider.buildSlider(itemArray);
+
+            if (ArtX.footerSlider.vars.footSlideInstance === "") {
+                // There were no favorites before, so we need to initialize the slider
+                ArtX.footerSlider.initSlider();
+
+            } else {
+                // Slider is already initialized, we need to reload it
+                ArtX.footerSlider.reload();
+                ArtX.eventdetail.initLinks();
+            }
+
+            // Hide spinner
+            $.mobile.loading('hide');
+
+            // Show slider
+        //    $("#footer-slider").fadeIn(400);
+        //}); 
+
+        // Iterate the counter variable
+        if(ArtX.footerSlider.vars.relatedInterestCounter < ArtX.footerSlider.vars.totalRelatedInterests) {
+            ArtX.footerSlider.vars.relatedInterestCounter++;
+        } else {
+            ArtX.footerSlider.vars.relatedInterestCounter = 0;
+        }
+
     },
     buildSlider: function(data) {
 
@@ -541,6 +624,8 @@ ArtX.footerSlider = {
         ArtX.eventdetail.initLinks();
     },
     initSliderNav: function() {
+        $(".footer-slider").removeClass("not-enough-slides");
+
         var numberOfSlides = $("#footer-slider").children("li:not(.bx-clone)").length;
         console.log("Number of footer slides: " + numberOfSlides);
 
@@ -565,7 +650,7 @@ ArtX.footerSlider = {
         // Add a new favorite to the slider 
         console.log("Adding a new favorite to the footer slider");   
 
-        $("#footer-slider").fadeOut(400, function() {
+        //$("#footer-slider").fadeOut(400, function() {
 
             if (ArtX.footerSlider.vars.footSlideInstance === "") {
                 // There were no favorites before, so we need to initialize the slider
@@ -582,8 +667,8 @@ ArtX.footerSlider = {
                 ArtX.footerSlider.reload();
             }
 
-            $("#footer-slider").fadeIn(400);
-        });     
+        //    $("#footer-slider").fadeIn(400);
+        //});     
     },
     removeFavorite: function(selectedEventID) {
         // Remove a favorite from the slider, if we're on the homepage
@@ -982,6 +1067,9 @@ ArtX.eventdetail = {
                 
                 //console.log(JSON.stringify(data));
                 var eventArray = data;
+
+                // Store the related interest information in a variable for the footer slider scripts
+                ArtX.var.relatedInterests = data.event.related;
 
                 ArtX.eventdetail.displayPage(eventArray);
             },
@@ -2311,6 +2399,8 @@ ArtX.map = {
                     // generic Boston map
                     map.setView([42.3581, -71.0636], 12);
                 }
+
+                ArtX.footerSlider.init();
 
             }); //End locations getJSON
         }
