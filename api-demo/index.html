@@ -219,7 +219,9 @@ $.ajax({
     url: "http://artx-staging.herokuapp.com/events",
     data: {
         latitude: 42.3415178,
-        longitude: -71.1213209
+        longitude: -71.1213209,
+        radius: 1,
+        per_page: 1000
     },
     success: function( data ) {
         console.log(data);
@@ -691,7 +693,9 @@ console.log(value.name);
             url: "http://artx-staging.herokuapp.com/events",
             data: {
                 latitude: 42.3415178,
-                longitude: -71.1213209
+                longitude: -71.1213209,
+                radius: 2,
+                per_page: 1000
             },
             success: function( data ) {
                 console.log(data);
