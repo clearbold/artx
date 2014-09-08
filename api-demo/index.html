@@ -213,7 +213,23 @@ $.ajax({
                             <ul id="geolocation" class="list-group"></ul>
                             <pre class="prettyprint lang-js">
                                 <code class="javascript">
-
+$.ajax({
+    type: "GET",
+    dataType: "json",
+    url: "http://artx-staging.herokuapp.com/events",
+    data: {
+        latitude: 42.3415178,
+        longitude: -71.1213209
+    },
+    success: function( data ) {
+        console.log(data);
+        $('#geolocation').empty();
+        $.each(data.events, function (key, value) {
+            $('#geolocation').append('<li class="list-group-item">' + value.name + '</li>')
+            console.log(value.name);
+        })
+    }
+})
                                 </code>
                             </pre>
                         </div>
