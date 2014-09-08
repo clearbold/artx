@@ -25316,7 +25316,6 @@ ArtX.logout = {
 ArtX.byLocation = {
 
     vars : {
-
         mapContainer : "event-map",
         locationData: {},
         openWithVenueID : "-1",
@@ -25327,7 +25326,6 @@ ArtX.byLocation = {
     },
 
     init : function() {
-
         if ($("#event-map").length > 0) {
             console.log( "Initializing map" );
 
@@ -25336,7 +25334,6 @@ ArtX.byLocation = {
             ArtX.byLocation.vars.mapInstance = L.mapbox.map( ArtX.byLocation.vars.mapContainer, 'sherrialexander.jepo6la8' );
 
             ArtX.byLocation.fetchLocations();
-
         }
     },
     fetchLocations: function() {
@@ -25350,7 +25347,7 @@ ArtX.byLocation = {
             url: ArtX.var.jsonDomain + "/locations/",
             success: function( data ){
                 console.log("Map data successfully fetched");
-                console.log(JSON.stringify(data));
+                //console.log(JSON.stringify(data));
 
                 ArtX.byLocation.vars.locationData = data.locations;
                 ArtX.byLocation.buildMap();
@@ -25378,7 +25375,7 @@ ArtX.byLocation = {
             success: function( data ){
                 console.log("Event data successfully fetched");
                 var eventData = JSON.stringify(data.events);
-                console.log(eventData);
+                //console.log(eventData);
 
                 if (eventData.length > 2) {
                     console.log("This venue has events");
@@ -25406,10 +25403,10 @@ ArtX.byLocation = {
 
             var name = this.name;
             var locationID = this.id;
-            console.log("This location's name: " + name);
-            console.log("This location's ID: " + locationID);
+            //console.log("This location's name: " + name);
+            //console.log("This location's ID: " + locationID);
 
-            ArtX.byLocation.vars.boundsArray[locationIndex] = [ this.latitude, this.longitude ];
+            ArtX.byLocation.vars.boundsArray.push([ this.latitude, this.longitude ]);
 
             ArtX.byLocation.vars.markers[locationID] = L.marker( [ this.latitude, this.longitude ], {
                 icon : L.mapbox.marker.icon({
@@ -25422,9 +25419,9 @@ ArtX.byLocation = {
             // Fetch event data when marker is clicked
             ArtX.byLocation.vars.markers[locationID].on( "click", function( e ){
 
-                console.log("LatLong: " + this.getLatLng());
+                //console.log("LatLong: " + this.getLatLng());
 
-                ArtX.byLocation.fetchSingleLocations(locationID);
+                ArtX.byLocation.fetchSingleLocation(locationID);
 
                 // Zoom the map on this marker
                 ArtX.byLocation.vars.mapInstance.setView(this.getLatLng(), 16, {animate: true});
@@ -25494,7 +25491,10 @@ ArtX.byLocation = {
             // Multi-location map
             console.log("Show map zoomed to show all locations");
             ArtX.byLocation.vars.mapInstance.setView([42.3581, -71.0636], 12);
-            ArtX.byLocation.vars.mapInstance.fitBounds(ArtX.byLocation.vars.boundsArray);
+            
+            var bounds = L.latLngBounds(ArtX.byLocation.vars.boundsArray);
+            //console.log(bounds);
+            ArtX.byLocation.vars.mapInstance.fitBounds(bounds, { padding: [10, 10]});
         }
 
         ArtX.footerSlider.init();
