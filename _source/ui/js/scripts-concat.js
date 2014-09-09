@@ -23369,7 +23369,8 @@ ArtX.footerSlider = {
         },
         slideTemplate: "",
         relatedInterestCounter: 0,
-        totalRelatedInterests: 2  // it's really 3, but it's 0-index-based
+        totalRelatedInterests: 2,  // it's really 3, but it's 0-index-based
+        locationRadius: 10  // Mile radius for nearby events
     },
     init: function() {
         if ($("#footer-slider").length > 0) {
@@ -23522,7 +23523,69 @@ ArtX.footerSlider = {
 
             console.log("Initializing Near You slider");
 
+            // First, we have to try to get the user's current position.
+            ArtX.geolocation.getLocation(ArtX.footerSlider.processNearbyEvents, ArtX.footerSlider.hideFooter);
+
         }
+    },
+    processNearbyEvents: function() {
+        // Check if we were successful
+        console.log("Location call made, checking if values are correct");
+
+        if ((ArtX.geolocation.vars.currentLatitude !== "") && (ArtX.geolocation.vars.currentLongitude !== "")) {
+            
+            console.log("My latitude: " + ArtX.geolocation.vars.currentLatitude);
+
+            // We have a position; fetch events
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: ArtX.var.jsonDomain + "/events",
+                data: {
+                    latitude: ArtX.geolocation.vars.currentLatitude,
+                    longitude: ArtX.geolocation.vars.currentLongitude,
+                    radius: ArtX.footerSlider.vars.locationRadius,
+                    per_page: 20
+                },
+                success: function( data ) {
+                    console.log("Footer slider data successfully fetched");
+                    
+                    var jsonString = JSON.stringify(data.events);
+                    console.log(jsonString);
+
+                    // Hide any existing messages
+                    $(".footer-slider-msg").hide();
+
+                    if (jsonString.length > 2) {
+                        // Events were returned, make the slider
+                        // console.log(jsonString);
+                        ArtX.footerSlider.buildSlider(data);
+                        ArtX.footerSlider.initSlider();
+                    } else {
+                        // No events returned, show the "no events in radius" message
+                        $("#location-radius").html(ArtX.footerSlider.vars.locationRadius);
+                        $("#footer-slider-msg-noeventsnearby").fadeIn(400);
+                    }
+                },
+                error: function (jqXHR, error, errorThrown) {
+                    console.log("Error fetching footer slider data");
+                    console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+                    console.log("jqXHR response: " + jqXHR.responseText);
+                },
+                complete: function() {
+                    $.mobile.loading('hide');
+                }
+            }); 
+        } else {
+            // Couldn't get a position; hide footer
+            ArtX.footerSlider.hideFooter();
+            $.mobile.loading('hide');
+        }
+    },
+    hideFooter: function() {
+        console.log("Hiding the footer");
+        $(".content.layout-footer").removeClass("layout-footer");
+        $(".footer").hide();
     },
     cycleRelatedInterests: function(data) {
         var currentInterest = data[ArtX.footerSlider.vars.relatedInterestCounter];
@@ -23586,17 +23649,17 @@ ArtX.footerSlider = {
             console.log("Initializing Favorites slider");
             itemArray = data.favorites;  
 
-        } else if ($("#venue-events-slider").length > 0) {
-            /* Related Events slider for Venue pages */
-
-            console.log("Initializing Related Events slider");
-            itemArray = data.events;
-
         } else if ($("#related-interest-slider").length > 0) {
             /* Related Interest slider for Event Detail pages */
 
             console.log("Initializing Related Interest slider");
             itemArray = data; // TODO: Get the correct data structure
+        } else {
+            /* Events slider for Venue and By Location pages */
+
+            console.log("Initializing Events slider");
+            itemArray = data.events;
+
         }
 
         $("#footer-slider").html(_.template(ArtX.footerSlider.vars.slideTemplate, {itemArray:itemArray}));
@@ -25298,6 +25361,8 @@ ArtX.login = {
     }
 };
 
+/* Logout functionality
+   ========================================================================== */
 ArtX.logout = {
     init: function() {
         $(".action-logout").click(function() {
@@ -25313,6 +25378,60 @@ ArtX.logout = {
     }
 };
 
+/* Geolocation helpers
+   ========================================================================== */
+ArtX.geolocation = {
+    vars: {
+        currentLatitude: "",
+        currentLongitude: ""
+    },
+    successCallback: function() {
+        // Placeholder for passed success function
+    },
+    failureCallback: function() {
+        // Placeholder for passed failure function
+    },
+    getLocation: function(successCallback, failureCallback) {
+        // Store the passed success/fail callbacks for later use
+        ArtX.geolocation.successCallback = successCallback;
+        ArtX.geolocation.failureCallback = failureCallback;
+        if (navigator.geolocation) {
+            $.mobile.loading('show');
+            navigator.geolocation.getCurrentPosition(ArtX.geolocation.storePosition, ArtX.geolocation.showError);
+        } else {
+            console.log("Geolocation is not supported by this browser.");
+            ArtX.geolocation.failureCallback();
+        }
+    },
+    storePosition: function(position) {
+        console.log("Storing latitude: " + position.coords.latitude + ", Longitude: " + position.coords.longitude);
+
+        ArtX.geolocation.vars.currentLatitude = position.coords.latitude;
+        ArtX.geolocation.vars.currentLongitude = position.coords.longitude;
+        ArtX.geolocation.successCallback();
+    },
+    showError: function() {
+        console.log("Geolocation error:");
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                console.log("User denied the request for Geolocation.");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                console.log("Location information is unavailable.");
+                break;
+            case error.TIMEOUT:
+                console.log("The request to get user location timed out.");
+                break;
+            case error.UNKNOWN_ERROR:
+                console.log("An unknown error occurred.");
+                break;
+        }
+        ArtX.geolocation.failureCallback();
+    }
+};
+
+/* By Location (map) functionality
+   ========================================================================== */
 ArtX.byLocation = {
 
     vars : {

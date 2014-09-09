@@ -23369,7 +23369,8 @@ ArtX.footerSlider = {
         },
         slideTemplate: "",
         relatedInterestCounter: 0,
-        totalRelatedInterests: 2  // it's really 3, but it's 0-index-based
+        totalRelatedInterests: 2,  // it's really 3, but it's 0-index-based
+        locationRadius: 10  // Mile radius for nearby events
     },
     init: function() {
         if ($("#footer-slider").length > 0) {
@@ -23522,7 +23523,69 @@ ArtX.footerSlider = {
 
             console.log("Initializing Near You slider");
 
+            // First, we have to try to get the user's current position.
+            ArtX.geolocation.getLocation(ArtX.footerSlider.processNearbyEvents, ArtX.footerSlider.hideFooter);
+
         }
+    },
+    processNearbyEvents: function() {
+        // Check if we were successful
+        console.log("Location call made, checking if values are correct");
+
+        if ((ArtX.geolocation.vars.currentLatitude !== "") && (ArtX.geolocation.vars.currentLongitude !== "")) {
+            
+            console.log("My latitude: " + ArtX.geolocation.vars.currentLatitude);
+
+            // We have a position; fetch events
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: ArtX.var.jsonDomain + "/events",
+                data: {
+                    latitude: ArtX.geolocation.vars.currentLatitude,
+                    longitude: ArtX.geolocation.vars.currentLongitude,
+                    radius: ArtX.footerSlider.vars.locationRadius,
+                    per_page: 20
+                },
+                success: function( data ) {
+                    console.log("Footer slider data successfully fetched");
+                    
+                    var jsonString = JSON.stringify(data.events);
+                    console.log(jsonString);
+
+                    // Hide any existing messages
+                    $(".footer-slider-msg").hide();
+
+                    if (jsonString.length > 2) {
+                        // Events were returned, make the slider
+                        // console.log(jsonString);
+                        ArtX.footerSlider.buildSlider(data);
+                        ArtX.footerSlider.initSlider();
+                    } else {
+                        // No events returned, show the "no events in radius" message
+                        $("#location-radius").html(ArtX.footerSlider.vars.locationRadius);
+                        $("#footer-slider-msg-noeventsnearby").fadeIn(400);
+                    }
+                },
+                error: function (jqXHR, error, errorThrown) {
+                    console.log("Error fetching footer slider data");
+                    console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+                    console.log("jqXHR response: " + jqXHR.responseText);
+                },
+                complete: function() {
+                    $.mobile.loading('hide');
+                }
+            }); 
+        } else {
+            // Couldn't get a position; hide footer
+            ArtX.footerSlider.hideFooter();
+            $.mobile.loading('hide');
+        }
+    },
+    hideFooter: function() {
+        console.log("Hiding the footer");
+        $(".content.layout-footer").removeClass("layout-footer");
+        $(".footer").hide();
     },
     cycleRelatedInterests: function(data) {
         var currentInterest = data[ArtX.footerSlider.vars.relatedInterestCounter];
@@ -23586,17 +23649,17 @@ ArtX.footerSlider = {
             console.log("Initializing Favorites slider");
             itemArray = data.favorites;  
 
-        } else if ($("#venue-events-slider").length > 0) {
-            /* Related Events slider for Venue pages */
-
-            console.log("Initializing Related Events slider");
-            itemArray = data.events;
-
         } else if ($("#related-interest-slider").length > 0) {
             /* Related Interest slider for Event Detail pages */
 
             console.log("Initializing Related Interest slider");
             itemArray = data; // TODO: Get the correct data structure
+        } else {
+            /* Events slider for Venue and By Location pages */
+
+            console.log("Initializing Events slider");
+            itemArray = data.events;
+
         }
 
         $("#footer-slider").html(_.template(ArtX.footerSlider.vars.slideTemplate, {itemArray:itemArray}));
@@ -24141,6 +24204,11 @@ ArtX.venuedetail = {
             $("#target-venuedetail").html(_.template(venueTemplate, {venueArray:venueArray}));
             $("#target-venuedetail").fadeIn(400);
             console.log("Venue page content finished displaying");
+
+            $(".venue-location-link").click(function() {
+                console.log("Venue location link clicked: " + $(this).attr("data-venue-id"));
+                ArtX.byLocation.vars.openWithVenueID = $(this).attr("data-venue-id");
+            });
 
             ArtX.footerSlider.init();
         });
@@ -25293,6 +25361,8 @@ ArtX.login = {
     }
 };
 
+/* Logout functionality
+   ========================================================================== */
 ArtX.logout = {
     init: function() {
         $(".action-logout").click(function() {
@@ -25308,20 +25378,73 @@ ArtX.logout = {
     }
 };
 
+/* Geolocation helpers
+   ========================================================================== */
+ArtX.geolocation = {
+    vars: {
+        currentLatitude: "",
+        currentLongitude: ""
+    },
+    successCallback: function() {
+        // Placeholder for passed success function
+    },
+    failureCallback: function() {
+        // Placeholder for passed failure function
+    },
+    getLocation: function(successCallback, failureCallback) {
+        // Store the passed success/fail callbacks for later use
+        ArtX.geolocation.successCallback = successCallback;
+        ArtX.geolocation.failureCallback = failureCallback;
+        if (navigator.geolocation) {
+            $.mobile.loading('show');
+            navigator.geolocation.getCurrentPosition(ArtX.geolocation.storePosition, ArtX.geolocation.showError);
+        } else {
+            console.log("Geolocation is not supported by this browser.");
+            ArtX.geolocation.failureCallback();
+        }
+    },
+    storePosition: function(position) {
+        console.log("Storing latitude: " + position.coords.latitude + ", Longitude: " + position.coords.longitude);
+
+        ArtX.geolocation.vars.currentLatitude = position.coords.latitude;
+        ArtX.geolocation.vars.currentLongitude = position.coords.longitude;
+        ArtX.geolocation.successCallback();
+    },
+    showError: function() {
+        console.log("Geolocation error:");
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                console.log("User denied the request for Geolocation.");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                console.log("Location information is unavailable.");
+                break;
+            case error.TIMEOUT:
+                console.log("The request to get user location timed out.");
+                break;
+            case error.UNKNOWN_ERROR:
+                console.log("An unknown error occurred.");
+                break;
+        }
+        ArtX.geolocation.failureCallback();
+    }
+};
+
+/* By Location (map) functionality
+   ========================================================================== */
 ArtX.byLocation = {
 
     vars : {
-
         mapContainer : "event-map",
         locationData: {},
         openWithVenueID : "-1",
         accessToken: "pk.eyJ1IjoiYXRvc2NhIiwiYSI6IlFSSDhOU0EifQ.8j2CBSsaQQmn-Ic7Vjx1bw",
         mapInstance: "",
-        boundsArray: []
+        boundsArray: [],
+        markers: []
     },
 
     init : function() {
-
         if ($("#event-map").length > 0) {
             console.log( "Initializing map" );
 
@@ -25330,7 +25453,6 @@ ArtX.byLocation = {
             ArtX.byLocation.vars.mapInstance = L.mapbox.map( ArtX.byLocation.vars.mapContainer, 'sherrialexander.jepo6la8' );
 
             ArtX.byLocation.fetchLocations();
-
         }
     },
     fetchLocations: function() {
@@ -25344,7 +25466,7 @@ ArtX.byLocation = {
             url: ArtX.var.jsonDomain + "/locations/",
             success: function( data ){
                 console.log("Map data successfully fetched");
-                console.log(JSON.stringify(data));
+                //console.log(JSON.stringify(data));
 
                 ArtX.byLocation.vars.locationData = data.locations;
                 ArtX.byLocation.buildMap();
@@ -25352,6 +25474,39 @@ ArtX.byLocation = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("User login submit failed");
+                ArtX.errors.logAjaxError(jqXHR, error, errorThrown, true);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
+        });
+    },
+    fetchSingleLocation: function(locationID) {
+        // Fetch the event data for this location
+        $.mobile.loading('show');
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            data: {
+                "per_page": 10
+            },
+            url: ArtX.var.jsonDomain + "/locations/" + locationID + "/events",
+            success: function( data ){
+                console.log("Event data successfully fetched");
+                var eventData = JSON.stringify(data.events);
+                //console.log(eventData);
+
+                if (eventData.length > 2) {
+                    console.log("This venue has events");
+                    ArtX.byLocation.showEventList(data.events);
+                } else {
+                    // No events returned, show the "no events" message
+                    console.log("No events at this venue");
+                    ArtX.byLocation.showErrorMsg("noevents");
+                }
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Fetch of event data failed");
                 ArtX.errors.logAjaxError(jqXHR, error, errorThrown, true);
             },
             complete: function() {
@@ -25367,76 +25522,32 @@ ArtX.byLocation = {
 
             var name = this.name;
             var locationID = this.id;
-            console.log("This location's name: " + name);
-            console.log("This location's ID: " + locationID);
+            //console.log("This location's name: " + name);
+            //console.log("This location's ID: " + locationID);
 
-            ArtX.byLocation.vars.boundsArray[locationIndex] = [ this.latitude, this.longitude ];
+            ArtX.byLocation.vars.boundsArray.push([ this.latitude, this.longitude ]);
 
-            var marker = L.marker( [ this.latitude, this.longitude ], {
+            ArtX.byLocation.vars.markers[locationID] = L.marker( [ this.latitude, this.longitude ], {
                 icon : L.mapbox.marker.icon({
-                    //'marker-color': '#009715',
                     'marker-color': '#20a9b3'
                 })
             });
 
-            //marker.bindPopup( name ).openPopup();
-            marker.bindPopup( name ).openPopup();
+            ArtX.byLocation.vars.markers[locationID].bindPopup( name ).openPopup();
 
-            //Fetch event data when marker is clicked
-            marker.on( "click", function( e ){
-                
-                // Get the name of the venue from the marker's popup
-                // We'll use it to match with the data
-                var myPopup = this.getPopup();
-                var myVenueName = myPopup.getContent();
-                var myVenueID;
-                console.log("LatLong: " + this.getLatLng());
+            // Fetch event data when marker is clicked
+            ArtX.byLocation.vars.markers[locationID].on( "click", function( e ){
 
-                // Get the corresponding location ID by matching up the name
-                $.each( ArtX.byLocation.vars.locationData , function(index, location){
-                    if (location.name == myVenueName) {
-                        myVenueID = location.id;
-                    }
-                });
+                //console.log("LatLong: " + this.getLatLng());
 
-                // Fetch the event data for our location
-                $.mobile.loading('show');
-                $.ajax({
-                    type: "GET",
-                    dataType: "json",
-                    data: {
-                        "per_page": 10
-                    },
-                    url: ArtX.var.jsonDomain + "/locations/" + myVenueID + "/events",
-                    success: function( data ){
-                        console.log("Event data successfully fetched");
-                        var eventData = JSON.stringify(data.events);
-                        console.log(eventData);
-
-                        if (eventData.length > 2) {
-                            console.log("This venue has events");
-                            ArtX.byLocation.showEventList(data.events);
-                        } else {
-                            // No events returned, show the "no events" message
-                            console.log("No events at this venue");
-                            ArtX.byLocation.showErrorMsg("noevents");
-                        }
-                    },
-                    error: function (jqXHR, error, errorThrown) {
-                        console.log("Fetch of event data failed");
-                        ArtX.errors.logAjaxError(jqXHR, error, errorThrown, true);
-                    },
-                    complete: function() {
-                        $.mobile.loading('hide');
-                    }
-                });
+                ArtX.byLocation.fetchSingleLocation(locationID);
 
                 // Zoom the map on this marker
                 ArtX.byLocation.vars.mapInstance.setView(this.getLatLng(), 16, {animate: true});
 
             }); //End click handler
 
-            marker.addTo( ArtX.byLocation.vars.mapInstance );
+            ArtX.byLocation.vars.markers[locationID].addTo( ArtX.byLocation.vars.mapInstance );
 
         }); //End each location
     },
@@ -25470,17 +25581,39 @@ ArtX.byLocation = {
     showMap: function() {
         // After locations are all loaded, we either need to display a specifically-requested venue + its list of events, or all venues.
         
-        console.log("Before showing the map, should we open with a venue ID? " + ArtX.byLocation.vars.openWithVenueID);
+        if (ArtX.byLocation.vars.openWithVenueID != -1) {
+            // Specific location map
+            console.log("Show a map for venue ID " + ArtX.byLocation.vars.openWithVenueID);
 
-        var foo = false; // Is it a single location requested? or not, using the ArtX.byLocation.vars.openWithVenueID variable
-        
-        if (foo) {
-            // Specific location map needs to be displayed
-            // TBD
+            // Set some fallback lat/long coordinates in case anything goes wrong getting the real ones
+            var myVenueLatitude = 42.3581;
+            var myVenueLongitude = -71.0636;
+
+            // Get the corresponding lat/long data by matching up the ID
+            $.each( ArtX.byLocation.vars.locationData , function(index, location){
+                if (location.id == ArtX.byLocation.vars.openWithVenueID) {
+                    myVenueLatitude = location.latitude;
+                    myVenueLongitude = location.longitude;
+                }
+            });
+
+            // Set the map view to this location, zoomed in
+            ArtX.byLocation.vars.mapInstance.setView([myVenueLatitude, myVenueLongitude], 16, {animate: true});
+
+            // Trigger the popup
+            ArtX.byLocation.vars.markers[ArtX.byLocation.vars.openWithVenueID].openPopup();
+            
+            // Build and show the event list
+            ArtX.byLocation.fetchSingleLocation(ArtX.byLocation.vars.openWithVenueID);
+
         } else {
-            // generic Boston map
+            // Multi-location map
+            console.log("Show map zoomed to show all locations");
             ArtX.byLocation.vars.mapInstance.setView([42.3581, -71.0636], 12);
-            ArtX.byLocation.vars.mapInstance.fitBounds(ArtX.byLocation.vars.boundsArray);
+            
+            var bounds = L.latLngBounds(ArtX.byLocation.vars.boundsArray);
+            //console.log(bounds);
+            ArtX.byLocation.vars.mapInstance.fitBounds(bounds, { padding: [10, 10]});
         }
 
         ArtX.footerSlider.init();
