@@ -23367,6 +23367,7 @@ ArtX.footerSlider = {
             oneToOneTouch:false,
             pager:false
         },
+        pageSize: 15,
         slideTemplate: "",
         relatedInterestCounter: 0,
         totalRelatedInterests: 2,  // it's really 3, but it's 0-index-based
@@ -23381,15 +23382,10 @@ ArtX.footerSlider = {
                 
                 ArtX.footerSlider.vars.slideTemplate = $('#template-favoriteslider').html();
 
-            } else if (($("#venue-events-slider").length > 0) || ($("#near-you-slider").length > 0)) {
-                /* Related Events slider for Venue pages AND Near You slider */
+            } else {
+                /* Events slider */
 
-                ArtX.footerSlider.vars.slideTemplate = $('#template-venueeventslider').html();
-
-            } else if ($("#related-interest-slider").length > 0) {
-                /* Related Interest slider for Event Detail pages */
-
-                ArtX.footerSlider.vars.slideTemplate = $('#template-relatedinterestslider').html();
+                ArtX.footerSlider.vars.slideTemplate = $('#template-eventslider').html();
             }
 
             // Populate the slider with data
@@ -23416,6 +23412,9 @@ ArtX.footerSlider = {
                 $.ajax({
                     type: "GET",
                     dataType: "json",
+                    data: {
+                        "per_page": ArtX.footerSlider.vars.pageSize
+                    },
                     url: ArtX.var.jsonDomain + "/favorites/",
                     beforeSend: function(request) {
                         request.setRequestHeader("authentication_token", $.cookie('token'));
@@ -23463,6 +23462,9 @@ ArtX.footerSlider = {
             $.ajax({
                 type: "GET",
                 dataType: "json",
+                data: {
+                    "per_page": ArtX.footerSlider.vars.pageSize
+                },
                 url: ArtX.var.jsonDomain + "/locations/" + venueID + "/events",
                 success: function( data ) {
                     console.log("Footer slider data successfully fetched");
@@ -23545,7 +23547,7 @@ ArtX.footerSlider = {
                     latitude: ArtX.geolocation.vars.currentLatitude,
                     longitude: ArtX.geolocation.vars.currentLongitude,
                     radius: ArtX.footerSlider.vars.locationRadius,
-                    per_page: 20
+                    "per_page": ArtX.footerSlider.vars.pageSize
                 },
                 success: function( data ) {
                     console.log("Footer slider data successfully fetched");
@@ -24097,6 +24099,14 @@ ArtX.eventdetail = {
         $(".event-detail-link").click(function() {
             console.log("Event detail link clicked!");
             ArtX.var.eventDetailID = $(this).attr("data-event-id");
+
+            // Aha -- if we're on the event page now, we have to reload the page
+            if ($("#template-eventdetail").length > 0) {
+                $.mobile.pageContainer.pagecontainer ("change", "event.html", {changeHash: true, reload:true, reloadPage:true});
+            }
+            /* Dev note: jQuery Mobile's back button no longer works when you load the same page dynamically like this.  It looks like it's something they're trying to address in current development efforts for the next releases (https://github.com/jquery/jquery-mobile/issues/2529 and linked issues), but it's not currently possible.
+
+            Even if it was, we'd have to do a better job about saving state -- keeping track of old/new variables, passing them appropriately, etc.  */
         });
     },
     destroyLinks: function() {

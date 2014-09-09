@@ -23381,15 +23381,10 @@ ArtX.footerSlider = {
                 
                 ArtX.footerSlider.vars.slideTemplate = $('#template-favoriteslider').html();
 
-            } else if (($("#venue-events-slider").length > 0) || ($("#near-you-slider").length > 0)) {
-                /* Related Events slider for Venue pages AND Near You slider */
+            } else {
+                /* Events slider */
 
-                ArtX.footerSlider.vars.slideTemplate = $('#template-venueeventslider').html();
-
-            } else if ($("#related-interest-slider").length > 0) {
-                /* Related Interest slider for Event Detail pages */
-
-                ArtX.footerSlider.vars.slideTemplate = $('#template-relatedinterestslider').html();
+                ArtX.footerSlider.vars.slideTemplate = $('#template-eventslider').html();
             }
 
             // Populate the slider with data
@@ -24097,6 +24092,11 @@ ArtX.eventdetail = {
         $(".event-detail-link").click(function() {
             console.log("Event detail link clicked!");
             ArtX.var.eventDetailID = $(this).attr("data-event-id");
+
+            // Aha -- if we're on the event page now, we have to reload the page
+            if ($("#template-eventdetail").length > 0) {
+                $.mobile.pageContainer.pagecontainer ("change", "event.html", {allowSamePageTransition:true,});
+            }
         });
     },
     destroyLinks: function() {

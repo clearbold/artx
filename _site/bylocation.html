@@ -204,15 +204,7 @@
     <% }); %>
 </script>
 
-<script type="text/template" id="template-venueeventslider">
-    <% _.each(itemArray, function(eventObj, key){ %>
-
-    <li><a href="event.html" data-event-id="<%= eventObj.id %>" class="event-detail-link"><img src="<%= eventObj.image %>" alt="<%= eventObj.name %>" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" /></a></li>
-
-    <% }); %>
-</script>
-
-<script type="text/template" id="template-relatedinterestslider">
+<script type="text/template" id="template-eventslider">
     <% _.each(itemArray, function(eventObj, key){ %>
 
     <li><a href="event.html" data-event-id="<%= eventObj.id %>" class="event-detail-link"><img src="<%= eventObj.image %>" alt="<%= eventObj.name %>" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" /></a></li>
