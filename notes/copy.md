@@ -23,3 +23,7 @@ Your favorites are exhibitions that you've saved to view later or plan on attend
 ### History - Default
 
 Your history are events that you've favorited that happened in the past. Keep track of which events you've attended to help us provide recommendations for upcoming exhibitions.
+
+### Sign In 
+
+Please sign in to access your favorites and see recommended exhibitions based on your interests.
