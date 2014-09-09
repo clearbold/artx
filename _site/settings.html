@@ -74,7 +74,10 @@
 </header> <!-- /header -->
 
                 <div class="content" role="main">
-            <form id="settings-form" name="settings-form" method="post" action="">
+            <div class="if-not-loggedin">
+                <p>You'll need to <a href="sign-in.html">sign in</a> or <a href="#" class="signup-trigger">sign up</a> in order to access your settings!</p>
+            </div>
+            <form id="settings-form" name="settings-form" method="post" action="" class="if-loggedin">
                 <p>
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required="required" />

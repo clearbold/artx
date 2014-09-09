@@ -1550,39 +1550,30 @@ ArtX.loadMore = {
     }
 };
 
-ArtX.loginBounce = function() {
-    if ($.cookie('token') === undefined) {
-        console.log("You can't access this page, you're not logged in.");
-        $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
-        console.log("Popping the new visitor sign up window");
-        setTimeout(function(){
-            ArtX.signupModal.open();
-        },1000);
-    }
-};
-
 /* Setting up My Settings Ajax functionality
    ========================================================================== */
 ArtX.settings = {
     init: function() {
         if ($("#settings-form").length > 0) {
 
-            console.log("Initializing app settings");
+            if ($.cookie('token') !== undefined) {
+                console.log("Initializing app settings");
 
-            // Preload the field values from the back-end API
-            ArtX.settings.fetchFieldValues();
+                // Preload the field values from the back-end API
+                ArtX.settings.fetchFieldValues();
 
-            // Set up validation and Ajax submit
-            $("#settings-form").validate({
-                rules: {
-                    "password_confirmation": {
-                        equalTo: "#password"
+                // Set up validation and Ajax submit
+                $("#settings-form").validate({
+                    rules: {
+                        "password_confirmation": {
+                            equalTo: "#password"
+                        },
+                        "email": "email",
+                        "zipcode": "zipcode"
                     },
-                    "email": "email",
-                    "zipcode": "zipcode"
-                },
-                submitHandler: ArtX.settings.ajaxSubmit
-            });
+                    submitHandler: ArtX.settings.ajaxSubmit
+                });
+            } 
         }
     },
     fetchFieldValues: function() {
@@ -1697,8 +1688,10 @@ ArtX.settings = {
 ArtX.historyList = {
     init: function() {
         if ($("#target-historylist").length > 0) {
-            console.log("Initializing History list");
-            ArtX.historyList.fetchData();
+            if ($.cookie('token') !== undefined) {
+                console.log("Initializing History list");
+                ArtX.historyList.fetchData();
+            }
         }
     },
     fetchData: function() {
@@ -1922,8 +1915,10 @@ ArtX.historyList = {
 ArtX.favoriteList = {
     init: function() {
         if ($("#target-favoritelist").length > 0) {
-            console.log("Initializing Favorites list");
-            ArtX.favoriteList.fetchData();
+            if ($.cookie('token') !== undefined) {
+                console.log("Initializing Favorites list");
+                ArtX.favoriteList.fetchData();
+            }
         }
     },
     fetchData: function() {
@@ -2036,88 +2031,92 @@ ArtX.interests = {
     },
     init: function() {
         if ($("#interest-form").length > 0) {
-            console.log("Initializing functionality for My Interests");
+            
+            if ($.cookie('token') !== undefined) {
 
-            ArtX.interests.checkForInterests();
+                console.log("Initializing functionality for My Interests");
 
-            var isCheckboxChecked = false;
-            var checkboxID;
-            var $thisCheckbox;
+                ArtX.interests.checkForInterests();
 
-            // Set up click event for interest form checkboxes
-            $("#interest-form-list").on("click", "input[type=checkbox]", function() {
-                isCheckboxChecked = $(this).prop("checked");
-                checkboxID = $(this).data("interest-id");
-                console.log("checkboxID: " + checkboxID);
-                checkboxValue = $(this).val();
+                var isCheckboxChecked = false;
+                var checkboxID;
+                var $thisCheckbox;
 
-                $thisCheckbox = $(this);
+                // Set up click event for interest form checkboxes
+                $("#interest-form-list").on("click", "input[type=checkbox]", function() {
+                    isCheckboxChecked = $(this).prop("checked");
+                    checkboxID = $(this).data("interest-id");
+                    console.log("checkboxID: " + checkboxID);
+                    checkboxValue = $(this).val();
 
-                if (isCheckboxChecked) {
-                    // We're interested in this, send a POST request
-                    ArtX.interests.vars.ajaxType = "POST";
-                    ArtX.interests.vars.ajaxURL = ArtX.var.jsonDomain + "/interests/";
-                    ArtX.interests.vars.ajaxData = {
-                        "tag_id": checkboxID
-                    };
-                    ArtX.interests.vars.ajaxSuccessMsg = "Interest '" + checkboxValue + "' saved.";
-                    ArtX.interests.vars.ajaxErrorMsg = "Saving interest '" + checkboxValue + "' failed!";
+                    $thisCheckbox = $(this);
 
-                    ArtX.interests.vars.ajaxCallback = function(checkboxObj, ajaxData) {
-                        console.log("Callback for adding an interest");
-                        var $myCheckbox = checkboxObj;
-                        var userInterestID;
-                        $.each(ajaxData, function(index, interest) {
-                            userInterestID = interest.id;
-                            console.log("Selected interest ID for this user: " + userInterestID);
-                        });
-                        $myCheckbox.attr("data-user-interest-id", userInterestID);
-                    };
-                } else {
-                    // We're not interested in this anymore, send a DELETE request
-                    var userInterestID = $(this).data("user-interest-id");
-                    console.log("userInterestID: " + userInterestID);
+                    if (isCheckboxChecked) {
+                        // We're interested in this, send a POST request
+                        ArtX.interests.vars.ajaxType = "POST";
+                        ArtX.interests.vars.ajaxURL = ArtX.var.jsonDomain + "/interests/";
+                        ArtX.interests.vars.ajaxData = {
+                            "tag_id": checkboxID
+                        };
+                        ArtX.interests.vars.ajaxSuccessMsg = "Interest '" + checkboxValue + "' saved.";
+                        ArtX.interests.vars.ajaxErrorMsg = "Saving interest '" + checkboxValue + "' failed!";
 
-                    ArtX.interests.vars.ajaxType = "POST";
-                    ArtX.interests.vars.ajaxURL = ArtX.var.jsonDomain + "/interests/" + userInterestID;
-                    ArtX.interests.vars.ajaxData = {
-                        "_method":"delete"
-                    };
-                    ArtX.interests.vars.ajaxSuccessMsg = "Interest '" + checkboxValue + "' deleted.";
-                    ArtX.interests.vars.ajaxErrorMsg = "Deleting interest '" + checkboxValue + "' failed!";
+                        ArtX.interests.vars.ajaxCallback = function(checkboxObj, ajaxData) {
+                            console.log("Callback for adding an interest");
+                            var $myCheckbox = checkboxObj;
+                            var userInterestID;
+                            $.each(ajaxData, function(index, interest) {
+                                userInterestID = interest.id;
+                                console.log("Selected interest ID for this user: " + userInterestID);
+                            });
+                            $myCheckbox.attr("data-user-interest-id", userInterestID);
+                        };
+                    } else {
+                        // We're not interested in this anymore, send a DELETE request
+                        var userInterestID = $(this).data("user-interest-id");
+                        console.log("userInterestID: " + userInterestID);
 
-                    ArtX.interests.vars.ajaxCallback = function(checkboxObj) {
-                        console.log("Callback for deleting an interest");
-                        var $myCheckbox = checkboxObj;
-                        $myCheckbox.removeAttr("data-user-interest-id");
-                    };
-                }
+                        ArtX.interests.vars.ajaxType = "POST";
+                        ArtX.interests.vars.ajaxURL = ArtX.var.jsonDomain + "/interests/" + userInterestID;
+                        ArtX.interests.vars.ajaxData = {
+                            "_method":"delete"
+                        };
+                        ArtX.interests.vars.ajaxSuccessMsg = "Interest '" + checkboxValue + "' deleted.";
+                        ArtX.interests.vars.ajaxErrorMsg = "Deleting interest '" + checkboxValue + "' failed!";
 
-                /* Make the actual Ajax request to handle the interest
-                TODO: add success/fail/error handling, etc.
-                No Load More functionality, possibly a future enhancement. */
-                $.mobile.loading('show');
-
-                $.ajax({
-                    type: ArtX.interests.vars.ajaxType,
-                    url: ArtX.interests.vars.ajaxURL,
-                    data: ArtX.interests.vars.ajaxData,
-                    beforeSend: function (request) {
-                        request.setRequestHeader("authentication_token", $.cookie('token'));
-                    },
-                    success: function ( data, textStatus, jqXHR ) {
-                        console.log(ArtX.interests.vars.ajaxSuccessMsg);
-                        ArtX.interests.vars.ajaxCallback($thisCheckbox, data);
-                    },
-                    error: function (jqXHR, error, errorThrown) {
-                        console.log(ArtX.interests.vars.ajaxErrorMsg);
-                        ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
-                    },
-                    complete: function() {
-                        $.mobile.loading('hide');
+                        ArtX.interests.vars.ajaxCallback = function(checkboxObj) {
+                            console.log("Callback for deleting an interest");
+                            var $myCheckbox = checkboxObj;
+                            $myCheckbox.removeAttr("data-user-interest-id");
+                        };
                     }
+
+                    /* Make the actual Ajax request to handle the interest
+                    TODO: add success/fail/error handling, etc.
+                    No Load More functionality, possibly a future enhancement. */
+                    $.mobile.loading('show');
+
+                    $.ajax({
+                        type: ArtX.interests.vars.ajaxType,
+                        url: ArtX.interests.vars.ajaxURL,
+                        data: ArtX.interests.vars.ajaxData,
+                        beforeSend: function (request) {
+                            request.setRequestHeader("authentication_token", $.cookie('token'));
+                        },
+                        success: function ( data, textStatus, jqXHR ) {
+                            console.log(ArtX.interests.vars.ajaxSuccessMsg);
+                            ArtX.interests.vars.ajaxCallback($thisCheckbox, data);
+                        },
+                        error: function (jqXHR, error, errorThrown) {
+                            console.log(ArtX.interests.vars.ajaxErrorMsg);
+                            ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                        },
+                        complete: function() {
+                            $.mobile.loading('hide');
+                        }
+                    });
                 });
-            });
+            }
 
         }
     },
@@ -2740,51 +2739,6 @@ $(document).on( "mobileinit", function( event ) {
 
 $(document).on( "pagecontainerbeforechange", function( event, ui ) {
     console.log("****JQM pagecontainerbeforechange event firing");
-
-    /*console.log("This should run each time the event does.");
-
-    // all properties shouldn't return "undefined"
-    var toPage = ui.toPage,
-        prevPage = ui.prevPage ? ui.prevPage : "",
-        options = ui.options;
-
-    //Keep this, it always seems to be right
-    var loadingURL;
-    if ( typeof toPage == "object" ) {
-        console.log("toPage is an object");
-        loadingURL = ui.toPage.attr("data-url");
-        console.log("Loading " + loadingURL);
-
-        if (loadingURL == "/settings.html") {
-            if ($.cookie('token') === undefined) {
-                console.log("You can't access this page, you're not logged in.");
-                
-                //ui.toPage.remove();
-                $("div[data-url='/settings.html']").remove();
-
-                ui.toPage = "/sign-in.html";
-
-                $.extend( ui.options, {
-                    //transition: "fade",
-                    changeHash: false
-                });
-            }
-        }
-    } else if ( typeof toPage == "string") {
-        console.log("toPage is a string");
-    }
-
-    if (prevPage !== "") {
-        console.log("prevPage exists!");
-        console.log(ui.prevPage.attr("data-url"));
-    }
-    
-    //console.log("prevPage")
-
-    //if ( typeof toPage == "string" ) {
-        //console.log("This will only run the second time, but only if it's not the first page.");
-    //}*/
-
 });
 
 

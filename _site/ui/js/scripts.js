@@ -379,6 +379,7 @@ ArtX.footerSlider = {
             oneToOneTouch:false,
             pager:false
         },
+        pageSize: 15,
         slideTemplate: "",
         relatedInterestCounter: 0,
         totalRelatedInterests: 2,  // it's really 3, but it's 0-index-based
@@ -423,6 +424,9 @@ ArtX.footerSlider = {
                 $.ajax({
                     type: "GET",
                     dataType: "json",
+                    data: {
+                        "per_page": ArtX.footerSlider.vars.pageSize
+                    },
                     url: ArtX.var.jsonDomain + "/favorites/",
                     beforeSend: function(request) {
                         request.setRequestHeader("authentication_token", $.cookie('token'));
@@ -470,6 +474,9 @@ ArtX.footerSlider = {
             $.ajax({
                 type: "GET",
                 dataType: "json",
+                data: {
+                    "per_page": ArtX.footerSlider.vars.pageSize
+                },
                 url: ArtX.var.jsonDomain + "/locations/" + venueID + "/events",
                 success: function( data ) {
                     console.log("Footer slider data successfully fetched");
@@ -552,7 +559,7 @@ ArtX.footerSlider = {
                     latitude: ArtX.geolocation.vars.currentLatitude,
                     longitude: ArtX.geolocation.vars.currentLongitude,
                     radius: ArtX.footerSlider.vars.locationRadius,
-                    per_page: 20
+                    "per_page": ArtX.footerSlider.vars.pageSize
                 },
                 success: function( data ) {
                     console.log("Footer slider data successfully fetched");
@@ -598,8 +605,8 @@ ArtX.footerSlider = {
         var currentInterest = data[ArtX.footerSlider.vars.relatedInterestCounter];
 
         console.log("Interest counter going into the function: " + ArtX.footerSlider.vars.relatedInterestCounter);
-        console.log("Here's the current interest:");
-        console.log(JSON.stringify(currentInterest));
+        //console.log("Here's the current interest:");
+        //console.log(JSON.stringify(currentInterest));
 
         // Show spinner
         $.mobile.loading('show');
@@ -1107,8 +1114,11 @@ ArtX.eventdetail = {
 
             // Aha -- if we're on the event page now, we have to reload the page
             if ($("#template-eventdetail").length > 0) {
-                $.mobile.pageContainer.pagecontainer ("change", "event.html", {allowSamePageTransition:true,});
+                $.mobile.pageContainer.pagecontainer ("change", "event.html", {changeHash: true, reload:true, reloadPage:true});
             }
+            /* Dev note: jQuery Mobile's back button no longer works when you load the same page dynamically like this.  It looks like it's something they're trying to address in current development efforts for the next releases (https://github.com/jquery/jquery-mobile/issues/2529 and linked issues), but it's not currently possible.
+
+            Even if it was, we'd have to do a better job about saving state -- keeping track of old/new variables, passing them appropriately, etc.  */
         });
     },
     destroyLinks: function() {
@@ -1545,22 +1555,25 @@ ArtX.loadMore = {
 ArtX.settings = {
     init: function() {
         if ($("#settings-form").length > 0) {
-            console.log("Initializing app settings");
 
-            // Preload the field values from the back-end API
-            ArtX.settings.fetchFieldValues();
+            if ($.cookie('token') !== undefined) {
+                console.log("Initializing app settings");
 
-            // Set up validation and Ajax submit
-            $("#settings-form").validate({
-                rules: {
-                    "password_confirmation": {
-                        equalTo: "#password"
+                // Preload the field values from the back-end API
+                ArtX.settings.fetchFieldValues();
+
+                // Set up validation and Ajax submit
+                $("#settings-form").validate({
+                    rules: {
+                        "password_confirmation": {
+                            equalTo: "#password"
+                        },
+                        "email": "email",
+                        "zipcode": "zipcode"
                     },
-                    "email": "email",
-                    "zipcode": "zipcode"
-                },
-                submitHandler: ArtX.settings.ajaxSubmit
-            });
+                    submitHandler: ArtX.settings.ajaxSubmit
+                });
+            } 
         }
     },
     fetchFieldValues: function() {
@@ -1675,8 +1688,10 @@ ArtX.settings = {
 ArtX.historyList = {
     init: function() {
         if ($("#target-historylist").length > 0) {
-            console.log("Initializing History list");
-            ArtX.historyList.fetchData();
+            if ($.cookie('token') !== undefined) {
+                console.log("Initializing History list");
+                ArtX.historyList.fetchData();
+            }
         }
     },
     fetchData: function() {
@@ -1900,8 +1915,10 @@ ArtX.historyList = {
 ArtX.favoriteList = {
     init: function() {
         if ($("#target-favoritelist").length > 0) {
-            console.log("Initializing Favorites list");
-            ArtX.favoriteList.fetchData();
+            if ($.cookie('token') !== undefined) {
+                console.log("Initializing Favorites list");
+                ArtX.favoriteList.fetchData();
+            }
         }
     },
     fetchData: function() {
@@ -2014,88 +2031,92 @@ ArtX.interests = {
     },
     init: function() {
         if ($("#interest-form").length > 0) {
-            console.log("Initializing functionality for My Interests");
+            
+            if ($.cookie('token') !== undefined) {
 
-            ArtX.interests.checkForInterests();
+                console.log("Initializing functionality for My Interests");
 
-            var isCheckboxChecked = false;
-            var checkboxID;
-            var $thisCheckbox;
+                ArtX.interests.checkForInterests();
 
-            // Set up click event for interest form checkboxes
-            $("#interest-form-list").on("click", "input[type=checkbox]", function() {
-                isCheckboxChecked = $(this).prop("checked");
-                checkboxID = $(this).data("interest-id");
-                console.log("checkboxID: " + checkboxID);
-                checkboxValue = $(this).val();
+                var isCheckboxChecked = false;
+                var checkboxID;
+                var $thisCheckbox;
 
-                $thisCheckbox = $(this);
+                // Set up click event for interest form checkboxes
+                $("#interest-form-list").on("click", "input[type=checkbox]", function() {
+                    isCheckboxChecked = $(this).prop("checked");
+                    checkboxID = $(this).data("interest-id");
+                    console.log("checkboxID: " + checkboxID);
+                    checkboxValue = $(this).val();
 
-                if (isCheckboxChecked) {
-                    // We're interested in this, send a POST request
-                    ArtX.interests.vars.ajaxType = "POST";
-                    ArtX.interests.vars.ajaxURL = ArtX.var.jsonDomain + "/interests/";
-                    ArtX.interests.vars.ajaxData = {
-                        "tag_id": checkboxID
-                    };
-                    ArtX.interests.vars.ajaxSuccessMsg = "Interest '" + checkboxValue + "' saved.";
-                    ArtX.interests.vars.ajaxErrorMsg = "Saving interest '" + checkboxValue + "' failed!";
+                    $thisCheckbox = $(this);
 
-                    ArtX.interests.vars.ajaxCallback = function(checkboxObj, ajaxData) {
-                        console.log("Callback for adding an interest");
-                        var $myCheckbox = checkboxObj;
-                        var userInterestID;
-                        $.each(ajaxData, function(index, interest) {
-                            userInterestID = interest.id;
-                            console.log("Selected interest ID for this user: " + userInterestID);
-                        });
-                        $myCheckbox.attr("data-user-interest-id", userInterestID);
-                    };
-                } else {
-                    // We're not interested in this anymore, send a DELETE request
-                    var userInterestID = $(this).data("user-interest-id");
-                    console.log("userInterestID: " + userInterestID);
+                    if (isCheckboxChecked) {
+                        // We're interested in this, send a POST request
+                        ArtX.interests.vars.ajaxType = "POST";
+                        ArtX.interests.vars.ajaxURL = ArtX.var.jsonDomain + "/interests/";
+                        ArtX.interests.vars.ajaxData = {
+                            "tag_id": checkboxID
+                        };
+                        ArtX.interests.vars.ajaxSuccessMsg = "Interest '" + checkboxValue + "' saved.";
+                        ArtX.interests.vars.ajaxErrorMsg = "Saving interest '" + checkboxValue + "' failed!";
 
-                    ArtX.interests.vars.ajaxType = "POST";
-                    ArtX.interests.vars.ajaxURL = ArtX.var.jsonDomain + "/interests/" + userInterestID;
-                    ArtX.interests.vars.ajaxData = {
-                        "_method":"delete"
-                    };
-                    ArtX.interests.vars.ajaxSuccessMsg = "Interest '" + checkboxValue + "' deleted.";
-                    ArtX.interests.vars.ajaxErrorMsg = "Deleting interest '" + checkboxValue + "' failed!";
+                        ArtX.interests.vars.ajaxCallback = function(checkboxObj, ajaxData) {
+                            console.log("Callback for adding an interest");
+                            var $myCheckbox = checkboxObj;
+                            var userInterestID;
+                            $.each(ajaxData, function(index, interest) {
+                                userInterestID = interest.id;
+                                console.log("Selected interest ID for this user: " + userInterestID);
+                            });
+                            $myCheckbox.attr("data-user-interest-id", userInterestID);
+                        };
+                    } else {
+                        // We're not interested in this anymore, send a DELETE request
+                        var userInterestID = $(this).data("user-interest-id");
+                        console.log("userInterestID: " + userInterestID);
 
-                    ArtX.interests.vars.ajaxCallback = function(checkboxObj) {
-                        console.log("Callback for deleting an interest");
-                        var $myCheckbox = checkboxObj;
-                        $myCheckbox.removeAttr("data-user-interest-id");
-                    };
-                }
+                        ArtX.interests.vars.ajaxType = "POST";
+                        ArtX.interests.vars.ajaxURL = ArtX.var.jsonDomain + "/interests/" + userInterestID;
+                        ArtX.interests.vars.ajaxData = {
+                            "_method":"delete"
+                        };
+                        ArtX.interests.vars.ajaxSuccessMsg = "Interest '" + checkboxValue + "' deleted.";
+                        ArtX.interests.vars.ajaxErrorMsg = "Deleting interest '" + checkboxValue + "' failed!";
 
-                /* Make the actual Ajax request to handle the interest
-                TODO: add success/fail/error handling, etc.
-                No Load More functionality, possibly a future enhancement. */
-                $.mobile.loading('show');
-
-                $.ajax({
-                    type: ArtX.interests.vars.ajaxType,
-                    url: ArtX.interests.vars.ajaxURL,
-                    data: ArtX.interests.vars.ajaxData,
-                    beforeSend: function (request) {
-                        request.setRequestHeader("authentication_token", $.cookie('token'));
-                    },
-                    success: function ( data, textStatus, jqXHR ) {
-                        console.log(ArtX.interests.vars.ajaxSuccessMsg);
-                        ArtX.interests.vars.ajaxCallback($thisCheckbox, data);
-                    },
-                    error: function (jqXHR, error, errorThrown) {
-                        console.log(ArtX.interests.vars.ajaxErrorMsg);
-                        ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
-                    },
-                    complete: function() {
-                        $.mobile.loading('hide');
+                        ArtX.interests.vars.ajaxCallback = function(checkboxObj) {
+                            console.log("Callback for deleting an interest");
+                            var $myCheckbox = checkboxObj;
+                            $myCheckbox.removeAttr("data-user-interest-id");
+                        };
                     }
+
+                    /* Make the actual Ajax request to handle the interest
+                    TODO: add success/fail/error handling, etc.
+                    No Load More functionality, possibly a future enhancement. */
+                    $.mobile.loading('show');
+
+                    $.ajax({
+                        type: ArtX.interests.vars.ajaxType,
+                        url: ArtX.interests.vars.ajaxURL,
+                        data: ArtX.interests.vars.ajaxData,
+                        beforeSend: function (request) {
+                            request.setRequestHeader("authentication_token", $.cookie('token'));
+                        },
+                        success: function ( data, textStatus, jqXHR ) {
+                            console.log(ArtX.interests.vars.ajaxSuccessMsg);
+                            ArtX.interests.vars.ajaxCallback($thisCheckbox, data);
+                        },
+                        error: function (jqXHR, error, errorThrown) {
+                            console.log(ArtX.interests.vars.ajaxErrorMsg);
+                            ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                        },
+                        complete: function() {
+                            $.mobile.loading('hide');
+                        }
+                    });
                 });
-            });
+            }
 
         }
     },
@@ -2716,9 +2737,18 @@ $(document).on( "mobileinit", function( event ) {
     $.mobile.popup.prototype.options.history = false;
 });
 
+$(document).on( "pagecontainerbeforechange", function( event, ui ) {
+    console.log("****JQM pagecontainerbeforechange event firing");
+});
 
-$(document).on( "pagebeforechange", function( event ) {
-    console.log("****JQM pagebeforechange event firing");
+
+$(document).on( "pagecontainerbeforeload", function( event ) {
+    console.log("****JQM pagecontainerbeforeload event firing");
+});
+
+
+$(document).on( "pagecontainerload", function( event ) {
+    console.log("****JQM pagecontainerload event firing");
 });
 
 

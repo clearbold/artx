@@ -75,38 +75,44 @@
 
                 <div class="content" role="main">
 
-            <p>Introductory text lorem ipsum dolor sit amet, consectetur adipisicing elit. Molestias, quisquam obcaecati eum maxime voluptatem quos praesentium esse saepe sunt officiis.</p>
-
-            <div id="error-favoritelist" class="error-messages">
-                <p>You have no current favorites.</p>
+            <div class="if-not-loggedin">
+                <p>You'll need to <a href="sign-in.html">sign in</a> or <a href="#" class="signup-trigger">sign up</a> in order to access your favorites!</p>
             </div>
 
-            <div id="target-favoritelist" class="thumb-list">
-                
-            </div> <!-- /thumb-list -->
+            <div class="if-loggedin">
+                <p>Introductory text lorem ipsum dolor sit amet, consectetur adipisicing elit. Molestias, quisquam obcaecati eum maxime voluptatem quos praesentium esse saepe sunt officiis.</p>
 
-            <script type="text/template" id="template-favoritelist">
-                <% _.each(jsonArray, function(favoriteObj, key){ %>
-                       
-                <div class="item-block cf">
-                    <div class="item-image">
-                        <a href="event.html" data-event-id="<%= favoriteObj.event.id %>" class="event-detail-link">
-                            <img src="<%= favoriteObj.event.image %>" alt="" onerror="if (this.src != '/ui/img/rect-thumb-noimage.jpg') this.src = '/ui/img/rect-thumb-noimage.jpg';" />
-                        </a>
-                    </div>
-                    <div class="item-info">
-                        <h2 class="item-title">
-                            <a href="event.html" data-event-id="<%= favoriteObj.event.id %>" class="event-detail-link truncate"><%= favoriteObj.event.name %></a>
-                        </h2>
-                        <p class="item-venue"><%= favoriteObj.event.location.name %></p>
-                        <p class="item-date"><%= favoriteObj.event.dates %></p>
-
-                        <a href="#" class="favorite-star item-symbol" data-event-id="<%= favoriteObj.event.id %>" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
-                    </div>
+                <div id="error-favoritelist" class="error-messages">
+                    <p>You have no current favorites.</p>
                 </div>
 
-                <% }); %>
-            </script>
+                <div id="target-favoritelist" class="thumb-list">
+                    
+                </div> <!-- /thumb-list -->
+
+                <script type="text/template" id="template-favoritelist">
+                    <% _.each(jsonArray, function(favoriteObj, key){ %>
+                           
+                    <div class="item-block cf">
+                        <div class="item-image">
+                            <a href="event.html" data-event-id="<%= favoriteObj.event.id %>" class="event-detail-link">
+                                <img src="<%= favoriteObj.event.image %>" alt="" onerror="if (this.src != '/ui/img/rect-thumb-noimage.jpg') this.src = '/ui/img/rect-thumb-noimage.jpg';" />
+                            </a>
+                        </div>
+                        <div class="item-info">
+                            <h2 class="item-title">
+                                <a href="event.html" data-event-id="<%= favoriteObj.event.id %>" class="event-detail-link truncate"><%= favoriteObj.event.name %></a>
+                            </h2>
+                            <p class="item-venue"><%= favoriteObj.event.location.name %></p>
+                            <p class="item-date"><%= favoriteObj.event.dates %></p>
+
+                            <a href="#" class="favorite-star item-symbol" data-event-id="<%= favoriteObj.event.id %>" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
+                        </div>
+                    </div>
+
+                    <% }); %>
+                </script>
+            </div>
 
         </div> <!-- /content -->
 

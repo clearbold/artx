@@ -5,34 +5,39 @@ titlebar: My Interests
 active: interests
 ---
         <div class="content" role="main">
-            <p id="interest-onboarding-intro" class="interest-intro">Thanks for signing up! Please help us curate your ArtsConnect experience by selecting some of your interests. When finished, you can start discovering events. <br /><br /><a href="index.html" class="btn">Discover events</a></p>
+            <div class="if-not-loggedin">
+                <p>You'll need to <a href="sign-in.html">sign in</a> or <a href="#" class="signup-trigger">sign up</a> in order to access your interests!</p>
+            </div>
+            <div class="if-loggedin">
+                <p id="interest-onboarding-intro" class="interest-intro">Thanks for signing up! Please help us curate your ArtsConnect experience by selecting some of your interests. When finished, you can start discovering events. <br /><br /><a href="index.html" class="btn">Discover events</a></p>
 
-            <p id="interest-normal-intro" class="interest-intro">Here you can adjust your currently selected interests.</p>
+                <p id="interest-normal-intro" class="interest-intro">Here you can adjust your currently selected interests.</p>
 
-            <form id="interest-form" name="interest-form" method="post" action="">
-                <ul id="interest-form-list" class="listview custom-checkbox-list">
+                <form id="interest-form" name="interest-form" method="post" action="">
+                    <ul id="interest-form-list" class="listview custom-checkbox-list">
 
-                </ul>
-               
-                <script type="text/template" id="interests-template">
-                <% _.each(jsonArray.tags, function(interest, key){ %>
-                    <li>
-                        <label for="interest-<%= interest.id %>"><%= interest.name %></label>
-                        <input type="checkbox" name="interest"
-                            id="interest-<%= interest.id %>" value="<%= interest.name %>"
-                            class="customize-checkbox" data-role="none" data-interest-id="<%= interest.id %>" />
-                    </li>
-                <% }); %>
-                </script>
+                    </ul>
+                   
+                    <script type="text/template" id="interests-template">
+                    <% _.each(jsonArray.tags, function(interest, key){ %>
+                        <li>
+                            <label for="interest-<%= interest.id %>"><%= interest.name %></label>
+                            <input type="checkbox" name="interest"
+                                id="interest-<%= interest.id %>" value="<%= interest.name %>"
+                                class="customize-checkbox" data-role="none" data-interest-id="<%= interest.id %>" />
+                        </li>
+                    <% }); %>
+                    </script>
 
-                <script type="text/template" id="interests-user-template">
-                <% _.each(jsonArray.interests, function(interest, key){ %>
-                    <li>
-                        <label for="user-interest-<%= interest.tag.id %>"><%= interest.tag.name %></label>
-                        <input type="checkbox" name="interest" id="user-interest-<%= interest.tag.id %>" value="<%= interest.tag.name %>" class="customize-checkbox" data-role="none" data-interest-id="<%= interest.tag.id %>" data-user-interest-id="<%= interest.id %>" checked="checked" />
-                    </li>
-                <% }); %>
-                </script>
+                    <script type="text/template" id="interests-user-template">
+                    <% _.each(jsonArray.interests, function(interest, key){ %>
+                        <li>
+                            <label for="user-interest-<%= interest.tag.id %>"><%= interest.tag.name %></label>
+                            <input type="checkbox" name="interest" id="user-interest-<%= interest.tag.id %>" value="<%= interest.tag.name %>" class="customize-checkbox" data-role="none" data-interest-id="<%= interest.tag.id %>" data-user-interest-id="<%= interest.id %>" checked="checked" />
+                        </li>
+                    <% }); %>
+                    </script>
 
-            </form>
+                </form>
+            </div>
         </div> <!-- end content -->
