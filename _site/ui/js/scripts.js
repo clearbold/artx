@@ -1207,11 +1207,6 @@ ArtX.venuedetail = {
             $("#target-venuedetail").fadeIn(400);
             console.log("Venue page content finished displaying");
 
-            $(".venue-location-link").click(function() {
-                console.log("Venue location link clicked: " + $(this).attr("data-venue-id"));
-                ArtX.byLocation.vars.openWithVenueID = $(this).attr("data-venue-id");
-            });
-
             ArtX.footerSlider.init();
         });
     }
@@ -1261,7 +1256,18 @@ ArtX.calendar = {
                                 // select the new day
                                 $(target.element).addClass("day-selected");
                                 // and display events for that day
-                                ArtX.calendar.displayEventList(target);
+
+                                // Check to see what the results are
+                                var checkData = JSON.stringify(target.events);
+
+                                if (checkData.length > 2) {
+                                    // Event data returned, show the list
+                                    ArtX.calendar.displayEventList(target);
+                                } else {
+                                    // No events, show error
+                                    ArtX.calendar.showErrorMsg("noevents");
+                                }
+       
                             } else {
                                 //console.log("Click target not a day.");
                             }
@@ -1334,6 +1340,10 @@ ArtX.calendar = {
     },
     displayEventList: function(target) {
         console.log("Displaying event list");
+
+        // hide any current error messages
+        $("#event-list-messages").find("p").fadeOut(400);
+
         var eventArray = target.events;
         var eventTemplate = $('#template-eventlist').html();
         $("#event-list").fadeOut(400, function() {
@@ -1344,6 +1354,13 @@ ArtX.calendar = {
                 ArtX.setupTextTruncation();
             });
         });
+    },
+    showErrorMsg: function(errorID) {
+        // Hide event list
+        $("#event-list").fadeOut( 400, function() {
+            $("#event-list").empty().show();
+        });
+        $("#event-list-msg-"+errorID).fadeIn(400);
     },
     init: function() {
         if ($("#event-calendar").length > 0) {
@@ -2457,6 +2474,16 @@ ArtX.byLocation = {
     init : function() {
         if ($("#event-map").length > 0) {
             console.log( "Initializing map" );
+
+            // Reset the openWithVenueID variable on page load, to start fresh
+            ArtX.byLocation.vars.openWithVenueID = "-1";
+
+            // Get the desired venue ID from a querystring
+            var qsVenueID = ArtX.util.findQuerystring("venueid");
+            //console.log("Venue ID passed in via querystring: " + qsVenueID);
+            if (typeof qsVenueID != 'undefined') {
+                ArtX.byLocation.vars.openWithVenueID = qsVenueID;
+            }
 
             // Set up map
             L.mapbox.accessToken = ArtX.byLocation.vars.accessToken;

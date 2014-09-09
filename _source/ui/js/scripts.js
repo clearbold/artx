@@ -1256,7 +1256,18 @@ ArtX.calendar = {
                                 // select the new day
                                 $(target.element).addClass("day-selected");
                                 // and display events for that day
-                                ArtX.calendar.displayEventList(target);
+
+                                // Check to see what the results are
+                                var checkData = JSON.stringify(target.events);
+
+                                if (checkData.length > 2) {
+                                    // Event data returned, show the list
+                                    ArtX.calendar.displayEventList(target);
+                                } else {
+                                    // No events, show error
+                                    ArtX.calendar.showErrorMsg("noevents");
+                                }
+       
                             } else {
                                 //console.log("Click target not a day.");
                             }
@@ -1329,6 +1340,10 @@ ArtX.calendar = {
     },
     displayEventList: function(target) {
         console.log("Displaying event list");
+
+        // hide any current error messages
+        $("#event-list-messages").find("p").fadeOut(400);
+
         var eventArray = target.events;
         var eventTemplate = $('#template-eventlist').html();
         $("#event-list").fadeOut(400, function() {
@@ -1339,6 +1354,13 @@ ArtX.calendar = {
                 ArtX.setupTextTruncation();
             });
         });
+    },
+    showErrorMsg: function(errorID) {
+        // Hide event list
+        $("#event-list").fadeOut( 400, function() {
+            $("#event-list").empty().show();
+        });
+        $("#event-list-msg-"+errorID).fadeIn(400);
     },
     init: function() {
         if ($("#event-calendar").length > 0) {

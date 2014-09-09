@@ -11,10 +11,15 @@ active: bydate
 
             </div>
 
+            <div id="event-list-messages" class="event-list-messages error-messages">
+                <p id="event-list-msg-noevents" class="event-list-msg">No events found for this date.</p>
+                <p id="event-list-msg-generalerror" class="event-list-msg">An error occurred, please reload the page and try again.</p>
+            </div>
+
             <script type="text/template" id="template-calendar">
                 <div class="clndr-controls">
                     <div class="clndr-previous-button"><i class="icon icon-rewind"></i><span class="visuallyhidden">Previous month</span></div>
-                    <div class="month"><%= month %></div>
+                    <div class="month"><%= month %> <%= year %></div>
                     <div class="clndr-next-button"><span class="visuallyhidden">Next month</span><i class="icon icon-fast-forward"></i></div>
                 </div>
                 <div class="clndr-grid">
