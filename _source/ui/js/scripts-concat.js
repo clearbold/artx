@@ -23169,6 +23169,16 @@ ArtX.util = {
             return (ArtX.util.viewportWidth() >= ArtX.util.viewportHeight()) ? "landscape" : "portrait";
         }
     },
+    findQuerystring: function(qs) {
+        hu = window.location.search.substring(1);
+        gy = hu.split("&");
+        for (i = 0; i < gy.length; i++) {
+            ft = gy[i].split("=");
+            if (ft[0] == qs) {
+                return ft[1];
+            }
+        }
+    },
     replaceAll: function (txt, replace, with_this) {
         return txt.replace(new RegExp(replace, 'g'),with_this);
     },
@@ -23315,9 +23325,8 @@ ArtX.discoverSlider = {
             ArtX.discoverSlider.initSlider();
         }
 
-        // Initialize favorite stars and event detail links
+        // Initialize favorite stars
         ArtX.favoriteStars.init();
-        ArtX.eventdetail.initLinks();
 
         ArtX.footerSlider.init();
     },
@@ -23376,6 +23385,8 @@ ArtX.footerSlider = {
     init: function() {
         if ($("#footer-slider").length > 0) {
             
+            ArtX.footerSlider.vars.relatedInterestCounter = 0; // on startup
+
             // Set up some variables
             if ($("#favorites-slider").length > 0) {
                 /* Favorites slider */
@@ -23383,7 +23394,7 @@ ArtX.footerSlider = {
                 ArtX.footerSlider.vars.slideTemplate = $('#template-favoriteslider').html();
 
             } else {
-                /* Events slider */
+                /* Generic Events slider */
 
                 ArtX.footerSlider.vars.slideTemplate = $('#template-eventslider').html();
             }
@@ -23456,7 +23467,8 @@ ArtX.footerSlider = {
             console.log("Initializing Related Events slider");
 
             // Get the Venue ID from the .venue-detail div
-            var venueID = $(".venue-detail").attr("data-venue-id");
+            //var venueID = $(".venue-detail").attr("data-venue-id");
+            var venueID = ArtX.var.venueDetailID;
             console.log("Venue ID: " + venueID);
 
             $.ajax({
@@ -23621,7 +23633,6 @@ ArtX.footerSlider = {
             } else {
                 // Slider is already initialized, we need to reload it
                 ArtX.footerSlider.reload();
-                ArtX.eventdetail.initLinks();
             }
 
             // Hide spinner
@@ -23668,13 +23679,8 @@ ArtX.footerSlider = {
         
     },
     initSlider: function() {
-        
         ArtX.footerSlider.vars.footSlideInstance = $("#footer-slider").bxSlider(ArtX.footerSlider.vars.footSlideOptions);
-
         ArtX.footerSlider.initSliderNav();
-
-        // Initialize event detail links
-        ArtX.eventdetail.initLinks();
     },
     initSliderNav: function() {
         $(".footer-slider").removeClass("not-enough-slides");
@@ -24084,38 +24090,19 @@ ArtX.eventdetail = {
     init: function() {
         if ($("#template-eventdetail").length > 0) {
             ArtX.eventdetail.initPage();
-        }
-
-        if ($(".event-detail-link").length > 0) {
-            ArtX.eventdetail.initLinks();
-        }
-        
-    },
-    initLinks : function() {
-        // First, destroy any current links so that we don't get duplicates
-        ArtX.eventdetail.destroyLinks();
-
-        console.log("Setting up event detail link click events");
-        $(".event-detail-link").click(function() {
-            console.log("Event detail link clicked!");
-            ArtX.var.eventDetailID = $(this).attr("data-event-id");
-
-            // Aha -- if we're on the event page now, we have to reload the page
-            if ($("#template-eventdetail").length > 0) {
-                $.mobile.pageContainer.pagecontainer ("change", "event.html", {changeHash: true, reload:true, reloadPage:true});
-            }
-            /* Dev note: jQuery Mobile's back button no longer works when you load the same page dynamically like this.  It looks like it's something they're trying to address in current development efforts for the next releases (https://github.com/jquery/jquery-mobile/issues/2529 and linked issues), but it's not currently possible.
-
-            Even if it was, we'd have to do a better job about saving state -- keeping track of old/new variables, passing them appropriately, etc.  */
-        });
-    },
-    destroyLinks: function() {
-        console.log("Destroying event detail link click events");
-        $(".event-detail-link").unbind("click");
+        }  
     },
     initPage : function() {
         $.mobile.loading('show');
-        //console.log("Checking the passed eventDetailID: " + ArtX.var.eventDetailID);
+
+        // Get the desired event ID from a querystring
+        var qsEventID = ArtX.util.findQuerystring("eventid");
+        //console.log("Event ID passed in via querystring: " + qsEventID);
+        if (typeof qsEventID != 'undefined') {
+            ArtX.var.eventDetailID = qsEventID;
+        }
+        
+        // Fetch the data with the event ID
         $.ajax({
             type: "GET",
             dataType: "json",
@@ -24150,7 +24137,6 @@ ArtX.eventdetail = {
         $("#target-eventdetail").fadeOut(400, function() {
             $("#target-eventdetail").html(_.template(eventTemplate, {eventArray:eventArray}));
             ArtX.favoriteStars.init();
-            ArtX.venuedetail.initLinks();
             $("#target-eventdetail").fadeIn(400);
 
             ArtX.footerSlider.init();
@@ -24165,24 +24151,18 @@ ArtX.venuedetail = {
     init: function() {
         if ($("#template-venuedetail").length > 0) {
             ArtX.venuedetail.initPage();
-        }
-
-        if ($(".venue-detail-link").length > 0) {
-            ArtX.venuedetail.initLinks();
-        }
-        
-    },
-    initLinks : function() {
-        console.log("Setting up venue detail link click events");
-
-        $(".venue-detail-link").click(function() {
-            console.log("Venue detail link clicked!");
-            ArtX.var.venueDetailID = $(this).attr("data-venue-id");
-        });
+        }        
     },
     initPage : function() {
         $.mobile.loading('show');
-        console.log("Checking the passed venueDetailID: " + ArtX.var.venueDetailID);
+        
+        // Get the desired venue ID from a querystring
+        var qsVenueID = ArtX.util.findQuerystring("venueid");
+        //console.log("Venue ID passed in via querystring: " + qsVenueID);
+        if (typeof qsVenueID != 'undefined') {
+            ArtX.var.venueDetailID = qsVenueID;
+        }
+
         $.ajax({
             type: "GET",
             dataType: "json",
@@ -24347,7 +24327,6 @@ ArtX.calendar = {
         $("#event-list").fadeOut(400, function() {
             $("#event-list").html(_.template(eventTemplate, {eventArray:eventArray}));
             ArtX.favoriteStars.init();
-            ArtX.eventdetail.initLinks();
             $("#event-list").fadeIn(400, function() {
                 // Re-do truncation once fade is complete
                 ArtX.setupTextTruncation();
@@ -24737,9 +24716,8 @@ ArtX.historyList = {
         ArtX.historyList.addEventHandlers();
     },
     addEventHandlers: function() {
-        // Initialize favorite stars and event detail links
+        // Initialize favorite stars and history checkbox selected states
         ArtX.favoriteStars.init();
-        ArtX.eventdetail.initLinks();
         ArtX.historyList.syncAttended();
     },
     showList: function() {
@@ -24965,9 +24943,8 @@ ArtX.favoriteList = {
         ArtX.favoriteList.addEventHandlers();
     },
     addEventHandlers: function() {
-        // Initialize favorite stars and event detail links
+        // Initialize favorite stars
         ArtX.favoriteStars.init();
-        ArtX.eventdetail.initLinks();
     },
     showList: function() {
         $("#target-favoritelist").fadeIn(400);
@@ -25596,7 +25573,6 @@ ArtX.byLocation = {
     },
     addEventHandlers: function() {
         ArtX.favoriteStars.init();
-        ArtX.eventdetail.initLinks();
         //ArtX.loadMore.init();
     },
     showMap: function() {

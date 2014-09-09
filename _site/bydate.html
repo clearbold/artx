@@ -120,13 +120,13 @@
                     
             <div class="item-block cf">
                 <div class="item-image">
-                    <a href="event.html" data-event-id="<%= eventObj.id %>" class="event-detail-link">
+                    <a href="event.html?eventid=<%= eventObj.id %>">
                         <img src="<%= eventObj.image %>" alt="" onerror="if (this.src != '/ui/img/rect-thumb-noimage.jpg') this.src = '/ui/img/rect-thumb-noimage.jpg';" />
                     </a>
                 </div>
                 <div class="item-info">
                     <h2 class="item-title">
-                        <a href="event.html" data-event-id="<%= eventObj.id %>" class="truncate event-detail-link"><%= eventObj.name %></a>
+                        <a href="event.html?eventid=<%= eventObj.id %>" class="truncate"><%= eventObj.name %></a>
                     </h2>
                     <p class="item-date">
                     <% if (compareStartDate != compareEndDate) { %>

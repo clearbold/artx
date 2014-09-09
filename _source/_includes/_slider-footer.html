@@ -26,7 +26,7 @@
 <script type="text/template" id="template-favoriteslider">
     <% _.each(itemArray, function(favoriteObj, key){ %>
 
-    <li><a href="event.html" data-event-id="<%= favoriteObj.event.id %>" class="event-detail-link"><img src="<%= favoriteObj.event.image %>" alt="<%= favoriteObj.event.name %>" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" /></a></li>
+    <li><a href="event.html?eventid=<%= favoriteObj.event.id %>"><img src="<%= favoriteObj.event.image %>" alt="<%= favoriteObj.event.name %>" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" /></a></li>
 
     <% }); %>
 </script>
@@ -34,7 +34,7 @@
 <script type="text/template" id="template-eventslider">
     <% _.each(itemArray, function(eventObj, key){ %>
 
-    <li><a href="event.html" data-event-id="<%= eventObj.id %>" class="event-detail-link"><img src="<%= eventObj.image %>" alt="<%= eventObj.name %>" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" /></a></li>
+    <li><a href="event.html?eventid=<%= eventObj.id %>"><img src="<%= eventObj.image %>" alt="<%= eventObj.name %>" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" /></a></li>
 
     <% }); %>
 </script>

@@ -93,7 +93,7 @@
                         <%= eventObj.name %>
                         <a href="#" class="favorite-star item-symbol" data-event-id="<%= eventObj.id %>" title="Toggle as a favorite"><i class="icon icon-star"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
                     </h2>
-                    <p class="item-venue"><a href="venue.html" data-venue-id="<%= eventObj.location.id %>" class="venue-detail-link"><span class="item-symbol"><i class="icon icon-location"></i></span><%= eventObj.location.name %></a></p>
+                    <p class="item-venue"><a href="venue.html?venueid=<%= eventObj.location.id %>"><span class="item-symbol"><i class="icon icon-location"></i></span><%= eventObj.location.name %></a></p>
                     <p class="item-date"><span class="item-symbol"><i class="icon icon-calendar"></i></span><%= eventObj.dates %></p>
                     <div class="item-description">
                         <%= eventObj.description %>
@@ -139,7 +139,7 @@
 <script type="text/template" id="template-favoriteslider">
     <% _.each(itemArray, function(favoriteObj, key){ %>
 
-    <li><a href="event.html" data-event-id="<%= favoriteObj.event.id %>" class="event-detail-link"><img src="<%= favoriteObj.event.image %>" alt="<%= favoriteObj.event.name %>" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" /></a></li>
+    <li><a href="event.html?eventid=<%= favoriteObj.event.id %>"><img src="<%= favoriteObj.event.image %>" alt="<%= favoriteObj.event.name %>" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" /></a></li>
 
     <% }); %>
 </script>
@@ -147,7 +147,7 @@
 <script type="text/template" id="template-eventslider">
     <% _.each(itemArray, function(eventObj, key){ %>
 
-    <li><a href="event.html" data-event-id="<%= eventObj.id %>" class="event-detail-link"><img src="<%= eventObj.image %>" alt="<%= eventObj.name %>" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" /></a></li>
+    <li><a href="event.html?eventid=<%= eventObj.id %>"><img src="<%= eventObj.image %>" alt="<%= eventObj.name %>" onerror="if (this.src != '/ui/img/rect-noimage.jpg') this.src = '/ui/img/rect-noimage.jpg';" /></a></li>
 
     <% }); %>
 </script>

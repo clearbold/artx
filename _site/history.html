@@ -97,13 +97,13 @@
                            
                     <div class="item-block cf">
                         <div class="item-image">
-                            <a href="event.html" data-event-id="<%= favoriteObj.event.id %>" class="event-detail-link">
+                            <a href="event.html?eventid=<%= favoriteObj.event.id %>">
                                 <img src="<%= favoriteObj.event.image %>" alt="" onerror="if (this.src != '/ui/img/rect-thumb-noimage.jpg') this.src = '/ui/img/rect-thumb-noimage.jpg';" />
                             </a>
                         </div>
                         <div class="item-info">
                             <h2 class="item-title">
-                                <a href="event.html" data-event-id="<%= favoriteObj.event.id %>" class="event-detail-link truncate"><%= favoriteObj.event.name %></a>
+                                <a href="event.html?eventid=<%= favoriteObj.event.id %>" class="truncate"><%= favoriteObj.event.name %></a>
                             </h2>
                             <p class="item-venue"><%= favoriteObj.event.location.name %></p>
 
