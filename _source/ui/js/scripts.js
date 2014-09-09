@@ -1207,11 +1207,6 @@ ArtX.venuedetail = {
             $("#target-venuedetail").fadeIn(400);
             console.log("Venue page content finished displaying");
 
-            $(".venue-location-link").click(function() {
-                console.log("Venue location link clicked: " + $(this).attr("data-venue-id"));
-                ArtX.byLocation.vars.openWithVenueID = $(this).attr("data-venue-id");
-            });
-
             ArtX.footerSlider.init();
         });
     }
@@ -2458,6 +2453,16 @@ ArtX.byLocation = {
         if ($("#event-map").length > 0) {
             console.log( "Initializing map" );
 
+            // Reset the openWithVenueID variable on page load, to start fresh
+            ArtX.byLocation.vars.openWithVenueID = "-1";
+
+            // Get the desired venue ID from a querystring
+            var qsVenueID = ArtX.util.findQuerystring("venueid");
+            //console.log("Venue ID passed in via querystring: " + qsVenueID);
+            if (typeof qsVenueID != 'undefined') {
+                ArtX.byLocation.vars.openWithVenueID = qsVenueID;
+            }
+
             // Set up map
             L.mapbox.accessToken = ArtX.byLocation.vars.accessToken;
             ArtX.byLocation.vars.mapInstance = L.mapbox.map( ArtX.byLocation.vars.mapContainer, 'sherrialexander.jepo6la8' );
@@ -2553,7 +2558,7 @@ ArtX.byLocation = {
                 ArtX.byLocation.fetchSingleLocation(locationID);
 
                 // Zoom the map on this marker
-                ArtX.byLocation.vars.mapInstance.setView(this.getLatLng(), 16, {animate: true});
+                // ArtX.byLocation.vars.mapInstance.setView(this.getLatLng(), 16, {animate: true});
 
             }); //End click handler
 

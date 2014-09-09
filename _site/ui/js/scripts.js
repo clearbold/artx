@@ -2553,7 +2553,7 @@ ArtX.byLocation = {
                 ArtX.byLocation.fetchSingleLocation(locationID);
 
                 // Zoom the map on this marker
-                ArtX.byLocation.vars.mapInstance.setView(this.getLatLng(), 16, {animate: true});
+                // ArtX.byLocation.vars.mapInstance.setView(this.getLatLng(), 16, {animate: true});
 
             }); //End click handler
 
@@ -2662,18 +2662,28 @@ ArtX.startup = {
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
 
-        // If it's a new visitor, pop the Sign Up window
-        if (ArtX.var.hasVisitedBefore !== true) {
+        // If it's the Discover page, we need to pop the signup modal every visit if not logged in
+        if ($("#discover-slider").length > 0) {
+            if ($.cookie('token') === undefined) {
+                console.log("Popping the new visitor sign up window");
+                setTimeout(function(){
+                    ArtX.signupModal.open();
+                },1000);
+            }
+        } else {
+            // If they're a new visitor, pop the Sign Up window
+            if (ArtX.var.hasVisitedBefore !== true) {
 
-            console.log("Popping the new visitor sign up window");
-            setTimeout(function(){
-                ArtX.signupModal.open();
-            },1000);
+                console.log("Popping the new visitor sign up window");
+                setTimeout(function(){
+                    ArtX.signupModal.open();
+                },1000);
 
-            // Plant the cookie for next time
-            $.cookie('priorvisit', 'yes', { expires: 365 * 10, path: '/' });
-            // Set the variable to true as well
-            ArtX.var.hasVisitedBefore = true;
+                // Plant the cookie for next time
+                $.cookie('priorvisit', 'yes', { expires: 365 * 10, path: '/' });
+                // Set the variable to true as well
+                ArtX.var.hasVisitedBefore = true;
+            }
         }
 
         // If they're already logged in, let's add the CSS class for that
