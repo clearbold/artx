@@ -15,3 +15,11 @@ Select your interests so we can provide you recommended exhibitions.
 ### My Interests - Default
 
 Keeping your interests updated helps us provide you better recommendations for exhibitions in the Boston area.
+
+### Favorites - Default
+
+Your favorites are exhibitions that you've saved to view later or plan on attending, by tapping the star icon on an event.
+
+### History - Default
+
+Your history are events that you've favorited that happened in the past. Keep track of which events you've attended to help us provide recommendations for upcoming exhibitions.
