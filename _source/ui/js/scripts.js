@@ -605,8 +605,8 @@ ArtX.footerSlider = {
         var currentInterest = data[ArtX.footerSlider.vars.relatedInterestCounter];
 
         console.log("Interest counter going into the function: " + ArtX.footerSlider.vars.relatedInterestCounter);
-        console.log("Here's the current interest:");
-        console.log(JSON.stringify(currentInterest));
+        //console.log("Here's the current interest:");
+        //console.log(JSON.stringify(currentInterest));
 
         // Show spinner
         $.mobile.loading('show');
@@ -1550,11 +1550,23 @@ ArtX.loadMore = {
     }
 };
 
+ArtX.loginBounce = function() {
+    if ($.cookie('token') === undefined) {
+        console.log("You can't access this page, you're not logged in.");
+        $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
+        console.log("Popping the new visitor sign up window");
+        setTimeout(function(){
+            ArtX.signupModal.open();
+        },1000);
+    }
+};
+
 /* Setting up My Settings Ajax functionality
    ========================================================================== */
 ArtX.settings = {
     init: function() {
         if ($("#settings-form").length > 0) {
+
             console.log("Initializing app settings");
 
             // Preload the field values from the back-end API
@@ -2726,9 +2738,63 @@ $(document).on( "mobileinit", function( event ) {
     $.mobile.popup.prototype.options.history = false;
 });
 
+$(document).on( "pagecontainerbeforechange", function( event, ui ) {
+    console.log("****JQM pagecontainerbeforechange event firing");
 
-$(document).on( "pagebeforechange", function( event ) {
-    console.log("****JQM pagebeforechange event firing");
+    /*console.log("This should run each time the event does.");
+
+    // all properties shouldn't return "undefined"
+    var toPage = ui.toPage,
+        prevPage = ui.prevPage ? ui.prevPage : "",
+        options = ui.options;
+
+    //Keep this, it always seems to be right
+    var loadingURL;
+    if ( typeof toPage == "object" ) {
+        console.log("toPage is an object");
+        loadingURL = ui.toPage.attr("data-url");
+        console.log("Loading " + loadingURL);
+
+        if (loadingURL == "/settings.html") {
+            if ($.cookie('token') === undefined) {
+                console.log("You can't access this page, you're not logged in.");
+                
+                //ui.toPage.remove();
+                $("div[data-url='/settings.html']").remove();
+
+                ui.toPage = "/sign-in.html";
+
+                $.extend( ui.options, {
+                    //transition: "fade",
+                    changeHash: false
+                });
+            }
+        }
+    } else if ( typeof toPage == "string") {
+        console.log("toPage is a string");
+    }
+
+    if (prevPage !== "") {
+        console.log("prevPage exists!");
+        console.log(ui.prevPage.attr("data-url"));
+    }
+    
+    //console.log("prevPage")
+
+    //if ( typeof toPage == "string" ) {
+        //console.log("This will only run the second time, but only if it's not the first page.");
+    //}*/
+
+});
+
+
+$(document).on( "pagecontainerbeforeload", function( event ) {
+    console.log("****JQM pagecontainerbeforeload event firing");
+});
+
+
+$(document).on( "pagecontainerload", function( event ) {
+    console.log("****JQM pagecontainerload event firing");
 });
 
 
