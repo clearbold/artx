@@ -1182,7 +1182,6 @@ div#event-map {
 
         /* Menu changes when logged in */
         .menu-settings,
-        .menu-interests,
         .menu-logout {
             display:none;
         }
@@ -1194,7 +1193,6 @@ div#event-map {
 /* Toggling some logged-in/logged-out differences */
 .is-logged-in .menu-panel ul {
     .menu-settings,
-    .menu-interests,
     .menu-logout {
         display:block;
     }
