@@ -511,18 +511,18 @@ button, .ui-page-theme-a button.ui-btn {
     margin:-7px (-$spacing-unit) 0;
 
     h2 {
-        line-height:33px;
+        line-height:1.1;
         text-align:left;
         margin-bottom:0;
         
         &.related,
         &.no-link {
-            padding:7px $spacing-unit;
+            padding:15px $spacing-unit;
         }
 
         a {
             display:block;
-            padding:7px $spacing-unit;
+            padding:15px $spacing-unit;
             position:relative;
         }
         .icon {
@@ -533,17 +533,14 @@ button, .ui-page-theme-a button.ui-btn {
     }
 
     h2.related {
-        float:left;
-
-        a {
-            display:inline;
-            padding:0;
-        }
+        padding-right:60px;
     }
 
     .btn-right {
-        margin-right:$spacing-unit;
-        margin-top:7px;
+        position:absolute;
+        right:$spacing-unit;
+        top:50%;
+        margin-top:-17px;
     }
 
 }
