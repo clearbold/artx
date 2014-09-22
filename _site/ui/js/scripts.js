@@ -1321,8 +1321,13 @@ ArtX.calendar = {
                     },
                     doneRendering: function(){
                         var thisMonth = moment().format("MMMM");
+                        var thisYear = moment().format("YYYY");
+                        var thisDate = thisMonth + " " + thisYear;
                         var displayedMonth = $(".clndr-controls").find(".month").html();
-                        if (thisMonth == displayedMonth) {
+                        //console.log("This date: " + thisDate);
+                        //console.log("Displayed month: " + displayedMonth);
+                        
+                        if (thisDate == displayedMonth) {
                             // It's this month
                             // Show the events for today
                             $(".day.today").trigger("click");
@@ -1334,11 +1339,9 @@ ArtX.calendar = {
                             } else {
                                 $(".day").first().trigger("click");
                             }
-
                         }
                     }
                 });
-
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Initial calendar event fetch failed");

@@ -748,7 +748,7 @@ ArtX.footerSlider = {
         $("#footer-slider").fadeOut(400, function() {
 
             //Find the link with the matching event ID, grab the parent LI and .remove() it
-            $("#footer-slider").find("a[data-event-id=" + selectedEventID + "]").parent("li").remove();
+            $("#footer-slider").find("a[href='event.html?eventid=" + selectedEventID + "']").parent("li").remove();
 
             // Count how many non-cloned children the footer slider now has
             var numberOfSlides = $("#footer-slider").children("li:not(.bx-clone)").length;
