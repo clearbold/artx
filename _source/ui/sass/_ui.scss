@@ -1040,6 +1040,7 @@ div#event-map {
             height:auto;
             min-height:73px;
             max-height:100px;
+            margin-left:0;
         }
 
         a  {
@@ -1086,7 +1087,8 @@ div#event-map {
         &.not-enough-slides {
             .bx-wrapper ~ .footer-slider-previous,
             .bx-wrapper ~ .footer-slider-next {
-                display:none;
+                //display:none;
+                visibility:hidden;
             }
         }
 
