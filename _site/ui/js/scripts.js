@@ -1146,6 +1146,13 @@ ArtX.eventdetail = {
         console.log("Displaying event detail page content");
         var eventArray = jsonData;
         var eventTemplate = $('#template-eventdetail').html();
+
+        //console.log("Event type: " + eventArray.event.event_type);
+
+        if (eventArray.event.event_type == "event") {
+            $("h1").find("a").text("Event");
+        }
+
         $("#target-eventdetail").fadeOut(400, function() {
             $("#target-eventdetail").html(_.template(eventTemplate, {eventArray:eventArray}));
             ArtX.favoriteStars.init();
