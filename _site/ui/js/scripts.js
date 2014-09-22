@@ -883,13 +883,17 @@ ArtX.favoriteStars = {
                                     ArtX.footerSlider.removeFavorite(selectedEventID);
                                 }
                                 // If we're on the Favorites page, remove the favorite from the page
+                                /*
                                 if ($("#target-favoritelist").length > 0) {
                                     ArtX.favoriteList.removeFavorite(selectedEventID);
                                 }
+                                */
                                 // If we're on the History page, remove the favorite from the page
+                                /*
                                 if ($("#target-historylist").length > 0) {
                                     ArtX.historyList.removeFavorite(selectedEventID);
                                 }
+                                */
                             },
                             error: function (jqXHR, error, errorThrown) {
                                 console.log("Error deleting favorite");
@@ -1772,6 +1776,8 @@ ArtX.historyList = {
         // Remove a favorite from the Favorites list, if the user unhighlights it there
         // The event ID to delete is passed into the function
 
+        // No longer used, but left in case it's useful
+
         $("#target-historylist").fadeOut(400, function() {
 
             //Find the link with the matching event ID, grab the parent .item-block and .remove() it
@@ -1994,6 +2000,8 @@ ArtX.favoriteList = {
     removeFavorite: function(selectedEventID) {
         // Remove a favorite from the Favorites list, if the user unhighlights it there
         // The event ID to delete is passed into the function
+
+        // No longer used, but leaving it here in case it's useful in future
 
         $("#target-favoritelist").fadeOut(400, function() {
 
