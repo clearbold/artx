@@ -23790,6 +23790,7 @@ ArtX.favoriteStars = {
                     // The user is not logged in, we can't save a favorite
 
                     console.log("We can't toggle a favorite because the user is not logged in.");
+
                     ArtX.signupModal.open();
 
                 } else {
@@ -23980,11 +23981,15 @@ ArtX.setupTextTruncation = function() {
 /* Set up Signup Modal
    ========================================================================== */
 ArtX.signupModal = {
+    vars: {
+        returnToPage: ""
+    },
     init: function() {
         console.log("Setting up Signup Modal window");
 
         // Set up some click events for the sign up links
         $(document).on("click", ".signup-trigger", function() {
+            // Open modal
             ArtX.signupModal.open();
         });
     },
@@ -24016,6 +24021,9 @@ ArtX.signupModal = {
         });
     },
     open: function() {
+        // Record which page you're currently on
+        ArtX.signupModal.vars.returnToPage = $(".ui-page-active").attr("data-url");
+
         // Load up the form into the modal window
         $.mobile.loading('show');
         $("#signup-form").load("/signup-form.html", function(jqXHR, error, errorThrown) {
@@ -25314,6 +25322,13 @@ ArtX.login = {
                 submitHandler: ArtX.login.ajaxSubmit
             });
         }
+
+        // Record the page you're on when a signin link is clicked
+        $(".signin-link").click(function() {
+            //console.log("Clicking the sign in link!");
+            ArtX.signupModal.vars.returnToPage = $(".ui-page-active").attr("data-url");
+            //console.log("ArtX.signupModal.vars.returnToPage: " + ArtX.signupModal.vars.returnToPage);
+        });
     },
     ajaxSubmit: function() {
         $.mobile.loading('show');
@@ -25333,7 +25348,13 @@ ArtX.login = {
                 if (!ArtX.el.html.hasClass("is-logged-in")) {
                     ArtX.el.html.addClass("is-logged-in");
                 }
-                $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
+                console.log("Return to page value: " + ArtX.signupModal.vars.returnToPage);
+                if ((ArtX.signupModal.vars.returnToPage !== undefined) && (ArtX.signupModal.vars.returnToPage !== "")) {
+                    $.mobile.pageContainer.pagecontainer ("change", ArtX.signupModal.vars.returnToPage, {reloadPage: true});
+                } else {
+                    $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
+                }
+                
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("User login submit failed");
@@ -25391,6 +25412,8 @@ ArtX.logout = {
     init: function() {
         $(".action-logout").click(function() {
             console.log("Log out link clicked!");
+            // Remove any existing "remember last page" value for signup
+            ArtX.signupModal.vars.returnToPage = "";
             // Remove the authorization token and username cookies
             $.removeCookie('token');
             $.removeCookie('currentuser');
