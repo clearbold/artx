@@ -1016,6 +1016,7 @@ ArtX.signupModal = {
                 console.log(data);
                 $.cookie('token', data.user.authentication_token);
                 $.cookie('currentuser', $("#email").val());
+                $.cookie('signedup', true);
                 $.mobile.pageContainer.pagecontainer ("change", "interests.html", {reloadPage: true});
             },
             error: function (jqXHR, error, errorThrown) {
@@ -2697,9 +2698,9 @@ ArtX.startup = {
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
 
-        // If it's the Discover page, we need to pop the signup modal every visit if not logged in
+        // If it's the Discover page, we need to pop the signup modal every visit but only if not logged in and haven't signed up yet
         if ($("#discover-slider").length > 0) {
-            if ($.cookie('token') === undefined) {
+            if (($.cookie('token') === undefined) && ($.cookie('signedup') === undefined)) {
                 console.log("Popping the new visitor sign up window");
                 setTimeout(function(){
                     ArtX.signupModal.open();

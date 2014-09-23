@@ -23372,14 +23372,14 @@ ArtX.footerSlider = {
             minSlides:2,
             maxSlides:4,
             slideWidth:200,
-            slideMargin:5,
+            slideMargin:0,
             oneToOneTouch:false,
             pager:false
         },
         pageSize: 15,
         slideTemplate: "",
         relatedInterestCounter: 0,
-        totalRelatedInterests: 2,  // it's really 3, but it's 0-index-based
+        totalRelatedInterests: 0,
         locationRadius: 10  // Mile radius for nearby events
     },
     init: function() {
@@ -23510,14 +23510,21 @@ ArtX.footerSlider = {
 
             var jsonString = JSON.stringify(ArtX.var.relatedInterests);
 
-            console.log(jsonString);
+            //console.log(jsonString);
 
             if (jsonString.length > 2) {
                 // There are related interests
 
-                // TODO: Pull the totalRelatedInterests variable from the actual data
-                // For now, we'll keep it hardcoded at 3
+                var numberOfTags = 0;
 
+                $.each(ArtX.var.relatedInterests, function (key, value) {
+                    numberOfTags++;
+                });
+
+                ArtX.footerSlider.vars.totalRelatedInterests = numberOfTags - 1; // zero-based index
+
+                //console.log("Number of tags: " + numberOfTags);
+                
                 // Create click event to trigger cycleRelatedInterests
                 $("#cycle-relatedinterest").click(function(){
                     ArtX.footerSlider.cycleRelatedInterests(ArtX.var.relatedInterests);
@@ -23565,7 +23572,7 @@ ArtX.footerSlider = {
                     console.log("Footer slider data successfully fetched");
                     
                     var jsonString = JSON.stringify(data.events);
-                    console.log(jsonString);
+                    //console.log(jsonString);
 
                     // Hide any existing messages
                     $(".footer-slider-msg").hide();
@@ -23617,30 +23624,24 @@ ArtX.footerSlider = {
         // Change the text of slider header (#target-relatedinterest)
         $("#target-relatedinterest").text(currentInterest.tag.name);
 
-        // Fade out slider
-        //$("#footer-slider").fadeOut(400, function() {
+        $(".footer-slider-msg").hide();
 
-            $(".footer-slider-msg").hide();
+        // Build slider with events via _.template
+        var itemArray = currentInterest.events;
+        ArtX.footerSlider.buildSlider(itemArray);
 
-            // Build slider with events via _.template
-            var itemArray = currentInterest.events;
-            ArtX.footerSlider.buildSlider(itemArray);
+        if (ArtX.footerSlider.vars.footSlideInstance === "") {
+            // There were no favorites before, so we need to initialize the slider
+            ArtX.footerSlider.initSlider();
 
-            if (ArtX.footerSlider.vars.footSlideInstance === "") {
-                // There were no favorites before, so we need to initialize the slider
-                ArtX.footerSlider.initSlider();
+        } else {
+            // Slider is already initialized, we need to reload it
+            ArtX.footerSlider.reload();
+        }
 
-            } else {
-                // Slider is already initialized, we need to reload it
-                ArtX.footerSlider.reload();
-            }
+        // Hide spinner
+        $.mobile.loading('hide');
 
-            // Hide spinner
-            $.mobile.loading('hide');
-
-            // Show slider
-        //    $("#footer-slider").fadeIn(400);
-        //}); 
 
         // Iterate the counter variable
         if(ArtX.footerSlider.vars.relatedInterestCounter < ArtX.footerSlider.vars.totalRelatedInterests) {
@@ -23709,51 +23710,40 @@ ArtX.footerSlider = {
         // Add a new favorite to the slider 
         console.log("Adding a new favorite to the footer slider");   
 
-        //$("#footer-slider").fadeOut(400, function() {
+        if (ArtX.footerSlider.vars.footSlideInstance === "") {
+            // There were no favorites before, so we need to initialize the slider
+            
+            $(".footer-slider-msg").hide();
+            ArtX.footerSlider.init();
 
-            if (ArtX.footerSlider.vars.footSlideInstance === "") {
-                // There were no favorites before, so we need to initialize the slider
-                
-                $(".footer-slider-msg").hide();
-                ArtX.footerSlider.init();
-
-            } else {
-                // Slider is already initialized, add our new favorite to the existing slider
-                
-                var itemArray = favoriteData;
-                var eventHtml = _.template(ArtX.footerSlider.vars.slideTemplate, {itemArray:itemArray});
-                $(eventHtml).prependTo($("#footer-slider"));
-                ArtX.footerSlider.reload();
-            }
-
-        //    $("#footer-slider").fadeIn(400);
-        //});     
+        } else {
+            // Slider is already initialized, add our new favorite to the existing slider
+            
+            var itemArray = favoriteData;
+            var eventHtml = _.template(ArtX.footerSlider.vars.slideTemplate, {itemArray:itemArray});
+            $(eventHtml).prependTo($("#footer-slider"));
+            ArtX.footerSlider.reload();
+        }   
     },
     removeFavorite: function(selectedEventID) {
         // Remove a favorite from the slider, if we're on the homepage
         // The event ID to delete is passed into the function
 
-        $("#footer-slider").fadeOut(400, function() {
+        //Find the link with the matching event ID, grab the parent LI and .remove() it
+        $("#footer-slider").find("a[href='event.html?eventid=" + selectedEventID + "']").parent("li").remove();
 
-            //Find the link with the matching event ID, grab the parent LI and .remove() it
-            $("#footer-slider").find("a[href='event.html?eventid=" + selectedEventID + "']").parent("li").remove();
+        // Count how many non-cloned children the footer slider now has
+        var numberOfSlides = $("#footer-slider").children("li:not(.bx-clone)").length;
+        console.log("Number of non-cloned children: " + numberOfSlides);
 
-            // Count how many non-cloned children the footer slider now has
-            var numberOfSlides = $("#footer-slider").children("li:not(.bx-clone)").length;
-            console.log("Number of non-cloned children: " + numberOfSlides);
+        if (numberOfSlides > 0) {
+            // Reload the slider
+            ArtX.footerSlider.reload();
 
-            if (numberOfSlides > 0) {
-                // Reload the slider
-                ArtX.footerSlider.reload();
-
-            } else {
-                // We removed all the favorites; show the "no favorites yet" message
-                $("#footer-slider-msg-nofavorites").fadeIn(400);
-            }
-
-            $("#footer-slider").fadeIn(400);
-
-        });
+        } else {
+            // We removed all the favorites; show the "no favorites yet" message
+            $("#footer-slider-msg-nofavorites").fadeIn(400);
+        }
     },
     reload: function() {
         if (($("#footer-slider").length > 0) && (ArtX.footerSlider.vars.footSlideInstance !== "")) {
@@ -24014,6 +24004,7 @@ ArtX.signupModal = {
                 console.log(data);
                 $.cookie('token', data.user.authentication_token);
                 $.cookie('currentuser', $("#email").val());
+                $.cookie('signedup', true);
                 $.mobile.pageContainer.pagecontainer ("change", "interests.html", {reloadPage: true});
             },
             error: function (jqXHR, error, errorThrown) {
@@ -25695,9 +25686,9 @@ ArtX.startup = {
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
 
-        // If it's the Discover page, we need to pop the signup modal every visit if not logged in
+        // If it's the Discover page, we need to pop the signup modal every visit but only if not logged in and haven't signed up yet
         if ($("#discover-slider").length > 0) {
-            if ($.cookie('token') === undefined) {
+            if (($.cookie('token') === undefined) && ($.cookie('signedup') === undefined)) {
                 console.log("Popping the new visitor sign up window");
                 setTimeout(function(){
                     ArtX.signupModal.open();
