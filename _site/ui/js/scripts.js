@@ -1069,7 +1069,7 @@ Artbot.signupModal = {
                 console.log(data);
                 $.cookie('token', data.user.authentication_token);
                 $.cookie('currentuser', $("#email").val());
-                $.cookie('signedup', true);
+                $.cookie('signedup', true, { expires: 3650 });
                 $.mobile.pageContainer.pagecontainer ("change", "interests.html", {reloadPage: true});
             },
             error: function (jqXHR, error, errorThrown) {
@@ -1081,8 +1081,14 @@ Artbot.signupModal = {
         });
     },
     open: function() {
-        // Record which page you're currently on
-        Artbot.signupModal.vars.returnToPage = $(".ui-page-active").attr("data-url");
+        // Record which page to return to after signup
+        if ($(".ui-page-active").attr("data-url") != "/sign-in.html") {
+            Artbot.signupModal.vars.returnToPage = $(".ui-page-active").attr("data-url");
+        } else {
+            Artbot.signupModal.vars.returnToPage = "/index.html";
+        }
+        
+        console.log("Return to page: " + Artbot.signupModal.vars.returnToPage);
 
         // Load up the form into the modal window
         $.mobile.loading('show');
@@ -1906,6 +1912,9 @@ Artbot.historyList = {
         if (($("#history-form").find("input[type=checkbox]").length > 0) && ($.cookie('token') !== undefined)) {
             console.log("Syncing attendance checkboxes with user's attended records");
 
+            // Reset the form, in case of caching (we want a fresh copy)
+            document.getElementById("history-form").reset();
+
             // Fetch the list of user's history to check against.
             $.ajax({
                 type: "GET",
@@ -1949,9 +1958,16 @@ Artbot.historyList = {
                                     $thisCheckbox.trigger("click");
                                 }
                             }
-
                         });
 
+                        // Debugging: Quick check to list out which are checked after sync
+                        var allCheckboxes = $("#history-form").find(".customize-checkbox");
+                        $.each(allCheckboxes, function(i, value) {
+                            var tempIsCheckboxChecked = $(this).prop("checked");
+                            var tempUserFavoriteID = $(this).attr("data-user-favorite-id");
+                            console.log("User favorite: " + tempUserFavoriteID + ", Value of property 'checked' after syncing: " + tempIsCheckboxChecked);
+                        });
+                        
                         Artbot.historyList.bindAttendanceCheckboxes();
 
                     } 
@@ -2413,6 +2429,7 @@ Artbot.login = {
                 $.cookie('token', data.authentication_token);
                 $.cookie('currentuser', $("#email").val());
                 $.cookie('currentuser', $("#signin-email").val());
+                $.cookie('signedup', true, { expires: 3650 });
                 if (!Artbot.el.html.hasClass("is-logged-in")) {
                     Artbot.el.html.addClass("is-logged-in");
                 }
@@ -2787,7 +2804,7 @@ Artbot.startup = {
             }
         } else {
             // If they're a new visitor, pop the Sign Up window
-            if (Artbot.var.hasVisitedBefore !== true) {
+            if (($.cookie('token') === undefined) && (Artbot.var.hasVisitedBefore !== true) && ($(".ui-page-active").attr("data-url") != "/sign-in.html")) {
 
                 console.log("Popping the new visitor sign up window");
                 setTimeout(function(){

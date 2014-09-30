@@ -457,7 +457,7 @@ Artbot.footerSlider = {
                             Artbot.footerSlider.initSlider();
                         } else {
                             // No favorites returned, show the "no favorites yet" message
-                            $("#footer-slider-msg-nofavorites").fadeIn(400);
+                            Artbot.footerSlider.showErrorMsg("nofavorites");
                         }
                     },
                     error: function (jqXHR, error, errorThrown) {
@@ -470,7 +470,7 @@ Artbot.footerSlider = {
             } else {
                 
                 // User is not logged in, show the appropriate message
-                $("#footer-slider-msg-favoritesignup").fadeIn(400);
+                Artbot.footerSlider.showErrorMsg("favoritesignup");
 
             }
         } else if ($("#venue-events-slider").length > 0) {
@@ -505,7 +505,7 @@ Artbot.footerSlider = {
                         Artbot.footerSlider.initSlider();
                     } else {
                         // No events returned, show the "no events" message
-                        $("#footer-slider-msg-noevents").fadeIn(400);
+                        Artbot.footerSlider.showErrorMsg("noevents");
                     }
                 },
                 error: function (jqXHR, error, errorThrown) {
@@ -547,8 +547,7 @@ Artbot.footerSlider = {
                 Artbot.footerSlider.cycleRelatedInterests(Artbot.var.relatedInterests);
 
             } else {
-                // TODO: Show error for no results
-                $("#footer-slider-msg-noevents").fadeIn(400);
+                Artbot.footerSlider.showErrorMsg("noevents");
             }
 
         } else if ($("#near-you-slider").length > 0) {
@@ -557,7 +556,7 @@ Artbot.footerSlider = {
             console.log("Initializing Near You slider");
 
             // First, we have to try to get the user's current position.
-            Artbot.geolocation.getLocation(Artbot.footerSlider.processNearbyEvents, Artbot.footerSlider.hideFooter);
+            Artbot.geolocation.getLocation(Artbot.footerSlider.processNearbyEvents, Artbot.footerSlider.showGeolocationError);
 
         }
     },
@@ -597,7 +596,7 @@ Artbot.footerSlider = {
                     } else {
                         // No events returned, show the "no events in radius" message
                         $("#location-radius").html(Artbot.footerSlider.vars.locationRadius);
-                        $("#footer-slider-msg-noeventsnearby").fadeIn(400);
+                        Artbot.footerSlider.showErrorMsg("noeventsnearby");
                     }
                 },
                 error: function (jqXHR, error, errorThrown) {
@@ -610,8 +609,8 @@ Artbot.footerSlider = {
                 }
             }); 
         } else {
-            // Couldn't get a position; hide footer
-            Artbot.footerSlider.hideFooter();
+            // Couldn't get a position; show error message
+            Artbot.footerSlider.showErrorMsg("nogeolocation");
             $.mobile.loading('hide');
         }
     },
@@ -754,7 +753,7 @@ Artbot.footerSlider = {
 
         } else {
             // We removed all the favorites; show the "no favorites yet" message
-            $("#footer-slider-msg-nofavorites").fadeIn(400);
+            Artbot.footerSlider.showErrorMsg("nofavorites");
         }
     },
     reload: function() {
@@ -766,6 +765,15 @@ Artbot.footerSlider = {
             Artbot.footerSlider.initSliderNav();
 
         }
+    },
+    showErrorMsg: function(errorID) {
+        $("#footer-slider").fadeOut( 400, function() {
+            $("#footer-slider-msg-"+errorID).fadeIn(400);
+            $("#footer-slider").show();
+        });  
+    },
+    showGeolocationError: function() {
+        Artbot.footerSlider.showErrorMsg("nogeolocation");
     },
     destroy: function() {
         if (($("#footer-slider").length > 0) && (Artbot.footerSlider.vars.footSlideInstance !== "")) {
@@ -2542,7 +2550,7 @@ Artbot.geolocation = {
         Artbot.geolocation.vars.currentLongitude = position.coords.longitude;
         Artbot.geolocation.successCallback();
     },
-    showError: function() {
+    showError: function(error) {
         console.log("Geolocation error:");
         switch(error.code) {
             case error.PERMISSION_DENIED:
