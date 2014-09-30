@@ -23523,14 +23523,16 @@ Artbot.footerSlider = {
 
                 Artbot.footerSlider.vars.totalRelatedInterests = numberOfTags - 1; // zero-based index
 
-                //console.log("Number of tags: " + numberOfTags);
+                if (numberOfTags > 1) {
+                    // Create click event to trigger cycleRelatedInterests
+                    $("#cycle-relatedinterest").click(function(){
+                        Artbot.footerSlider.cycleRelatedInterests(Artbot.var.relatedInterests);
+                        return false;
+                    }).addClass("is-visible");
+                } else {
+                    $("#cycle-relatedinterest").removeClass("is-visible");
+                }
                 
-                // Create click event to trigger cycleRelatedInterests
-                $("#cycle-relatedinterest").click(function(){
-                    Artbot.footerSlider.cycleRelatedInterests(Artbot.var.relatedInterests);
-                    return false;
-                });
-
                 // Trigger cycleRelatedInterests
                 Artbot.footerSlider.cycleRelatedInterests(Artbot.var.relatedInterests);
 

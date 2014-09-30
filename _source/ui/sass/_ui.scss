@@ -533,7 +533,7 @@ button, .ui-page-theme-a button.ui-btn {
     }
 
     h2.related {
-        padding-right:60px;
+        padding-right:60px; 
     }
 
     .btn-right {
@@ -542,7 +542,16 @@ button, .ui-page-theme-a button.ui-btn {
         top:50%;
         margin-top:-17px;
     }
-
+    #cycle-relatedinterest {
+        visibility:hidden;
+        opacity:0;
+        @include transition(all .2s linear);
+        
+        &.is-visible {
+            visibility:visible;
+            opacity:1;
+        }
+    }
 }
 
 .content {
