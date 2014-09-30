@@ -2760,9 +2760,10 @@ Artbot.byLocation = {
             console.log("Show map zoomed to show all locations");
             Artbot.byLocation.vars.mapInstance.setView([42.3581, -71.0636], 12);
             
-            var bounds = L.latLngBounds(Artbot.byLocation.vars.boundsArray);
+            // If we wanted to limit the map so that it contained all pins:
+            //var bounds = L.latLngBounds(Artbot.byLocation.vars.boundsArray);
             //console.log(bounds);
-            Artbot.byLocation.vars.mapInstance.fitBounds(bounds, { padding: [10, 10]});
+            //Artbot.byLocation.vars.mapInstance.fitBounds(bounds, { padding: [10, 10]});
         }
 
         Artbot.footerSlider.init();
