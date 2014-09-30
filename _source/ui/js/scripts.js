@@ -917,11 +917,15 @@ Artbot.favoriteStars = {
             $.ajax({
                 type: "GET",
                 url: Artbot.var.jsonDomain + "/favorites/",
+                data: {
+                    page: 1,
+                    per_page: 10000
+                },
                 beforeSend: function (request) {
                     request.setRequestHeader("authentication_token", $.cookie('token'));
                 },
                 success: function(data, textStatus, jqXHR) {
-                    console.log("Successfully fetched data for syncing stars");
+                    console.log("Successfully fetched Favorites data for syncing stars");
                     //console.log(JSON.stringify(data));
 
                     var userFavorites = data.favorites;
@@ -942,9 +946,53 @@ Artbot.favoriteStars = {
                             }
                         });
                     });
+
+                    // Now we have to do the same for History, because Favorites is now only future and present events, and our event might be in the past.
+                    // Nested Ajax calls are ugly but necessary because of asynchronous scripting.
+
+                    // Fetch the list of user's history to check against.
+                    
+                    $.ajax({
+                        type: "GET",
+                        url: Artbot.var.jsonDomain + "/favorites/history/",
+                        beforeSend: function (request) {
+                            request.setRequestHeader("authentication_token", $.cookie('token'));
+                        },
+                        data: {
+                            page: 1,
+                            per_page: 10000
+                        },
+                        success: function(data, textStatus, jqXHR) {
+                            console.log("Successfully fetched History data for syncing stars");
+                            //console.log(JSON.stringify(data));
+
+                            var userHistories = data.favorites;
+
+                            // We'll start by iterating through each history item
+                            $.each(userHistories, function(i, value) {
+                                var userHistory = userHistories[i];
+                                var userHistoryEventID = userHistory.event.id;
+                                var userHistoryID = userHistory.id;
+
+                                // Then let's compare that favorite ID to the corresponding ones on the page
+                                $(".favorite-star").each(function() {
+                                    var pageHistoryEventID = $(this).attr("data-event-id");
+
+                                    // If they match, highlight the star
+                                    if (pageHistoryEventID == userHistoryEventID) {
+                                        Artbot.favoriteStars.highlightStar($(this), userHistoryID);
+                                    }
+                                });
+                            });
+                        },
+                        error: function (jqXHR, error, errorThrown) {
+                            console.log("Error fetching History data to sync stars");
+                            Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
+                        }
+                    }); 
                 },
                 error: function (jqXHR, error, errorThrown) {
-                    console.log("Error fetching data to sync stars");
+                    console.log("Error fetching Favorites data to sync stars");
                     Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
                 }
             });
@@ -954,7 +1002,7 @@ Artbot.favoriteStars = {
         var $thisStarLink = $(starLinkObj);
         var $thisStarIcon = $thisStarLink.find(".icon");
 
-        // console.log("User favorite ID: " + userFavoriteID);
+        console.log("Highlighting a favorite star!  User favorite ID: " + userFavoriteID);
 
         // Swap the star icon
         $thisStarIcon.removeClass("icon-star").addClass("icon-star2");
@@ -1709,6 +1757,10 @@ Artbot.historyList = {
             type: "GET",
             dataType: "json",
             url: Artbot.var.jsonDomain + "/favorites/history/",
+            data: {
+                page: 1,
+                per_page:10000
+            },
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
             },
@@ -1937,6 +1989,10 @@ Artbot.favoriteList = {
             type: "GET",
             dataType: "json",
             url: Artbot.var.jsonDomain + "/favorites/",
+            data: {
+                page: 1,
+                per_page:10000
+            },
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
             },
