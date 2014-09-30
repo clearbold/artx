@@ -24900,6 +24900,9 @@ Artbot.historyList = {
         if (($("#history-form").find("input[type=checkbox]").length > 0) && ($.cookie('token') !== undefined)) {
             console.log("Syncing attendance checkboxes with user's attended records");
 
+            // Reset the form, in case of caching (we want a fresh copy)
+            document.getElementById("history-form").reset();
+
             // Fetch the list of user's history to check against.
             $.ajax({
                 type: "GET",
@@ -24943,9 +24946,16 @@ Artbot.historyList = {
                                     $thisCheckbox.trigger("click");
                                 }
                             }
-
                         });
 
+                        // Debugging: Quick check to list out which are checked after sync
+                        var allCheckboxes = $("#history-form").find(".customize-checkbox");
+                        $.each(allCheckboxes, function(i, value) {
+                            var tempIsCheckboxChecked = $(this).prop("checked");
+                            var tempUserFavoriteID = $(this).attr("data-user-favorite-id");
+                            console.log("User favorite: " + tempUserFavoriteID + ", Value of property 'checked' after syncing: " + tempIsCheckboxChecked);
+                        });
+                        
                         Artbot.historyList.bindAttendanceCheckboxes();
 
                     } 
