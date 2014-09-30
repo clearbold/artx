@@ -69,7 +69,7 @@ jQuery.validator.addMethod("remoteEmail", function(value, element) {
         data: {
             "email": value
         },
-        url: ArtX.var.jsonDomain + "/registrations",
+        url: Artbot.var.jsonDomain + "/registrations",
         success: function(response){
             console.log("Checking: the user is in the system");
             return true;
@@ -87,7 +87,7 @@ jQuery.validator.addMethod("remoteEmail", function(value, element) {
                 return false;
             } else {
                 console.log("Error checking if the user is in the system");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
                 return false;
             }
         },
@@ -145,11 +145,11 @@ jQuery.validator.setDefaults({
 
 
 /* Global namespace */
-var ArtX = ArtX || {};
+var Artbot = Artbot || {};
 
-ArtX.data = ArtX.data || {};
+Artbot.data = Artbot.data || {};
 
-ArtX.el = {
+Artbot.el = {
     html            : $('html'),
     win             : $(window),
     doc             : $(document),
@@ -158,27 +158,27 @@ ArtX.el = {
     eventCalendar   : ""
 };
 
-ArtX.util = {
+Artbot.util = {
     hasTouch        : Modernizr.touchcapable,
     hasPosFixed     : Modernizr.positionfixed,
     hasiOSPosFixed  : Modernizr.iospositionfixed,
-    viewportWidth   : function() { return ArtX.el.win.width();     },
-    viewportHeight  : function() { return ArtX.el.win.height();     },
-    docHeight       : function() { return ArtX.el.doc.height();    },
-    bodyHeight      : function() { return ArtX.el.body.height();    },
-    footerHeight    : function() { return ArtX.el.footer.height();    },
-    scrollPos       : function() { return ArtX.el.win.scrollTop(); },
+    viewportWidth   : function() { return Artbot.el.win.width();     },
+    viewportHeight  : function() { return Artbot.el.win.height();     },
+    docHeight       : function() { return Artbot.el.doc.height();    },
+    bodyHeight      : function() { return Artbot.el.body.height();    },
+    footerHeight    : function() { return Artbot.el.footer.height();    },
+    scrollPos       : function() { return Artbot.el.win.scrollTop(); },
     mobileMode      : function() {
-        return (ArtX.util.viewportWidth() <= 767)? true : false;
+        return (Artbot.util.viewportWidth() <= 767)? true : false;
     },
     desktopMode     : function() {
-        return (ArtX.util.viewportWidth() >= 1024)? true : false;
+        return (Artbot.util.viewportWidth() >= 1024)? true : false;
     },
     orientation     : function() {
         if (typeof orientation != 'undefined') {
             return (Math.abs(window.orientation) === 90)? "landscape" : "portrait";
         } else {
-            return (ArtX.util.viewportWidth() >= ArtX.util.viewportHeight()) ? "landscape" : "portrait";
+            return (Artbot.util.viewportWidth() >= Artbot.util.viewportHeight()) ? "landscape" : "portrait";
         }
     },
     findQuerystring: function(qs) {
@@ -226,7 +226,7 @@ ArtX.util = {
 };
 
 /* Logging Ajax errors */
-ArtX.errors = {
+Artbot.errors = {
     logAjaxError: function (jqXHR, error, errorThrown, isErrorAjaxResponse) {
         console.log("Error: " + errorThrown);
         console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
@@ -258,7 +258,7 @@ ArtX.errors = {
 };
 
 /* Setting up a dataService function that can handle different Ajax requests */
-ArtX.dataService = {
+Artbot.dataService = {
     getJsonFeed: function(jsonUrl, callback) {
         $.getJSON(jsonUrl, function (data) {
             callback(data);
@@ -268,7 +268,7 @@ ArtX.dataService = {
 
 
 // Variables that can be used throughout
-ArtX.var = {
+Artbot.var = {
     itemsPerPage : 5,
     isInitialLoad: true,
     hasVisitedBefore: false,
@@ -281,11 +281,11 @@ ArtX.var = {
 
 /* Set up Peeking slider on Discover Page
    ========================================================================== */
-ArtX.discoverSlider = {
+Artbot.discoverSlider = {
     init: function() {
         // Assumption -- there will only ever be one peek-style slider per page/screen
         if ($("#discover-slider").find("ul").length > 0) {
-            ArtX.discoverSlider.populateSlider();
+            Artbot.discoverSlider.populateSlider();
         }
     },
     populateSlider: function() {
@@ -306,13 +306,13 @@ ArtX.discoverSlider = {
             data: {
                 per_page: 10
             },
-            url: ArtX.var.jsonDomain + "/discoveries/",
+            url: Artbot.var.jsonDomain + "/discoveries/",
             beforeSend: beforeSendFunction,
             success: function( data ) {
                 console.log("Discover slider data successfully fetched");
                 //console.log(JSON.stringify(data.events));
                 console.log("Number of discover events fetched: " + data.events.length);
-                ArtX.discoverSlider.buildSlider(data);
+                Artbot.discoverSlider.buildSlider(data);
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Error fetching Discover slider data");
@@ -334,13 +334,13 @@ ArtX.discoverSlider = {
         var numberOfSlides = $("#discover-slider").find("ul").children().length;
 
         if (numberOfSlides > 1) { // there's more than one slide to show
-            ArtX.discoverSlider.initSlider();
+            Artbot.discoverSlider.initSlider();
         }
 
         // Initialize favorite stars
-        ArtX.favoriteStars.init();
+        Artbot.favoriteStars.init();
 
-        ArtX.footerSlider.init();
+        Artbot.footerSlider.init();
     },
     initSlider: function() {
         console.log("More than one slide -- initializing Discover slider functionality");
@@ -377,7 +377,7 @@ ArtX.discoverSlider = {
 
 /* Set up Favorites-style slider in footer
    ========================================================================== */
-ArtX.footerSlider = {
+Artbot.footerSlider = {
     vars: {
         footSlideInstance: "",
         footSlideOptions: {
@@ -397,22 +397,22 @@ ArtX.footerSlider = {
     init: function() {
         if ($("#footer-slider").length > 0) {
             
-            ArtX.footerSlider.vars.relatedInterestCounter = 0; // on startup
+            Artbot.footerSlider.vars.relatedInterestCounter = 0; // on startup
 
             // Set up some variables
             if ($("#favorites-slider").length > 0) {
                 /* Favorites slider */
                 
-                ArtX.footerSlider.vars.slideTemplate = $('#template-favoriteslider').html();
+                Artbot.footerSlider.vars.slideTemplate = $('#template-favoriteslider').html();
 
             } else {
                 /* Generic Events slider */
 
-                ArtX.footerSlider.vars.slideTemplate = $('#template-eventslider').html();
+                Artbot.footerSlider.vars.slideTemplate = $('#template-eventslider').html();
             }
 
             // Populate the slider with data
-            ArtX.footerSlider.populateSlider();
+            Artbot.footerSlider.populateSlider();
         }
     },
     populateSlider: function() {
@@ -436,9 +436,9 @@ ArtX.footerSlider = {
                     type: "GET",
                     dataType: "json",
                     data: {
-                        "per_page": ArtX.footerSlider.vars.pageSize
+                        "per_page": Artbot.footerSlider.vars.pageSize
                     },
-                    url: ArtX.var.jsonDomain + "/favorites/",
+                    url: Artbot.var.jsonDomain + "/favorites/",
                     beforeSend: function(request) {
                         request.setRequestHeader("authentication_token", $.cookie('token'));
                     },
@@ -453,8 +453,8 @@ ArtX.footerSlider = {
                         if (jsonString.length > 2) {
                             // Favorites were returned, make the slider
                             // console.log(jsonString);
-                            ArtX.footerSlider.buildSlider(data);
-                            ArtX.footerSlider.initSlider();
+                            Artbot.footerSlider.buildSlider(data);
+                            Artbot.footerSlider.initSlider();
                         } else {
                             // No favorites returned, show the "no favorites yet" message
                             $("#footer-slider-msg-nofavorites").fadeIn(400);
@@ -480,16 +480,16 @@ ArtX.footerSlider = {
 
             // Get the Venue ID from the .venue-detail div
             //var venueID = $(".venue-detail").attr("data-venue-id");
-            var venueID = ArtX.var.venueDetailID;
+            var venueID = Artbot.var.venueDetailID;
             console.log("Venue ID: " + venueID);
 
             $.ajax({
                 type: "GET",
                 dataType: "json",
                 data: {
-                    "per_page": ArtX.footerSlider.vars.pageSize
+                    "per_page": Artbot.footerSlider.vars.pageSize
                 },
-                url: ArtX.var.jsonDomain + "/locations/" + venueID + "/events",
+                url: Artbot.var.jsonDomain + "/locations/" + venueID + "/events",
                 success: function( data ) {
                     console.log("Footer slider data successfully fetched");
                     
@@ -501,8 +501,8 @@ ArtX.footerSlider = {
                     if (jsonString.length > 2) {
                         // Events were returned, make the slider
                         // console.log(jsonString);
-                        ArtX.footerSlider.buildSlider(data);
-                        ArtX.footerSlider.initSlider();
+                        Artbot.footerSlider.buildSlider(data);
+                        Artbot.footerSlider.initSlider();
                     } else {
                         // No events returned, show the "no events" message
                         $("#footer-slider-msg-noevents").fadeIn(400);
@@ -520,7 +520,7 @@ ArtX.footerSlider = {
 
             console.log("Initializing Related Interest slider");
 
-            var jsonString = JSON.stringify(ArtX.var.relatedInterests);
+            var jsonString = JSON.stringify(Artbot.var.relatedInterests);
 
             //console.log(jsonString);
 
@@ -529,22 +529,22 @@ ArtX.footerSlider = {
 
                 var numberOfTags = 0;
 
-                $.each(ArtX.var.relatedInterests, function (key, value) {
+                $.each(Artbot.var.relatedInterests, function (key, value) {
                     numberOfTags++;
                 });
 
-                ArtX.footerSlider.vars.totalRelatedInterests = numberOfTags - 1; // zero-based index
+                Artbot.footerSlider.vars.totalRelatedInterests = numberOfTags - 1; // zero-based index
 
                 //console.log("Number of tags: " + numberOfTags);
                 
                 // Create click event to trigger cycleRelatedInterests
                 $("#cycle-relatedinterest").click(function(){
-                    ArtX.footerSlider.cycleRelatedInterests(ArtX.var.relatedInterests);
+                    Artbot.footerSlider.cycleRelatedInterests(Artbot.var.relatedInterests);
                     return false;
                 });
 
                 // Trigger cycleRelatedInterests
-                ArtX.footerSlider.cycleRelatedInterests(ArtX.var.relatedInterests);
+                Artbot.footerSlider.cycleRelatedInterests(Artbot.var.relatedInterests);
 
             } else {
                 // TODO: Show error for no results
@@ -557,7 +557,7 @@ ArtX.footerSlider = {
             console.log("Initializing Near You slider");
 
             // First, we have to try to get the user's current position.
-            ArtX.geolocation.getLocation(ArtX.footerSlider.processNearbyEvents, ArtX.footerSlider.hideFooter);
+            Artbot.geolocation.getLocation(Artbot.footerSlider.processNearbyEvents, Artbot.footerSlider.hideFooter);
 
         }
     },
@@ -565,20 +565,20 @@ ArtX.footerSlider = {
         // Check if we were successful
         console.log("Location call made, checking if values are correct");
 
-        if ((ArtX.geolocation.vars.currentLatitude !== "") && (ArtX.geolocation.vars.currentLongitude !== "")) {
+        if ((Artbot.geolocation.vars.currentLatitude !== "") && (Artbot.geolocation.vars.currentLongitude !== "")) {
             
-            console.log("My latitude: " + ArtX.geolocation.vars.currentLatitude);
+            console.log("My latitude: " + Artbot.geolocation.vars.currentLatitude);
 
             // We have a position; fetch events
             $.ajax({
                 type: "GET",
                 dataType: "json",
-                url: ArtX.var.jsonDomain + "/events",
+                url: Artbot.var.jsonDomain + "/events",
                 data: {
-                    latitude: ArtX.geolocation.vars.currentLatitude,
-                    longitude: ArtX.geolocation.vars.currentLongitude,
-                    radius: ArtX.footerSlider.vars.locationRadius,
-                    "per_page": ArtX.footerSlider.vars.pageSize
+                    latitude: Artbot.geolocation.vars.currentLatitude,
+                    longitude: Artbot.geolocation.vars.currentLongitude,
+                    radius: Artbot.footerSlider.vars.locationRadius,
+                    "per_page": Artbot.footerSlider.vars.pageSize
                 },
                 success: function( data ) {
                     console.log("Footer slider data successfully fetched");
@@ -592,11 +592,11 @@ ArtX.footerSlider = {
                     if (jsonString.length > 2) {
                         // Events were returned, make the slider
                         // console.log(jsonString);
-                        ArtX.footerSlider.buildSlider(data);
-                        ArtX.footerSlider.initSlider();
+                        Artbot.footerSlider.buildSlider(data);
+                        Artbot.footerSlider.initSlider();
                     } else {
                         // No events returned, show the "no events in radius" message
-                        $("#location-radius").html(ArtX.footerSlider.vars.locationRadius);
+                        $("#location-radius").html(Artbot.footerSlider.vars.locationRadius);
                         $("#footer-slider-msg-noeventsnearby").fadeIn(400);
                     }
                 },
@@ -611,7 +611,7 @@ ArtX.footerSlider = {
             }); 
         } else {
             // Couldn't get a position; hide footer
-            ArtX.footerSlider.hideFooter();
+            Artbot.footerSlider.hideFooter();
             $.mobile.loading('hide');
         }
     },
@@ -621,9 +621,9 @@ ArtX.footerSlider = {
         $(".footer").hide();
     },
     cycleRelatedInterests: function(data) {
-        var currentInterest = data[ArtX.footerSlider.vars.relatedInterestCounter];
+        var currentInterest = data[Artbot.footerSlider.vars.relatedInterestCounter];
 
-        console.log("Interest counter going into the function: " + ArtX.footerSlider.vars.relatedInterestCounter);
+        console.log("Interest counter going into the function: " + Artbot.footerSlider.vars.relatedInterestCounter);
         //console.log("Here's the current interest:");
         //console.log(JSON.stringify(currentInterest));
 
@@ -640,15 +640,15 @@ ArtX.footerSlider = {
 
         // Build slider with events via _.template
         var itemArray = currentInterest.events;
-        ArtX.footerSlider.buildSlider(itemArray);
+        Artbot.footerSlider.buildSlider(itemArray);
 
-        if (ArtX.footerSlider.vars.footSlideInstance === "") {
+        if (Artbot.footerSlider.vars.footSlideInstance === "") {
             // There were no favorites before, so we need to initialize the slider
-            ArtX.footerSlider.initSlider();
+            Artbot.footerSlider.initSlider();
 
         } else {
             // Slider is already initialized, we need to reload it
-            ArtX.footerSlider.reload();
+            Artbot.footerSlider.reload();
         }
 
         // Hide spinner
@@ -656,10 +656,10 @@ ArtX.footerSlider = {
 
 
         // Iterate the counter variable
-        if(ArtX.footerSlider.vars.relatedInterestCounter < ArtX.footerSlider.vars.totalRelatedInterests) {
-            ArtX.footerSlider.vars.relatedInterestCounter++;
+        if(Artbot.footerSlider.vars.relatedInterestCounter < Artbot.footerSlider.vars.totalRelatedInterests) {
+            Artbot.footerSlider.vars.relatedInterestCounter++;
         } else {
-            ArtX.footerSlider.vars.relatedInterestCounter = 0;
+            Artbot.footerSlider.vars.relatedInterestCounter = 0;
         }
 
     },
@@ -688,12 +688,12 @@ ArtX.footerSlider = {
 
         }
 
-        $("#footer-slider").html(_.template(ArtX.footerSlider.vars.slideTemplate, {itemArray:itemArray}));
+        $("#footer-slider").html(_.template(Artbot.footerSlider.vars.slideTemplate, {itemArray:itemArray}));
         
     },
     initSlider: function() {
-        ArtX.footerSlider.vars.footSlideInstance = $("#footer-slider").bxSlider(ArtX.footerSlider.vars.footSlideOptions);
-        ArtX.footerSlider.initSliderNav();
+        Artbot.footerSlider.vars.footSlideInstance = $("#footer-slider").bxSlider(Artbot.footerSlider.vars.footSlideOptions);
+        Artbot.footerSlider.initSliderNav();
     },
     initSliderNav: function() {
         $(".footer-slider").removeClass("not-enough-slides");
@@ -706,12 +706,12 @@ ArtX.footerSlider = {
 
         if (numberOfSlides > 2) {
             $('#footer-slider-next').click(function(){
-              ArtX.footerSlider.vars.footSlideInstance.goToNextSlide();
+              Artbot.footerSlider.vars.footSlideInstance.goToNextSlide();
               return false;
             });
 
             $('#footer-slider-previous').click(function(){
-              ArtX.footerSlider.vars.footSlideInstance.goToPrevSlide();
+              Artbot.footerSlider.vars.footSlideInstance.goToPrevSlide();
               return false;
             });
         } else {
@@ -722,19 +722,19 @@ ArtX.footerSlider = {
         // Add a new favorite to the slider 
         console.log("Adding a new favorite to the footer slider");   
 
-        if (ArtX.footerSlider.vars.footSlideInstance === "") {
+        if (Artbot.footerSlider.vars.footSlideInstance === "") {
             // There were no favorites before, so we need to initialize the slider
             
             $(".footer-slider-msg").hide();
-            ArtX.footerSlider.init();
+            Artbot.footerSlider.init();
 
         } else {
             // Slider is already initialized, add our new favorite to the existing slider
             
             var itemArray = favoriteData;
-            var eventHtml = _.template(ArtX.footerSlider.vars.slideTemplate, {itemArray:itemArray});
+            var eventHtml = _.template(Artbot.footerSlider.vars.slideTemplate, {itemArray:itemArray});
             $(eventHtml).prependTo($("#footer-slider"));
-            ArtX.footerSlider.reload();
+            Artbot.footerSlider.reload();
         }   
     },
     removeFavorite: function(selectedEventID) {
@@ -750,7 +750,7 @@ ArtX.footerSlider = {
 
         if (numberOfSlides > 0) {
             // Reload the slider
-            ArtX.footerSlider.reload();
+            Artbot.footerSlider.reload();
 
         } else {
             // We removed all the favorites; show the "no favorites yet" message
@@ -758,21 +758,21 @@ ArtX.footerSlider = {
         }
     },
     reload: function() {
-        if (($("#footer-slider").length > 0) && (ArtX.footerSlider.vars.footSlideInstance !== "")) {
+        if (($("#footer-slider").length > 0) && (Artbot.footerSlider.vars.footSlideInstance !== "")) {
             
             console.log("Reloading footer slider");
   
-            ArtX.footerSlider.vars.footSlideInstance.reloadSlider(ArtX.footerSlider.vars.footSlideOptions);
-            ArtX.footerSlider.initSliderNav();
+            Artbot.footerSlider.vars.footSlideInstance.reloadSlider(Artbot.footerSlider.vars.footSlideOptions);
+            Artbot.footerSlider.initSliderNav();
 
         }
     },
     destroy: function() {
-        if (($("#footer-slider").length > 0) && (ArtX.footerSlider.vars.footSlideInstance !== "")) {
+        if (($("#footer-slider").length > 0) && (Artbot.footerSlider.vars.footSlideInstance !== "")) {
             console.log("Destroying footer slider");
             $("#footer-slider").fadeOut(400, function() {
-                ArtX.footerSlider.vars.footSlideInstance.destroySlider();
-                ArtX.footerSlider.vars.footSlideInstance = "";
+                Artbot.footerSlider.vars.footSlideInstance.destroySlider();
+                Artbot.footerSlider.vars.footSlideInstance = "";
                 $("#footer-slider").empty();
 
                 $("#footer-slider").fadeIn(400);
@@ -785,16 +785,16 @@ ArtX.footerSlider = {
 /* Set up Favorite stars
    ========================================================================== */
 
-ArtX.favoriteStars = {
+Artbot.favoriteStars = {
     init: function() {
         if ($(".favorite-star").length > 0) {
             console.log("Initializing favorite stars");
 
             // First, destroy any current star bindings so that we can call this
             // wherever we want, without duplicating events
-            ArtX.favoriteStars.destroy();
+            Artbot.favoriteStars.destroy();
 
-            ArtX.favoriteStars.sync();
+            Artbot.favoriteStars.sync();
 
             $(".favorite-star").click(function() {
 
@@ -803,7 +803,7 @@ ArtX.favoriteStars = {
 
                     console.log("We can't toggle a favorite because the user is not logged in.");
 
-                    ArtX.signupModal.open();
+                    Artbot.signupModal.open();
 
                 } else {
                     // The user is logged in, so we can save or delete the favorite
@@ -822,7 +822,7 @@ ArtX.favoriteStars = {
 
                         $.ajax({
                             type: "POST",
-                            url: ArtX.var.jsonDomain + "/events/" + selectedEventID + "/favorite/",
+                            url: Artbot.var.jsonDomain + "/events/" + selectedEventID + "/favorite/",
                             beforeSend: function (request) {
                                 request.setRequestHeader("authentication_token", $.cookie('token'));
                             },
@@ -831,16 +831,16 @@ ArtX.favoriteStars = {
 
                                 var selectedFavoriteID = data.favorite.id;
                                 // Swap the star
-                                ArtX.favoriteStars.highlightStar($thisStarLink, selectedFavoriteID);
+                                Artbot.favoriteStars.highlightStar($thisStarLink, selectedFavoriteID);
                                 // If it exists on the page, reload the favorites slider with the new favorite
-                                //if (($("#favorites-slider").length > 0) && (ArtX.footerSlider.vars.footSlideInstance !== "")) {
+                                //if (($("#favorites-slider").length > 0) && (Artbot.footerSlider.vars.footSlideInstance !== "")) {
                                 if ($("#favorites-slider").length > 0) {
-                                    ArtX.footerSlider.addFavorite(data);
+                                    Artbot.footerSlider.addFavorite(data);
                                 }
                             },
                             error: function (jqXHR, error, errorThrown) {
                                 console.log("Error saving favorite");
-                                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
                             },
                             complete: function() {
                                 $.mobile.loading('hide');
@@ -858,7 +858,7 @@ ArtX.favoriteStars = {
 
                         $.ajax({
                             type: "POST",
-                            url: ArtX.var.jsonDomain + "/favorites/" + selectedUserEventID,
+                            url: Artbot.var.jsonDomain + "/favorites/" + selectedUserEventID,
                             data:  {
                                 "_method":"delete"
                             },
@@ -868,27 +868,27 @@ ArtX.favoriteStars = {
                             success: function(data, textStatus, jqXHR) {
                                 console.log("Favorite successfully deleted");
                                 // Swap the star
-                                ArtX.favoriteStars.unhighlightStar($thisStarLink);
+                                Artbot.favoriteStars.unhighlightStar($thisStarLink);
                                 // If favorites slider exists, remove favorite from slider
                                 if (($("#favorites-slider").length > 0)) {
-                                    ArtX.footerSlider.removeFavorite(selectedEventID);
+                                    Artbot.footerSlider.removeFavorite(selectedEventID);
                                 }
                                 // If we're on the Favorites page, remove the favorite from the page
                                 /*
                                 if ($("#target-favoritelist").length > 0) {
-                                    ArtX.favoriteList.removeFavorite(selectedEventID);
+                                    Artbot.favoriteList.removeFavorite(selectedEventID);
                                 }
                                 */
                                 // If we're on the History page, remove the favorite from the page
                                 /*
                                 if ($("#target-historylist").length > 0) {
-                                    ArtX.historyList.removeFavorite(selectedEventID);
+                                    Artbot.historyList.removeFavorite(selectedEventID);
                                 }
                                 */
                             },
                             error: function (jqXHR, error, errorThrown) {
                                 console.log("Error deleting favorite");
-                                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
                             },
                             complete: function() {
                                 $.mobile.loading('hide');
@@ -916,7 +916,7 @@ ArtX.favoriteStars = {
             // Fetch the list of user's favorites to check against.
             $.ajax({
                 type: "GET",
-                url: ArtX.var.jsonDomain + "/favorites/",
+                url: Artbot.var.jsonDomain + "/favorites/",
                 beforeSend: function (request) {
                     request.setRequestHeader("authentication_token", $.cookie('token'));
                 },
@@ -938,14 +938,14 @@ ArtX.favoriteStars = {
 
                             // If they match, highlight the star
                             if (pageFavoriteEventID == userFavoriteEventID) {
-                                ArtX.favoriteStars.highlightStar($(this), userFavoriteID);
+                                Artbot.favoriteStars.highlightStar($(this), userFavoriteID);
                             }
                         });
                     });
                 },
                 error: function (jqXHR, error, errorThrown) {
                     console.log("Error fetching data to sync stars");
-                    ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                    Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
                 }
             });
         }
@@ -973,7 +973,7 @@ ArtX.favoriteStars = {
 
 /* Set up Text Truncation
    ========================================================================== */
-ArtX.setupTextTruncation = function() {
+Artbot.setupTextTruncation = function() {
     console.log("Initializing text truncation");
 
     $(".truncate").trunk8({
@@ -982,7 +982,7 @@ ArtX.setupTextTruncation = function() {
     });
 
     // Set up a resize event for truncated text
-    ArtX.el.win.resize(function() {
+    Artbot.el.win.resize(function() {
         $(".truncate").trunk8({
             lines: 2,
             tooltip: false
@@ -992,7 +992,7 @@ ArtX.setupTextTruncation = function() {
 
 /* Set up Signup Modal
    ========================================================================== */
-ArtX.signupModal = {
+Artbot.signupModal = {
     vars: {
         returnToPage: ""
     },
@@ -1002,7 +1002,7 @@ ArtX.signupModal = {
         // Set up some click events for the sign up links
         $(document).on("click", ".signup-trigger", function() {
             // Open modal
-            ArtX.signupModal.open();
+            Artbot.signupModal.open();
         });
     },
     ajaxSubmit: function() {
@@ -1010,7 +1010,7 @@ ArtX.signupModal = {
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: ArtX.var.jsonDomain + "/registrations",
+            url: Artbot.var.jsonDomain + "/registrations",
             data: {
                 email: $("#email").val(),
                 password:  $("#password").val(),
@@ -1026,15 +1026,15 @@ ArtX.signupModal = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("User registration failed");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
-                ArtX.errors.showFormError(jqXHR.responseText);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.showFormError(jqXHR.responseText);
                 $.mobile.loading('hide');
             }
         });
     },
     open: function() {
         // Record which page you're currently on
-        ArtX.signupModal.vars.returnToPage = $(".ui-page-active").attr("data-url");
+        Artbot.signupModal.vars.returnToPage = $(".ui-page-active").attr("data-url");
 
         // Load up the form into the modal window
         $.mobile.loading('show');
@@ -1042,7 +1042,7 @@ ArtX.signupModal = {
             
             if (status == "error") {
                 console.log("Failed to load the signup form into the modal");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
             } else {
                 // Create the form for jQM
                 $("#signup-form").trigger('create');
@@ -1051,7 +1051,7 @@ ArtX.signupModal = {
 
                 // Set up form submit
                 $("#signup-form").validate({
-                    submitHandler: ArtX.signupModal.ajaxSubmit
+                    submitHandler: Artbot.signupModal.ajaxSubmit
                 });
             }
 
@@ -1066,7 +1066,7 @@ ArtX.signupModal = {
 
 /* Set up custom checkboxes
    ========================================================================== */
-ArtX.customCheckboxes = {
+Artbot.customCheckboxes = {
     init: function(targetContainer) {
         var $checkboxes;
 
@@ -1101,20 +1101,20 @@ ArtX.customCheckboxes = {
 /* Set up Event Detail
    ========================================================================== */
 
-ArtX.eventdetail = {
+Artbot.eventdetail = {
     init: function() {
         if ($("#template-eventdetail").length > 0) {
-            ArtX.eventdetail.initPage();
+            Artbot.eventdetail.initPage();
         }  
     },
     initPage : function() {
         $.mobile.loading('show');
 
         // Get the desired event ID from a querystring
-        var qsEventID = ArtX.util.findQuerystring("eventid");
+        var qsEventID = Artbot.util.findQuerystring("eventid");
         //console.log("Event ID passed in via querystring: " + qsEventID);
         if (typeof qsEventID != 'undefined') {
-            ArtX.var.eventDetailID = qsEventID;
+            Artbot.var.eventDetailID = qsEventID;
         }
         
         // Fetch the data with the event ID
@@ -1124,7 +1124,7 @@ ArtX.eventdetail = {
             data: {
                 related: true
             },
-            url: ArtX.var.jsonDomain + "/events/" + ArtX.var.eventDetailID,
+            url: Artbot.var.jsonDomain + "/events/" + Artbot.var.eventDetailID,
             success: function( data ){
                 console.log("Event detail data fetch successful");
                 
@@ -1132,13 +1132,13 @@ ArtX.eventdetail = {
                 var eventArray = data;
 
                 // Store the related interest information in a variable for the footer slider scripts
-                ArtX.var.relatedInterests = data.event.related;
+                Artbot.var.relatedInterests = data.event.related;
 
-                ArtX.eventdetail.displayPage(eventArray);
+                Artbot.eventdetail.displayPage(eventArray);
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Event detail data fetch failed");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -1158,10 +1158,10 @@ ArtX.eventdetail = {
 
         $("#target-eventdetail").fadeOut(400, function() {
             $("#target-eventdetail").html(_.template(eventTemplate, {eventArray:eventArray}));
-            ArtX.favoriteStars.init();
+            Artbot.favoriteStars.init();
             $("#target-eventdetail").fadeIn(400);
 
-            ArtX.footerSlider.init();
+            Artbot.footerSlider.init();
         });
     }
 };
@@ -1169,20 +1169,20 @@ ArtX.eventdetail = {
 /* Set up Venue Detail
    ========================================================================== */
 
-ArtX.venuedetail = {
+Artbot.venuedetail = {
     init: function() {
         if ($("#template-venuedetail").length > 0) {
-            ArtX.venuedetail.initPage();
+            Artbot.venuedetail.initPage();
         }        
     },
     initPage : function() {
         $.mobile.loading('show');
         
         // Get the desired venue ID from a querystring
-        var qsVenueID = ArtX.util.findQuerystring("venueid");
+        var qsVenueID = Artbot.util.findQuerystring("venueid");
         //console.log("Venue ID passed in via querystring: " + qsVenueID);
         if (typeof qsVenueID != 'undefined') {
-            ArtX.var.venueDetailID = qsVenueID;
+            Artbot.var.venueDetailID = qsVenueID;
         }
 
         $.ajax({
@@ -1191,17 +1191,17 @@ ArtX.venuedetail = {
             data: {
                 related: true
             },
-            url: ArtX.var.jsonDomain + "/locations/" + ArtX.var.venueDetailID,
+            url: Artbot.var.jsonDomain + "/locations/" + Artbot.var.venueDetailID,
             success: function( data ){
                 console.log("Venue detail data fetch successful");
                 
                 //console.log(JSON.stringify(data));
                 var venueArray = data;
-                ArtX.venuedetail.displayPage(venueArray);
+                Artbot.venuedetail.displayPage(venueArray);
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Venue detail data fetch failed");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -1217,17 +1217,17 @@ ArtX.venuedetail = {
             $("#target-venuedetail").fadeIn(400);
             console.log("Venue page content finished displaying");
 
-            ArtX.footerSlider.init();
+            Artbot.footerSlider.init();
         });
     }
 };
 
 /* Set up By Date Event Calendar
    ========================================================================== */
-ArtX.calendar = {
+Artbot.calendar = {
     getEvents: function(desiredMonth, desiredYear) {
 
-        var jsonURL = ArtX.var.jsonDomain + "/events";
+        var jsonURL = Artbot.var.jsonDomain + "/events";
 
         $.mobile.loading('show');
         $.ajax({
@@ -1248,7 +1248,7 @@ ArtX.calendar = {
                 //console.log("Number of events returned: " + data.events.length);
 
                 // Create a Clndr and save the instance as myCalendar
-                ArtX.el.eventCalendar = $("#event-calendar").clndr({
+                Artbot.el.eventCalendar = $("#event-calendar").clndr({
                     template: $('#template-calendar').html(),
                     events: eventArray,
                     dateParameter: 'start_date',
@@ -1272,10 +1272,10 @@ ArtX.calendar = {
 
                                 if (checkData.length > 2) {
                                     // Event data returned, show the list
-                                    ArtX.calendar.displayEventList(target);
+                                    Artbot.calendar.displayEventList(target);
                                 } else {
                                     // No events, show error
-                                    ArtX.calendar.showErrorMsg("noevents");
+                                    Artbot.calendar.showErrorMsg("noevents");
                                 }
        
                             } else {
@@ -1286,7 +1286,7 @@ ArtX.calendar = {
                             var chosenMonth = month.format("MM");
                             //console.log("Month change!  New month: " + chosenMonth);
                             var chosenYear = month.format("YYYY");
-                            var jsonURL = ArtX.var.jsonDomain + "/events";
+                            var jsonURL = Artbot.var.jsonDomain + "/events";
                             var newEventArray = [];
 
                             $.mobile.loading('show');
@@ -1306,11 +1306,11 @@ ArtX.calendar = {
                                     //console.log("Number of events returned: " + data.events.length);
 
                                     newEventArray = data.events;
-                                    ArtX.el.eventCalendar.setEvents(newEventArray);
+                                    Artbot.el.eventCalendar.setEvents(newEventArray);
                                 },
                                 error: function (jqXHR, error, errorThrown) {
                                     console.log("Events for " + chosenMonth + " " + chosenYear + " failed");
-                                    ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                                    Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
                                 },
                                 complete: function() {
                                     $.mobile.loading('hide');
@@ -1344,7 +1344,7 @@ ArtX.calendar = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Initial calendar event fetch failed");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -1361,10 +1361,10 @@ ArtX.calendar = {
         var eventTemplate = $('#template-eventlist').html();
         $("#event-list").fadeOut(400, function() {
             $("#event-list").html(_.template(eventTemplate, {eventArray:eventArray}));
-            ArtX.favoriteStars.init();
+            Artbot.favoriteStars.init();
             $("#event-list").fadeIn(400, function() {
                 // Re-do truncation once fade is complete
-                ArtX.setupTextTruncation();
+                Artbot.setupTextTruncation();
             });
         });
     },
@@ -1386,7 +1386,7 @@ ArtX.calendar = {
             // Adjust the month value by one, to be an integer from 1 to 12
             thisMonth++;
 
-            ArtX.calendar.getEvents(thisMonth, thisYear);
+            Artbot.calendar.getEvents(thisMonth, thisYear);
         }
     }
 };
@@ -1394,7 +1394,7 @@ ArtX.calendar = {
 
 /* Set up Load More functionality
    ========================================================================== */
-ArtX.loadMore = {
+Artbot.loadMore = {
     vars: {
         loadMoreLink : $("#load-more"),
         nextPageJsonURL : "",
@@ -1406,7 +1406,7 @@ ArtX.loadMore = {
     setupLoadMoreLink: function() {
         console.log("Setting up the Load More link click events");
 
-        ArtX.loadMore.vars.loadMoreLink
+        Artbot.loadMore.vars.loadMoreLink
             .removeClass("btn-hidden") // Show the Load More link
             .click(function() {
                 $.mobile.loading('show');
@@ -1415,7 +1415,7 @@ ArtX.loadMore = {
                 // leaves the button there, and a frustrated user clicks a million times and you
                 // get lots of multiple entries
 
-                ArtX.loadMore.vars.loadMoreLink.fadeOut();
+                Artbot.loadMore.vars.loadMoreLink.fadeOut();
 
                 var jsonArray;
                 var $newResults;
@@ -1427,76 +1427,76 @@ ArtX.loadMore = {
                 /*  DEV NOTE: When this is hooked up to a real JSON feed,
                     we'll feed it the next page URL from the Load More link's data-feed attribute like this:
 
-                    ArtX.loadMore.vars.nextPageJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
-                    ArtX.loadMore.vars.nextPageJsonURL += "/" + ArtX.loadMore.vars.nextPage + "/" + ArtX.var.itemsPerPage;
+                    Artbot.loadMore.vars.nextPageJsonURL = Artbot.loadMore.vars.loadMoreLink.data("feed");
+                    Artbot.loadMore.vars.nextPageJsonURL += "/" + Artbot.loadMore.vars.nextPage + "/" + Artbot.var.itemsPerPage;
 
                     But since this is a demo with static JSON files, we're putting in a temporary switch statement for it here: */
 
-                var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
+                var temporaryJsonURL = Artbot.loadMore.vars.loadMoreLink.data("feed");
 
                 switch(temporaryJsonURL) {
                     case "/GetEventsByLocation/" :
-                        ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/getEventsByLocation-page" + ArtX.loadMore.vars.nextPage + ".json";
+                        Artbot.loadMore.vars.nextPageJsonURL = "/ui/js/json/getEventsByLocation-page" + Artbot.loadMore.vars.nextPage + ".json";
                         break;
                     case "/LoadFavorites/" :
-                        ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + ArtX.loadMore.vars.nextPage + ".json";
+                        Artbot.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + Artbot.loadMore.vars.nextPage + ".json";
                         break;
                     default:
-                        ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + ArtX.loadMore.vars.nextPage + ".json";
+                        Artbot.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + Artbot.loadMore.vars.nextPage + ".json";
                 }
 
-                $.getJSON(ArtX.loadMore.vars.nextPageJsonURL, function(data) {
+                $.getJSON(Artbot.loadMore.vars.nextPageJsonURL, function(data) {
                     jsonArray = data;
 
                     // Format results with underscore.js template
                     // Assign those results to a variable and chain .hide()
-                    $newResults = $(_.template(ArtX.loadMore.vars.itemTemplate, {jsonArray:jsonArray})).hide();
+                    $newResults = $(_.template(Artbot.loadMore.vars.itemTemplate, {jsonArray:jsonArray})).hide();
 
                     // Append newResults to the list
-                    $newResults.appendTo(ArtX.loadMore.vars.itemContainer);
+                    $newResults.appendTo(Artbot.loadMore.vars.itemContainer);
 
                     // Fade in the new results
                     $newResults.fadeIn();
 
                     // Re-do truncation
-                    ArtX.setupTextTruncation();
+                    Artbot.setupTextTruncation();
 
                     // Update the variables
-                    ArtX.loadMore.vars.currentPage = ArtX.loadMore.vars.nextPage;
-                    ArtX.loadMore.vars.nextPage = ArtX.loadMore.vars.nextPage + 1;
+                    Artbot.loadMore.vars.currentPage = Artbot.loadMore.vars.nextPage;
+                    Artbot.loadMore.vars.nextPage = Artbot.loadMore.vars.nextPage + 1;
 
                     // Check to see if we still need to show the Load More link
                     // Hide if not needed anymore
 
-                    var currentItemsCount = ArtX.util.getNumberOfChildItems(ArtX.loadMore.vars.itemContainer);
+                    var currentItemsCount = Artbot.util.getNumberOfChildItems(Artbot.loadMore.vars.itemContainer);
 
                     /*  DEV NOTE: When this is hooked up to a real JSON feed,
                         we'll feed it the next page URL from the Load More link's data-feed attribute like this:
 
-                        ArtX.loadMore.vars.nextPageJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
-                        ArtX.loadMore.vars.nextPageJsonURL += ArtX.loadMore.vars.nextPage;
+                        Artbot.loadMore.vars.nextPageJsonURL = Artbot.loadMore.vars.loadMoreLink.data("feed");
+                        Artbot.loadMore.vars.nextPageJsonURL += Artbot.loadMore.vars.nextPage;
 
                         But since this is a demo with static JSON files, we're putting in a temporary switch statement for it here: */
 
-                    var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
+                    var temporaryJsonURL = Artbot.loadMore.vars.loadMoreLink.data("feed");
 
                     switch(temporaryJsonURL) {
                         case "/GetEventsByLocation/" :
-                            ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/getEventsByLocation-page" + ArtX.vars.nextPageJsonURL + ".json";
+                            Artbot.loadMore.vars.nextPageJsonURL = "/ui/js/json/getEventsByLocation-page" + Artbot.vars.nextPageJsonURL + ".json";
                             break;
                         case "/LoadFavorites/" :
-                            ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + ArtX.loadMore.vars.nextPage + ".json";
+                            Artbot.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + Artbot.loadMore.vars.nextPage + ".json";
                             break;
                         default:
-                            ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + ArtX.loadMore.vars.nextPage + ".json";
+                            Artbot.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page" + Artbot.loadMore.vars.nextPage + ".json";
                     }
 
                     // Check to see if there are more results to show
-                    ArtX.dataService.getJsonFeed(ArtX.loadMore.vars.nextPageJsonURL, function(data) {
-                            var isMoreResults = ArtX.util.isThereMore(data);
+                    Artbot.dataService.getJsonFeed(Artbot.loadMore.vars.nextPageJsonURL, function(data) {
+                            var isMoreResults = Artbot.util.isThereMore(data);
                             if (isMoreResults) {
                                 // More results; we need to show the "Load More" link again
-                                ArtX.loadMore.vars.loadMoreLink.fadeIn();
+                                Artbot.loadMore.vars.loadMoreLink.fadeIn();
                             }
                         }
                     );
@@ -1507,7 +1507,7 @@ ArtX.loadMore = {
             });
     },
     init: function() {
-        if (ArtX.loadMore.vars.loadMoreLink.length > 0) {
+        if (Artbot.loadMore.vars.loadMoreLink.length > 0) {
             console.log("Initializing Load More functionality");
 
             // We need to check to see how many items are currently being shown.
@@ -1516,41 +1516,41 @@ ArtX.loadMore = {
 
             // First, let's get the item container and assign it to a variable
             // Assumption: the load more link is always directly preceded by the item container
-            ArtX.loadMore.vars.itemContainer = ArtX.loadMore.vars.loadMoreLink.prev();
+            Artbot.loadMore.vars.itemContainer = Artbot.loadMore.vars.loadMoreLink.prev();
 
-            var currentItemsCount = ArtX.util.getNumberOfChildItems(ArtX.loadMore.vars.itemContainer);
+            var currentItemsCount = Artbot.util.getNumberOfChildItems(Artbot.loadMore.vars.itemContainer);
 
-            if (currentItemsCount == ArtX.var.itemsPerPage) {
+            if (currentItemsCount == Artbot.var.itemsPerPage) {
                 // There's the same amount as our items per page,
                 // so there might be more to pull down
 
                 /*  DEV NOTE: When this is hooked up to a real JSON feed,
                     we'll feed it the page 2 URL from the Load More link's data-feed attribute like this:
 
-                    ArtX.loadMore.vars.nextPageJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
-                    ArtX.loadMore.vars.nextPageJsonURL += "2";
+                    Artbot.loadMore.vars.nextPageJsonURL = Artbot.loadMore.vars.loadMoreLink.data("feed");
+                    Artbot.loadMore.vars.nextPageJsonURL += "2";
 
                     But since this is a demo with static JSON files, we're putting in a temporary switch statement for it here: */
 
-                var temporaryJsonURL = ArtX.loadMore.vars.loadMoreLink.data("feed");
+                var temporaryJsonURL = Artbot.loadMore.vars.loadMoreLink.data("feed");
 
                 switch(temporaryJsonURL) {
                     case "/GetEventsByLocation/" :
-                        ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/getEventsByLocation-page2.json";
+                        Artbot.loadMore.vars.nextPageJsonURL = "/ui/js/json/getEventsByLocation-page2.json";
                         break;
                     case "/LoadFavorites/" :
-                        ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page2.json";
+                        Artbot.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page2.json";
                         break;
                     default:
-                        ArtX.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page2.json";
+                        Artbot.loadMore.vars.nextPageJsonURL = "/ui/js/json/loadFavorites-page2.json";
                 }
 
                 // Check to see if there are more results to show, and set up the Load More link if so
-                ArtX.dataService.getJsonFeed(ArtX.loadMore.vars.nextPageJsonURL, function(data) {
-                        var isMoreResults = ArtX.util.isThereMore(data);
+                Artbot.dataService.getJsonFeed(Artbot.loadMore.vars.nextPageJsonURL, function(data) {
+                        var isMoreResults = Artbot.util.isThereMore(data);
                         if (isMoreResults) {
                             // More results; we need to show the "Load More" link again
-                            ArtX.loadMore.setupLoadMoreLink();
+                            Artbot.loadMore.setupLoadMoreLink();
                         }
                     }
                 );
@@ -1561,7 +1561,7 @@ ArtX.loadMore = {
 
 /* Setting up My Settings Ajax functionality
    ========================================================================== */
-ArtX.settings = {
+Artbot.settings = {
     init: function() {
         if ($("#settings-form").length > 0) {
 
@@ -1569,7 +1569,7 @@ ArtX.settings = {
                 console.log("Initializing app settings");
 
                 // Preload the field values from the back-end API
-                ArtX.settings.fetchFieldValues();
+                Artbot.settings.fetchFieldValues();
 
                 // Set up validation and Ajax submit
                 $("#settings-form").validate({
@@ -1580,7 +1580,7 @@ ArtX.settings = {
                         "email": "email",
                         "zipcode": "zipcode"
                     },
-                    submitHandler: ArtX.settings.ajaxSubmit
+                    submitHandler: Artbot.settings.ajaxSubmit
                 });
             } 
         }
@@ -1588,17 +1588,17 @@ ArtX.settings = {
     fetchFieldValues: function() {
         $.ajax({
             type: "GET",
-            url: ArtX.var.jsonDomain + "/preferences/",
+            url: Artbot.var.jsonDomain + "/preferences/",
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
             },
             success: function ( data, textStatus, jqXHR ) {
                 console.log("User preferences retrieved successfully.");
-                ArtX.settings.populateFieldValues(data);
+                Artbot.settings.populateFieldValues(data);
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Error retrieving user preferences");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         });
     },
@@ -1624,7 +1624,7 @@ ArtX.settings = {
         // Set up change event handling for the flip-switches
         var $ajaxInputs = $("#settings-form").find("input[type=checkbox]");
         $ajaxInputs.change(function() {
-            ArtX.settings.toggleThisOption(this);
+            Artbot.settings.toggleThisOption(this);
         });
     },
     toggleThisOption: function(checkboxObj) {
@@ -1641,7 +1641,7 @@ ArtX.settings = {
         $.mobile.loading('show');
         $.ajax({
             type: "PUT",
-            url: ArtX.var.jsonDomain + "/preferences/",
+            url: Artbot.var.jsonDomain + "/preferences/",
             data: ajaxDataToSend,
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
@@ -1651,7 +1651,7 @@ ArtX.settings = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Error sending toggle Ajax call");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -1672,7 +1672,7 @@ ArtX.settings = {
         $.mobile.loading('show');
         $.ajax({
             type: "PATCH",
-            url: ArtX.var.jsonDomain + "/preferences/",
+            url: Artbot.var.jsonDomain + "/preferences/",
             data: formData,
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
@@ -1682,7 +1682,7 @@ ArtX.settings = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Error saving all user preferences");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -1694,12 +1694,12 @@ ArtX.settings = {
 
 /* Setting up History list functionality
    ========================================================================== */
-ArtX.historyList = {
+Artbot.historyList = {
     init: function() {
         if ($("#target-historylist").length > 0) {
             if ($.cookie('token') !== undefined) {
                 console.log("Initializing History list");
-                ArtX.historyList.fetchData();
+                Artbot.historyList.fetchData();
             }
         }
     },
@@ -1708,7 +1708,7 @@ ArtX.historyList = {
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: ArtX.var.jsonDomain + "/favorites/history/",
+            url: Artbot.var.jsonDomain + "/favorites/history/",
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
             },
@@ -1722,20 +1722,20 @@ ArtX.historyList = {
                 if (jsonDataString.length > 2) {
                     // There are favorites, build the list
                     
-                    ArtX.historyList.hideErrorMsg();
+                    Artbot.historyList.hideErrorMsg();
 
                     $("#target-historylist").fadeOut(400, function() {
-                        ArtX.historyList.buildList(data);
+                        Artbot.historyList.buildList(data);
                     });
 
                 } else {
                     // Empty set, no favorites yet
-                    ArtX.historyList.showErrorMsg();
+                    Artbot.historyList.showErrorMsg();
                 }
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Error fetching History data");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -1755,17 +1755,17 @@ ArtX.historyList = {
 
         $(historyHtml).appendTo($("#target-historylist"));
 
-        ArtX.historyList.addEventHandlers();
+        Artbot.historyList.addEventHandlers();
     },
     addEventHandlers: function() {
         // Initialize favorite stars and history checkbox selected states
-        ArtX.favoriteStars.init();
-        ArtX.historyList.syncAttended();
+        Artbot.favoriteStars.init();
+        Artbot.historyList.syncAttended();
     },
     showList: function() {
         $("#target-historylist").fadeIn(400, function() {
             // Re-do truncation once fade is complete
-            ArtX.setupTextTruncation();
+            Artbot.setupTextTruncation();
         });
     },
     showErrorMsg: function() {
@@ -1791,26 +1791,26 @@ ArtX.historyList = {
 
             if (numberOfFavorites === 0) {
                 // We removed all the favorites; show the "no favorites yet" message
-                ArtX.historyList.showErrorMsg();
+                Artbot.historyList.showErrorMsg();
             }
 
-            ArtX.historyList.showList();
+            Artbot.historyList.showList();
 
         });
     },
     bindAttendanceCheckboxes: function() {
-        ArtX.historyList.unbindAttendanceCheckboxes();
+        Artbot.historyList.unbindAttendanceCheckboxes();
 
-        ArtX.customCheckboxes.init("#history-form");
+        Artbot.customCheckboxes.init("#history-form");
 
         // Set up click event for History Attendance checkboxes
         $("#history-form").find("input[type=checkbox]").click(function() {
-            ArtX.historyList.toggleAttended($(this));
+            Artbot.historyList.toggleAttended($(this));
         });
     },
     unbindAttendanceCheckboxes: function() {
         
-        ArtX.customCheckboxes.destroy("#history-form");
+        Artbot.customCheckboxes.destroy("#history-form");
 
         // Remove click event for History Attendance checkboxes
         $("#history-form").find("input[type=checkbox]").unbind("click");
@@ -1831,7 +1831,7 @@ ArtX.historyList = {
         $.mobile.loading('show');
         $.ajax({
             type: "PUT",
-            url: ArtX.var.jsonDomain + "/favorites/" + userFavoriteID,
+            url: Artbot.var.jsonDomain + "/favorites/" + userFavoriteID,
             data: ajaxDataToSend,
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
@@ -1841,7 +1841,7 @@ ArtX.historyList = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Error sending Attendance Ajax call");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -1858,7 +1858,7 @@ ArtX.historyList = {
             $.ajax({
                 type: "GET",
                 dataType: "json",
-                url: ArtX.var.jsonDomain + "/favorites/history/",
+                url: Artbot.var.jsonDomain + "/favorites/history/",
                 beforeSend: function (request) {
                     request.setRequestHeader("authentication_token", $.cookie('token'));
                 },
@@ -1900,16 +1900,16 @@ ArtX.historyList = {
 
                         });
 
-                        ArtX.historyList.bindAttendanceCheckboxes();
+                        Artbot.historyList.bindAttendanceCheckboxes();
 
                     } 
                 },
                 error: function (jqXHR, error, errorThrown) {
                     console.log("Error fetching History data");
-                    ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                    Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
                 },
                 complete: function() {
-                    ArtX.historyList.showList();
+                    Artbot.historyList.showList();
                     $.mobile.loading('hide');
                 }
             });
@@ -1922,12 +1922,12 @@ ArtX.historyList = {
 
 /* Setting up Favorites list functionality
    ========================================================================== */
-ArtX.favoriteList = {
+Artbot.favoriteList = {
     init: function() {
         if ($("#target-favoritelist").length > 0) {
             if ($.cookie('token') !== undefined) {
                 console.log("Initializing Favorites list");
-                ArtX.favoriteList.fetchData();
+                Artbot.favoriteList.fetchData();
             }
         }
     },
@@ -1936,7 +1936,7 @@ ArtX.favoriteList = {
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: ArtX.var.jsonDomain + "/favorites/",
+            url: Artbot.var.jsonDomain + "/favorites/",
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
             },
@@ -1950,21 +1950,21 @@ ArtX.favoriteList = {
                 if (jsonDataString.length > 2) {
                     // There are favorites, build the list
                     
-                    ArtX.favoriteList.hideErrorMsg();
+                    Artbot.favoriteList.hideErrorMsg();
 
                     $("#target-favoritelist").fadeOut(400, function() {
-                        ArtX.favoriteList.buildList(data);
-                        ArtX.favoriteList.showList();
+                        Artbot.favoriteList.buildList(data);
+                        Artbot.favoriteList.showList();
                     });
 
                 } else {
                     // Empty set, no favorites yet
-                    ArtX.favoriteList.showErrorMsg();
+                    Artbot.favoriteList.showErrorMsg();
                 }
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Error fetching Favorites data");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -1984,11 +1984,11 @@ ArtX.favoriteList = {
 
         $(favoritesHtml).appendTo($("#target-favoritelist"));
 
-        ArtX.favoriteList.addEventHandlers();
+        Artbot.favoriteList.addEventHandlers();
     },
     addEventHandlers: function() {
         // Initialize favorite stars
-        ArtX.favoriteStars.init();
+        Artbot.favoriteStars.init();
     },
     showList: function() {
         $("#target-favoritelist").fadeIn(400);
@@ -2016,10 +2016,10 @@ ArtX.favoriteList = {
 
             if (numberOfFavorites === 0) {
                 // We removed all the favorites; show the "no favorites yet" message
-                ArtX.favoriteList.showErrorMsg();
+                Artbot.favoriteList.showErrorMsg();
             }
 
-            ArtX.favoriteList.showList();
+            Artbot.favoriteList.showList();
 
         });
     }
@@ -2028,10 +2028,10 @@ ArtX.favoriteList = {
 
 /* Setting up Interests functionality
    ========================================================================== */
-ArtX.interests = {
+Artbot.interests = {
     vars: { // Defaults are set to get the full list of interests
         ajaxType : "GET",
-        ajaxURL : ArtX.var.jsonDomain + "/possible_interests/",
+        ajaxURL : Artbot.var.jsonDomain + "/possible_interests/",
         ajaxData : "",
         ajaxSuccessMsg : "Successfully retrieved full list of possible interests",
         ajaxErrorMsg : "Retrieval of full possible interest list failed",
@@ -2047,7 +2047,7 @@ ArtX.interests = {
 
                 console.log("Initializing functionality for My Interests");
 
-                ArtX.interests.checkForInterests();
+                Artbot.interests.checkForInterests();
 
                 var isCheckboxChecked = false;
                 var checkboxID;
@@ -2064,15 +2064,15 @@ ArtX.interests = {
 
                     if (isCheckboxChecked) {
                         // We're interested in this, send a POST request
-                        ArtX.interests.vars.ajaxType = "POST";
-                        ArtX.interests.vars.ajaxURL = ArtX.var.jsonDomain + "/interests/";
-                        ArtX.interests.vars.ajaxData = {
+                        Artbot.interests.vars.ajaxType = "POST";
+                        Artbot.interests.vars.ajaxURL = Artbot.var.jsonDomain + "/interests/";
+                        Artbot.interests.vars.ajaxData = {
                             "tag_id": checkboxID
                         };
-                        ArtX.interests.vars.ajaxSuccessMsg = "Interest '" + checkboxValue + "' saved.";
-                        ArtX.interests.vars.ajaxErrorMsg = "Saving interest '" + checkboxValue + "' failed!";
+                        Artbot.interests.vars.ajaxSuccessMsg = "Interest '" + checkboxValue + "' saved.";
+                        Artbot.interests.vars.ajaxErrorMsg = "Saving interest '" + checkboxValue + "' failed!";
 
-                        ArtX.interests.vars.ajaxCallback = function(checkboxObj, ajaxData) {
+                        Artbot.interests.vars.ajaxCallback = function(checkboxObj, ajaxData) {
                             console.log("Callback for adding an interest");
                             var $myCheckbox = checkboxObj;
                             var userInterestID;
@@ -2087,15 +2087,15 @@ ArtX.interests = {
                         var userInterestID = $(this).data("user-interest-id");
                         console.log("userInterestID: " + userInterestID);
 
-                        ArtX.interests.vars.ajaxType = "POST";
-                        ArtX.interests.vars.ajaxURL = ArtX.var.jsonDomain + "/interests/" + userInterestID;
-                        ArtX.interests.vars.ajaxData = {
+                        Artbot.interests.vars.ajaxType = "POST";
+                        Artbot.interests.vars.ajaxURL = Artbot.var.jsonDomain + "/interests/" + userInterestID;
+                        Artbot.interests.vars.ajaxData = {
                             "_method":"delete"
                         };
-                        ArtX.interests.vars.ajaxSuccessMsg = "Interest '" + checkboxValue + "' deleted.";
-                        ArtX.interests.vars.ajaxErrorMsg = "Deleting interest '" + checkboxValue + "' failed!";
+                        Artbot.interests.vars.ajaxSuccessMsg = "Interest '" + checkboxValue + "' deleted.";
+                        Artbot.interests.vars.ajaxErrorMsg = "Deleting interest '" + checkboxValue + "' failed!";
 
-                        ArtX.interests.vars.ajaxCallback = function(checkboxObj) {
+                        Artbot.interests.vars.ajaxCallback = function(checkboxObj) {
                             console.log("Callback for deleting an interest");
                             var $myCheckbox = checkboxObj;
                             $myCheckbox.removeAttr("data-user-interest-id");
@@ -2108,19 +2108,19 @@ ArtX.interests = {
                     $.mobile.loading('show');
 
                     $.ajax({
-                        type: ArtX.interests.vars.ajaxType,
-                        url: ArtX.interests.vars.ajaxURL,
-                        data: ArtX.interests.vars.ajaxData,
+                        type: Artbot.interests.vars.ajaxType,
+                        url: Artbot.interests.vars.ajaxURL,
+                        data: Artbot.interests.vars.ajaxData,
                         beforeSend: function (request) {
                             request.setRequestHeader("authentication_token", $.cookie('token'));
                         },
                         success: function ( data, textStatus, jqXHR ) {
-                            console.log(ArtX.interests.vars.ajaxSuccessMsg);
-                            ArtX.interests.vars.ajaxCallback($thisCheckbox, data);
+                            console.log(Artbot.interests.vars.ajaxSuccessMsg);
+                            Artbot.interests.vars.ajaxCallback($thisCheckbox, data);
                         },
                         error: function (jqXHR, error, errorThrown) {
-                            console.log(ArtX.interests.vars.ajaxErrorMsg);
-                            ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                            console.log(Artbot.interests.vars.ajaxErrorMsg);
+                            Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
                         },
                         complete: function() {
                             $.mobile.loading('hide');
@@ -2140,19 +2140,19 @@ ArtX.interests = {
     checkForInterests: function() {
         console.log("Checking for user interests");
 
-        ArtX.interests.vars.ajaxType = "GET";
-        ArtX.interests.vars.ajaxURL = ArtX.var.jsonDomain + "/interests/";
-        ArtX.interests.vars.ajaxSuccessMsg = "Successfully checked list of user's interests";
-        ArtX.interests.vars.ajaxErrorMsg = "Check of user's interest list failed";
+        Artbot.interests.vars.ajaxType = "GET";
+        Artbot.interests.vars.ajaxURL = Artbot.var.jsonDomain + "/interests/";
+        Artbot.interests.vars.ajaxSuccessMsg = "Successfully checked list of user's interests";
+        Artbot.interests.vars.ajaxErrorMsg = "Check of user's interest list failed";
 
         $.ajax({
-            type: ArtX.interests.vars.ajaxType,
-            url: ArtX.interests.vars.ajaxURL,
+            type: Artbot.interests.vars.ajaxType,
+            url: Artbot.interests.vars.ajaxURL,
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
             },
             success: function ( data, textStatus, jqXHR ) {
-                console.log(ArtX.interests.vars.ajaxSuccessMsg);
+                console.log(Artbot.interests.vars.ajaxSuccessMsg);
                 //console.log("User interests: " + JSON.stringify(data));
 
                 $.mobile.loading('show');
@@ -2160,27 +2160,27 @@ ArtX.interests = {
                 if(data.interests && data.interests.length) {
                     console.log("User has interests!");
 
-                    ArtX.interests.vars.interestIntro = "#interest-normal-intro";
+                    Artbot.interests.vars.interestIntro = "#interest-normal-intro";
 
                     // Display user's list
                     $("#interest-form-list").fadeOut(400, function() {
-                        ArtX.interests.getUserInterests();
+                        Artbot.interests.getUserInterests();
                     });
 
                 } else {
                     console.log("User has no interests yet");
 
-                    ArtX.interests.vars.interestIntro = "#interest-onboarding-intro";
+                    Artbot.interests.vars.interestIntro = "#interest-onboarding-intro";
 
                     // Display all interests
                     $("#interest-form-list").fadeOut(400, function() {
-                        ArtX.interests.getAllInterests();
+                        Artbot.interests.getAllInterests();
                     });
                 }
             },
             error: function (jqXHR, error, errorThrown) {
-                console.log(ArtX.interests.vars.ajaxErrorMsg);
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                console.log(Artbot.interests.vars.ajaxErrorMsg);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         });
     },
@@ -2200,10 +2200,10 @@ ArtX.interests = {
         $(interestHtml).appendTo($("#interest-form-list"));
     },
     showList: function() {
-        var $interestIntro = $(ArtX.interests.vars.interestIntro);
+        var $interestIntro = $(Artbot.interests.vars.interestIntro);
 
         console.log("Showing finished interest list");
-        ArtX.customCheckboxes.init("#interest-form-list");
+        Artbot.customCheckboxes.init("#interest-form-list");
 
         $.mobile.loading('hide');
         $interestIntro.fadeIn(400);
@@ -2213,15 +2213,15 @@ ArtX.interests = {
 
         $.ajax({
             type: "GET",
-            url: ArtX.var.jsonDomain + "/possible_interests/",
+            url: Artbot.var.jsonDomain + "/possible_interests/",
             success: function( data ){
                 console.log("Successfully retrieved full list of possible interests");
-                ArtX.interests.buildInterestList(data, false);
-                ArtX.interests.showList();
+                Artbot.interests.buildInterestList(data, false);
+                Artbot.interests.showList();
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Retrieval of full possible interest list failed");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         });
     },
@@ -2230,7 +2230,7 @@ ArtX.interests = {
         var unchecked = {};
         unchecked.tags = [];
 
-        var allTagsUrl = ArtX.var.jsonDomain + "/possible_interests/";
+        var allTagsUrl = Artbot.var.jsonDomain + "/possible_interests/";
 
         // All interests Ajax call
         $.ajax({
@@ -2244,7 +2244,7 @@ ArtX.interests = {
                 // User's interests Ajax call
                 $.ajax({
                     type: "GET",
-                    url: ArtX.var.jsonDomain + "/interests/",
+                    url: Artbot.var.jsonDomain + "/interests/",
                     beforeSend: function (request) {
                         request.setRequestHeader("authentication_token", $.cookie('token'));
                     },
@@ -2283,19 +2283,19 @@ ArtX.interests = {
 
                         //console.log("Total number of unchecked tags: " + unchecked.tags.length);
 
-                        ArtX.interests.buildInterestList(unchecked, false);
-                        ArtX.interests.showList();
+                        Artbot.interests.buildInterestList(unchecked, false);
+                        Artbot.interests.showList();
 
                     },
                     error: function (jqXHR, error, errorThrown) {
                         console.log("Failed retrieving selected interests feed for subsetting");
-                        ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                        Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
                     }
                 }); //End selected tags JSON call
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Failed retrieving all tags feed for subsetting");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         }); //End all tags JSON call
 
@@ -2304,18 +2304,18 @@ ArtX.interests = {
     getUserInterests: function() {
         $.ajax({
             type: "GET",
-            url: ArtX.var.jsonDomain + "/interests/",
+            url: Artbot.var.jsonDomain + "/interests/",
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
             },
             success: function ( data, textStatus, jqXHR ) {
                 console.log("Successfully retrieved list of user's interests");
-                ArtX.interests.buildInterestList(data, true);
-                ArtX.interests.getUncheckedInterests();
+                Artbot.interests.buildInterestList(data, true);
+                Artbot.interests.getUncheckedInterests();
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Retrieval of user's interest list failed");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
             }
         });
 
@@ -2324,22 +2324,22 @@ ArtX.interests = {
 
 /* Login functionality
    ========================================================================== */
-ArtX.login = {
+Artbot.login = {
     init: function() {
         if ($("#signin-form").length > 0) {
             console.log("Initializing sign-in form");
             console.log("Value of token cookie: " + $.cookie('token'));
 
             $("#signin-form").validate({
-                submitHandler: ArtX.login.ajaxSubmit
+                submitHandler: Artbot.login.ajaxSubmit
             });
         }
 
         // Record the page you're on when a signin link is clicked
         $(".signin-link").click(function() {
             //console.log("Clicking the sign in link!");
-            ArtX.signupModal.vars.returnToPage = $(".ui-page-active").attr("data-url");
-            //console.log("ArtX.signupModal.vars.returnToPage: " + ArtX.signupModal.vars.returnToPage);
+            Artbot.signupModal.vars.returnToPage = $(".ui-page-active").attr("data-url");
+            //console.log("Artbot.signupModal.vars.returnToPage: " + Artbot.signupModal.vars.returnToPage);
         });
     },
     ajaxSubmit: function() {
@@ -2347,7 +2347,7 @@ ArtX.login = {
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: ArtX.var.jsonDomain + "/tokens/",
+            url: Artbot.var.jsonDomain + "/tokens/",
             data: {
                 email: $("#signin-email").val(),
                 password:  $("#signin-password").val()
@@ -2357,12 +2357,12 @@ ArtX.login = {
                 $.cookie('token', data.authentication_token);
                 $.cookie('currentuser', $("#email").val());
                 $.cookie('currentuser', $("#signin-email").val());
-                if (!ArtX.el.html.hasClass("is-logged-in")) {
-                    ArtX.el.html.addClass("is-logged-in");
+                if (!Artbot.el.html.hasClass("is-logged-in")) {
+                    Artbot.el.html.addClass("is-logged-in");
                 }
-                console.log("Return to page value: " + ArtX.signupModal.vars.returnToPage);
-                if ((ArtX.signupModal.vars.returnToPage !== undefined) && (ArtX.signupModal.vars.returnToPage !== "")) {
-                    $.mobile.pageContainer.pagecontainer ("change", ArtX.signupModal.vars.returnToPage, {reloadPage: true});
+                console.log("Return to page value: " + Artbot.signupModal.vars.returnToPage);
+                if ((Artbot.signupModal.vars.returnToPage !== undefined) && (Artbot.signupModal.vars.returnToPage !== "")) {
+                    $.mobile.pageContainer.pagecontainer ("change", Artbot.signupModal.vars.returnToPage, {reloadPage: true});
                 } else {
                     $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
                 }
@@ -2370,7 +2370,7 @@ ArtX.login = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("User login submit failed");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown, true);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown, true);
 
                 /* If authentication fails with a 403 or 404 error, it will return a generic error payload and we can't run it through the usual showFormError because there's no form field ID provided */
 
@@ -2407,7 +2407,7 @@ ArtX.login = {
                     }
 
                 } else {
-                    ArtX.errors.showFormError(jqXHR.responseText);
+                    Artbot.errors.showFormError(jqXHR.responseText);
                 }
 
             },
@@ -2420,17 +2420,17 @@ ArtX.login = {
 
 /* Logout functionality
    ========================================================================== */
-ArtX.logout = {
+Artbot.logout = {
     init: function() {
         $(".action-logout").click(function() {
             console.log("Log out link clicked!");
             // Remove any existing "remember last page" value for signup
-            ArtX.signupModal.vars.returnToPage = "";
+            Artbot.signupModal.vars.returnToPage = "";
             // Remove the authorization token and username cookies
             $.removeCookie('token');
             $.removeCookie('currentuser');
             // Remove the "is-logged-in" class from the HTML element
-            ArtX.el.html.removeClass("is-logged-in");
+            Artbot.el.html.removeClass("is-logged-in");
             // Send them back to the main Discover page
             $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
         });
@@ -2439,7 +2439,7 @@ ArtX.logout = {
 
 /* Geolocation helpers
    ========================================================================== */
-ArtX.geolocation = {
+Artbot.geolocation = {
     vars: {
         currentLatitude: "",
         currentLongitude: ""
@@ -2452,22 +2452,22 @@ ArtX.geolocation = {
     },
     getLocation: function(successCallback, failureCallback) {
         // Store the passed success/fail callbacks for later use
-        ArtX.geolocation.successCallback = successCallback;
-        ArtX.geolocation.failureCallback = failureCallback;
+        Artbot.geolocation.successCallback = successCallback;
+        Artbot.geolocation.failureCallback = failureCallback;
         if (navigator.geolocation) {
             $.mobile.loading('show');
-            navigator.geolocation.getCurrentPosition(ArtX.geolocation.storePosition, ArtX.geolocation.showError);
+            navigator.geolocation.getCurrentPosition(Artbot.geolocation.storePosition, Artbot.geolocation.showError);
         } else {
             console.log("Geolocation is not supported by this browser.");
-            ArtX.geolocation.failureCallback();
+            Artbot.geolocation.failureCallback();
         }
     },
     storePosition: function(position) {
         console.log("Storing latitude: " + position.coords.latitude + ", Longitude: " + position.coords.longitude);
 
-        ArtX.geolocation.vars.currentLatitude = position.coords.latitude;
-        ArtX.geolocation.vars.currentLongitude = position.coords.longitude;
-        ArtX.geolocation.successCallback();
+        Artbot.geolocation.vars.currentLatitude = position.coords.latitude;
+        Artbot.geolocation.vars.currentLongitude = position.coords.longitude;
+        Artbot.geolocation.successCallback();
     },
     showError: function() {
         console.log("Geolocation error:");
@@ -2485,13 +2485,13 @@ ArtX.geolocation = {
                 console.log("An unknown error occurred.");
                 break;
         }
-        ArtX.geolocation.failureCallback();
+        Artbot.geolocation.failureCallback();
     }
 };
 
 /* By Location (map) functionality
    ========================================================================== */
-ArtX.byLocation = {
+Artbot.byLocation = {
 
     vars : {
         mapContainer : "event-map",
@@ -2508,20 +2508,20 @@ ArtX.byLocation = {
             console.log( "Initializing map" );
 
             // Reset the openWithVenueID variable on page load, to start fresh
-            ArtX.byLocation.vars.openWithVenueID = "-1";
+            Artbot.byLocation.vars.openWithVenueID = "-1";
 
             // Get the desired venue ID from a querystring
-            var qsVenueID = ArtX.util.findQuerystring("venueid");
+            var qsVenueID = Artbot.util.findQuerystring("venueid");
             //console.log("Venue ID passed in via querystring: " + qsVenueID);
             if (typeof qsVenueID != 'undefined') {
-                ArtX.byLocation.vars.openWithVenueID = qsVenueID;
+                Artbot.byLocation.vars.openWithVenueID = qsVenueID;
             }
 
             // Set up map
-            L.mapbox.accessToken = ArtX.byLocation.vars.accessToken;
-            ArtX.byLocation.vars.mapInstance = L.mapbox.map( ArtX.byLocation.vars.mapContainer, 'sherrialexander.jepo6la8' );
+            L.mapbox.accessToken = Artbot.byLocation.vars.accessToken;
+            Artbot.byLocation.vars.mapInstance = L.mapbox.map( Artbot.byLocation.vars.mapContainer, 'sherrialexander.jepo6la8' );
 
-            ArtX.byLocation.fetchLocations();
+            Artbot.byLocation.fetchLocations();
         }
     },
     fetchLocations: function() {
@@ -2532,18 +2532,18 @@ ArtX.byLocation = {
             data: {
                 "per_page": 1000
             },
-            url: ArtX.var.jsonDomain + "/locations/",
+            url: Artbot.var.jsonDomain + "/locations/",
             success: function( data ){
                 console.log("Map data successfully fetched");
                 //console.log(JSON.stringify(data));
 
-                ArtX.byLocation.vars.locationData = data.locations;
-                ArtX.byLocation.buildMap();
-                ArtX.byLocation.showMap();
+                Artbot.byLocation.vars.locationData = data.locations;
+                Artbot.byLocation.buildMap();
+                Artbot.byLocation.showMap();
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("User login submit failed");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown, true);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown, true);
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -2559,7 +2559,7 @@ ArtX.byLocation = {
             data: {
                 "per_page": 10
             },
-            url: ArtX.var.jsonDomain + "/locations/" + locationID + "/events",
+            url: Artbot.var.jsonDomain + "/locations/" + locationID + "/events",
             success: function( data ){
                 console.log("Event data successfully fetched");
                 var eventData = JSON.stringify(data.events);
@@ -2567,16 +2567,16 @@ ArtX.byLocation = {
 
                 if (eventData.length > 2) {
                     console.log("This venue has events");
-                    ArtX.byLocation.showEventList(data.events);
+                    Artbot.byLocation.showEventList(data.events);
                 } else {
                     // No events returned, show the "no events" message
                     console.log("No events at this venue");
-                    ArtX.byLocation.showErrorMsg("noevents");
+                    Artbot.byLocation.showErrorMsg("noevents");
                 }
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Fetch of event data failed");
-                ArtX.errors.logAjaxError(jqXHR, error, errorThrown, true);
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown, true);
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -2585,7 +2585,7 @@ ArtX.byLocation = {
     },
     buildMap: function() {
 
-        $.each( ArtX.byLocation.vars.locationData , function(locationIndex){
+        $.each( Artbot.byLocation.vars.locationData , function(locationIndex){
 
             //Create a marker for each location
 
@@ -2594,29 +2594,29 @@ ArtX.byLocation = {
             //console.log("This location's name: " + name);
             //console.log("This location's ID: " + locationID);
 
-            ArtX.byLocation.vars.boundsArray.push([ this.latitude, this.longitude ]);
+            Artbot.byLocation.vars.boundsArray.push([ this.latitude, this.longitude ]);
 
-            ArtX.byLocation.vars.markers[locationID] = L.marker( [ this.latitude, this.longitude ], {
+            Artbot.byLocation.vars.markers[locationID] = L.marker( [ this.latitude, this.longitude ], {
                 icon : L.mapbox.marker.icon({
                     'marker-color': '#20a9b3'
                 })
             });
 
-            ArtX.byLocation.vars.markers[locationID].bindPopup( name ).openPopup();
+            Artbot.byLocation.vars.markers[locationID].bindPopup( name ).openPopup();
 
             // Fetch event data when marker is clicked
-            ArtX.byLocation.vars.markers[locationID].on( "click", function( e ){
+            Artbot.byLocation.vars.markers[locationID].on( "click", function( e ){
 
                 //console.log("LatLong: " + this.getLatLng());
 
-                ArtX.byLocation.fetchSingleLocation(locationID);
+                Artbot.byLocation.fetchSingleLocation(locationID);
 
                 // Zoom the map on this marker
-                // ArtX.byLocation.vars.mapInstance.setView(this.getLatLng(), 16, {animate: true});
+                // Artbot.byLocation.vars.mapInstance.setView(this.getLatLng(), 16, {animate: true});
 
             }); //End click handler
 
-            ArtX.byLocation.vars.markers[locationID].addTo( ArtX.byLocation.vars.mapInstance );
+            Artbot.byLocation.vars.markers[locationID].addTo( Artbot.byLocation.vars.mapInstance );
 
         }); //End each location
     },
@@ -2635,83 +2635,83 @@ ArtX.byLocation = {
         $("#event-list").fadeOut( 400, function() {
             $("#event-list").empty().html(_.template($('#template-eventlist').html(), {eventArray:eventArray}));
             
-            ArtX.byLocation.addEventHandlers();
+            Artbot.byLocation.addEventHandlers();
 
             $("#event-list").fadeIn(400, function() {
-                ArtX.setupTextTruncation();
+                Artbot.setupTextTruncation();
             });
         }); //End fade out
     },
     addEventHandlers: function() {
-        ArtX.favoriteStars.init();
-        //ArtX.loadMore.init();
+        Artbot.favoriteStars.init();
+        //Artbot.loadMore.init();
     },
     showMap: function() {
         // After locations are all loaded, we either need to display a specifically-requested venue + its list of events, or all venues.
         
-        if (ArtX.byLocation.vars.openWithVenueID != -1) {
+        if (Artbot.byLocation.vars.openWithVenueID != -1) {
             // Specific location map
-            console.log("Show a map for venue ID " + ArtX.byLocation.vars.openWithVenueID);
+            console.log("Show a map for venue ID " + Artbot.byLocation.vars.openWithVenueID);
 
             // Set some fallback lat/long coordinates in case anything goes wrong getting the real ones
             var myVenueLatitude = 42.3581;
             var myVenueLongitude = -71.0636;
 
             // Get the corresponding lat/long data by matching up the ID
-            $.each( ArtX.byLocation.vars.locationData , function(index, location){
-                if (location.id == ArtX.byLocation.vars.openWithVenueID) {
+            $.each( Artbot.byLocation.vars.locationData , function(index, location){
+                if (location.id == Artbot.byLocation.vars.openWithVenueID) {
                     myVenueLatitude = location.latitude;
                     myVenueLongitude = location.longitude;
                 }
             });
 
             // Set the map view to this location, zoomed in
-            ArtX.byLocation.vars.mapInstance.setView([myVenueLatitude, myVenueLongitude], 16, {animate: true});
+            Artbot.byLocation.vars.mapInstance.setView([myVenueLatitude, myVenueLongitude], 16, {animate: true});
 
             // Trigger the popup
-            ArtX.byLocation.vars.markers[ArtX.byLocation.vars.openWithVenueID].openPopup();
+            Artbot.byLocation.vars.markers[Artbot.byLocation.vars.openWithVenueID].openPopup();
             
             // Build and show the event list
-            ArtX.byLocation.fetchSingleLocation(ArtX.byLocation.vars.openWithVenueID);
+            Artbot.byLocation.fetchSingleLocation(Artbot.byLocation.vars.openWithVenueID);
 
         } else {
             // Multi-location map
             console.log("Show map zoomed to show all locations");
-            ArtX.byLocation.vars.mapInstance.setView([42.3581, -71.0636], 12);
+            Artbot.byLocation.vars.mapInstance.setView([42.3581, -71.0636], 12);
             
-            var bounds = L.latLngBounds(ArtX.byLocation.vars.boundsArray);
+            var bounds = L.latLngBounds(Artbot.byLocation.vars.boundsArray);
             //console.log(bounds);
-            ArtX.byLocation.vars.mapInstance.fitBounds(bounds, { padding: [10, 10]});
+            Artbot.byLocation.vars.mapInstance.fitBounds(bounds, { padding: [10, 10]});
         }
 
-        ArtX.footerSlider.init();
+        Artbot.footerSlider.init();
     }
 };
 
 /* Initialize/Fire
    ========================================================================== */
-ArtX.startup = {
+Artbot.startup = {
     init : function () {
         console.log("**Beginning of scripts initializing");
 
         $('a[href="#"]').click(function(e){e.preventDefault();});
 
-        ArtX.discoverSlider.init();
-        ArtX.login.init();
-        ArtX.logout.init();
-        ArtX.interests.init();
-        ArtX.calendar.init();
-        ArtX.settings.init();
-        ArtX.byLocation.init();
-        ArtX.eventdetail.init();
-        ArtX.venuedetail.init();
-        ArtX.favoriteList.init();
-        ArtX.historyList.init();
+        Artbot.discoverSlider.init();
+        Artbot.login.init();
+        Artbot.logout.init();
+        Artbot.interests.init();
+        Artbot.calendar.init();
+        Artbot.settings.init();
+        Artbot.byLocation.init();
+        Artbot.eventdetail.init();
+        Artbot.venuedetail.init();
+        Artbot.favoriteList.init();
+        Artbot.historyList.init();
 
-        ArtX.loadMore.init();
-        ArtX.customCheckboxes.init();
-        ArtX.setupTextTruncation();
-        ArtX.favoriteStars.init();
+        Artbot.loadMore.init();
+        Artbot.customCheckboxes.init();
+        Artbot.setupTextTruncation();
+        Artbot.favoriteStars.init();
 
         console.log("**End of scripts initializing");
     },
@@ -2726,29 +2726,29 @@ ArtX.startup = {
             if (($.cookie('token') === undefined) && ($.cookie('signedup') === undefined)) {
                 console.log("Popping the new visitor sign up window");
                 setTimeout(function(){
-                    ArtX.signupModal.open();
+                    Artbot.signupModal.open();
                 },1000);
             }
         } else {
             // If they're a new visitor, pop the Sign Up window
-            if (ArtX.var.hasVisitedBefore !== true) {
+            if (Artbot.var.hasVisitedBefore !== true) {
 
                 console.log("Popping the new visitor sign up window");
                 setTimeout(function(){
-                    ArtX.signupModal.open();
+                    Artbot.signupModal.open();
                 },1000);
 
                 // Plant the cookie for next time
                 $.cookie('priorvisit', 'yes', { expires: 365 * 10, path: '/' });
                 // Set the variable to true as well
-                ArtX.var.hasVisitedBefore = true;
+                Artbot.var.hasVisitedBefore = true;
             }
         }
 
         // If they're already logged in, let's add the CSS class for that
         if ($.cookie('token') !== undefined) {
-            if (!ArtX.el.html.hasClass("is-logged-in")) {
-                ArtX.el.html.addClass("is-logged-in");
+            if (!Artbot.el.html.hasClass("is-logged-in")) {
+                Artbot.el.html.addClass("is-logged-in");
             }
         }
 
@@ -2764,10 +2764,10 @@ $(document).ready(function() {
     $("#signup-popup").enhanceWithin().popup({
         history: false,
         positionTo: "window",
-        afterclose: ArtX.signupModal.close
+        afterclose: Artbot.signupModal.close
     });
 
-    ArtX.signupModal.init();
+    Artbot.signupModal.init();
 });
 
 /*
@@ -2811,13 +2811,13 @@ $(document).on( "pagebeforehide", function( event ) {
     console.log("****JQM pagebeforehide event firing");
 
     /* Destroying sliders before hiding a page */
-    ArtX.footerSlider.destroy();
+    Artbot.footerSlider.destroy();
 
     /* Destroying interest checkbox bindings before hiding a page */
-    ArtX.interests.destroy();
+    Artbot.interests.destroy();
 
     // Setting the initial load variable to false, as we're moving to another page
-    ArtX.var.isInitialLoad = false;
+    Artbot.var.isInitialLoad = false;
 });
 
 
@@ -2844,7 +2844,7 @@ $(document).on( "pagecontainershow", function( event ) {
     /* Fire based on document context
     ========================================================================== */
 
-    var namespace  = ArtX.startup;
+    var namespace  = Artbot.startup;
     if (typeof namespace.init === 'function') {
         namespace.init();
     }
@@ -2856,7 +2856,7 @@ $(document).on( "pagecontainershow", function( event ) {
         console.log("Checking cookie -- new visitor");
     } else {
         console.log("Checking cookie -- they've been here before");
-        ArtX.var.hasVisitedBefore = true;
+        Artbot.var.hasVisitedBefore = true;
     }
 
     if (typeof namespace.finalize === 'function') {
