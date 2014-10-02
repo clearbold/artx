@@ -24950,8 +24950,9 @@ Artbot.historyList = {
                         // Toggle the checkbox with the appropriate data attribute
                         var $thisCheckbox = $("#history-form").find("input[data-user-favorite-id=" + userFavoriteID + "]");
 
-                        if (!$thisCheckbox.prop("checked")) {
-                            $thisCheckbox.trigger("click");
+                        if ($thisCheckbox.prop("checked") !== true) {
+                            //$thisCheckbox.trigger("click");
+                            $thisCheckbox.prop("checked", true);
                             console.log("Double-checking: is the checkbox checked as expected after the click event? " + $thisCheckbox.prop("checked"));
                         }
                     }
