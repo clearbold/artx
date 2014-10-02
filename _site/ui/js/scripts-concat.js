@@ -23445,7 +23445,7 @@ Artbot.footerSlider = {
                             Artbot.footerSlider.initSlider();
                         } else {
                             // No favorites returned, show the "no favorites yet" message
-                            $("#footer-slider-msg-nofavorites").fadeIn(400);
+                            Artbot.footerSlider.showErrorMsg("nofavorites");
                         }
                     },
                     error: function (jqXHR, error, errorThrown) {
@@ -23458,7 +23458,7 @@ Artbot.footerSlider = {
             } else {
                 
                 // User is not logged in, show the appropriate message
-                $("#footer-slider-msg-favoritesignup").fadeIn(400);
+                Artbot.footerSlider.showErrorMsg("favoritesignup");
 
             }
         } else if ($("#venue-events-slider").length > 0) {
@@ -23493,7 +23493,7 @@ Artbot.footerSlider = {
                         Artbot.footerSlider.initSlider();
                     } else {
                         // No events returned, show the "no events" message
-                        $("#footer-slider-msg-noevents").fadeIn(400);
+                        Artbot.footerSlider.showErrorMsg("noevents");
                     }
                 },
                 error: function (jqXHR, error, errorThrown) {
@@ -23523,20 +23523,21 @@ Artbot.footerSlider = {
 
                 Artbot.footerSlider.vars.totalRelatedInterests = numberOfTags - 1; // zero-based index
 
-                //console.log("Number of tags: " + numberOfTags);
+                if (numberOfTags > 1) {
+                    // Create click event to trigger cycleRelatedInterests
+                    $("#cycle-relatedinterest").click(function(){
+                        Artbot.footerSlider.cycleRelatedInterests(Artbot.var.relatedInterests);
+                        return false;
+                    }).addClass("is-visible");
+                } else {
+                    $("#cycle-relatedinterest").removeClass("is-visible");
+                }
                 
-                // Create click event to trigger cycleRelatedInterests
-                $("#cycle-relatedinterest").click(function(){
-                    Artbot.footerSlider.cycleRelatedInterests(Artbot.var.relatedInterests);
-                    return false;
-                });
-
                 // Trigger cycleRelatedInterests
                 Artbot.footerSlider.cycleRelatedInterests(Artbot.var.relatedInterests);
 
             } else {
-                // TODO: Show error for no results
-                $("#footer-slider-msg-noevents").fadeIn(400);
+                Artbot.footerSlider.showErrorMsg("noevents");
             }
 
         } else if ($("#near-you-slider").length > 0) {
@@ -23545,7 +23546,7 @@ Artbot.footerSlider = {
             console.log("Initializing Near You slider");
 
             // First, we have to try to get the user's current position.
-            Artbot.geolocation.getLocation(Artbot.footerSlider.processNearbyEvents, Artbot.footerSlider.hideFooter);
+            Artbot.geolocation.getLocation(Artbot.footerSlider.processNearbyEvents, Artbot.footerSlider.showGeolocationError);
 
         }
     },
@@ -23585,7 +23586,7 @@ Artbot.footerSlider = {
                     } else {
                         // No events returned, show the "no events in radius" message
                         $("#location-radius").html(Artbot.footerSlider.vars.locationRadius);
-                        $("#footer-slider-msg-noeventsnearby").fadeIn(400);
+                        Artbot.footerSlider.showErrorMsg("noeventsnearby");
                     }
                 },
                 error: function (jqXHR, error, errorThrown) {
@@ -23598,8 +23599,8 @@ Artbot.footerSlider = {
                 }
             }); 
         } else {
-            // Couldn't get a position; hide footer
-            Artbot.footerSlider.hideFooter();
+            // Couldn't get a position; show error message
+            Artbot.footerSlider.showErrorMsg("nogeolocation");
             $.mobile.loading('hide');
         }
     },
@@ -23742,7 +23743,7 @@ Artbot.footerSlider = {
 
         } else {
             // We removed all the favorites; show the "no favorites yet" message
-            $("#footer-slider-msg-nofavorites").fadeIn(400);
+            Artbot.footerSlider.showErrorMsg("nofavorites");
         }
     },
     reload: function() {
@@ -23754,6 +23755,15 @@ Artbot.footerSlider = {
             Artbot.footerSlider.initSliderNav();
 
         }
+    },
+    showErrorMsg: function(errorID) {
+        $("#footer-slider").fadeOut( 400, function() {
+            $("#footer-slider-msg-"+errorID).fadeIn(400);
+            $("#footer-slider").show();
+        });  
+    },
+    showGeolocationError: function() {
+        Artbot.footerSlider.showErrorMsg("nogeolocation");
     },
     destroy: function() {
         if (($("#footer-slider").length > 0) && (Artbot.footerSlider.vars.footSlideInstance !== "")) {
@@ -24737,6 +24747,9 @@ Artbot.settings = {
 /* Setting up History list functionality
    ========================================================================== */
 Artbot.historyList = {
+    vars: {
+        historyData: []
+    },
     init: function() {
         if ($("#target-historylist").length > 0) {
             if ($.cookie('token') !== undefined) {
@@ -24761,7 +24774,9 @@ Artbot.historyList = {
             success: function( data ) {
                 console.log("Successfully fetched History data");
                 
-                jsonDataString = JSON.stringify(data.favorites);
+                Artbot.historyList.vars.historyData = data;
+
+                jsonDataString = JSON.stringify(Artbot.historyList.vars.historyData.favorites);
 
                 //console.log(jsonDataString);
 
@@ -24771,7 +24786,7 @@ Artbot.historyList = {
                     Artbot.historyList.hideErrorMsg();
 
                     $("#target-historylist").fadeOut(400, function() {
-                        Artbot.historyList.buildList(data);
+                        Artbot.historyList.buildList(Artbot.historyList.vars.historyData);
                     });
 
                 } else {
@@ -24801,6 +24816,7 @@ Artbot.historyList = {
 
         $(historyHtml).appendTo($("#target-historylist"));
 
+        Artbot.historyList.unbindAttendanceCheckboxes();
         Artbot.historyList.addEventHandlers();
     },
     addEventHandlers: function() {
@@ -24845,9 +24861,7 @@ Artbot.historyList = {
         });
     },
     bindAttendanceCheckboxes: function() {
-        Artbot.historyList.unbindAttendanceCheckboxes();
-
-        Artbot.customCheckboxes.init("#history-form");
+        //Artbot.customCheckboxes.init("#history-form");
 
         // Set up click event for History Attendance checkboxes
         $("#history-form").find("input[type=checkbox]").click(function() {
@@ -24856,7 +24870,7 @@ Artbot.historyList = {
     },
     unbindAttendanceCheckboxes: function() {
         
-        Artbot.customCheckboxes.destroy("#history-form");
+        //Artbot.customCheckboxes.destroy("#history-form");
 
         // Remove click event for History Attendance checkboxes
         $("#history-form").find("input[type=checkbox]").unbind("click");
@@ -24897,80 +24911,58 @@ Artbot.historyList = {
     syncAttended : function() {
         /* This function checks all attended checkboxes currently present in the page, and compares them against the current user's saved favorites (if logged in).  If there's a match, that box will be checked. */
 
-        if (($("#history-form").find("input[type=checkbox]").length > 0) && ($.cookie('token') !== undefined)) {
+        if (($("#history-form").find("input[type=checkbox]").length > 0)) {
             console.log("Syncing attendance checkboxes with user's attended records");
 
             // Reset the form, in case of caching (we want a fresh copy)
             document.getElementById("history-form").reset();
 
-            // Fetch the list of user's history to check against.
-            $.ajax({
-                type: "GET",
-                dataType: "json",
-                url: Artbot.var.jsonDomain + "/favorites/history/",
-                beforeSend: function (request) {
-                    request.setRequestHeader("authentication_token", $.cookie('token'));
-                },
-                success: function( data ) {
-                    console.log("Successfully fetched History data for syncing");
-                    
-                    jsonDataString = JSON.stringify(data.favorites);
-
-                    //console.log(jsonDataString);
-
-                    if (jsonDataString.length > 2) {
-                        // There are history items, so we may need to sync them up
-
-                        var userHistoryItems = data.favorites;
-
-                        // Iterate through each history item
-                        $.each(userHistoryItems, function(i, value) {
-                            var thisItem = userHistoryItems[i];
-                            var thisEventAttended;
-                            
-                            if (thisItem.attended === true) {
-                                thisEventAttended = true;
-                            } else {
-                                thisEventAttended = false;
-                            }
-                            //console.log("This event attended? " + thisEventAttended);
-
-                            if (thisEventAttended) {
-                                var userFavoriteID = thisItem.id;
-                                //console.log("User favorite ID: " + userFavoriteID);
-
-                                // Toggle the checkbox with the appropriate data attribute
-                                var $thisCheckbox = $("#history-form").find("input[data-user-favorite-id=" + userFavoriteID + "]");
-
-                                if (!$thisCheckbox.attr("checked")) {
-                                    $thisCheckbox.trigger("click");
-                                }
-                            }
-                        });
-
-                        // Debugging: Quick check to list out which are checked after sync
-                        var allCheckboxes = $("#history-form").find(".customize-checkbox");
-                        $.each(allCheckboxes, function(i, value) {
-                            var tempIsCheckboxChecked = $(this).prop("checked");
-                            var tempUserFavoriteID = $(this).attr("data-user-favorite-id");
-                            console.log("User favorite: " + tempUserFavoriteID + ", Value of property 'checked' after syncing: " + tempIsCheckboxChecked);
-                        });
-                        
-                        Artbot.historyList.bindAttendanceCheckboxes();
-
-                    } 
-                },
-                error: function (jqXHR, error, errorThrown) {
-                    console.log("Error fetching History data");
-                    Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
-                },
-                complete: function() {
-                    Artbot.historyList.showList();
-                    $.mobile.loading('hide');
-                }
-            });
-
             
+            jsonDataString = JSON.stringify(Artbot.historyList.vars.historyData.favorites);
+
+            //console.log(jsonDataString);
+
+            if (jsonDataString.length > 2) {
+                // There are history items, so we may need to sync them up
+
+                var userHistoryItems = Artbot.historyList.vars.historyData.favorites;
+
+                // Iterate through each history item
+                $.each(userHistoryItems, function(i, value) {
+                    var thisItem = userHistoryItems[i];
+                    var thisEventAttended;
+                    
+                    if (thisItem.attended === true) {
+                        thisEventAttended = true;
+                    } else {
+                        thisEventAttended = false;
+                    }
+                    //console.log("This event attended? " + thisEventAttended);
+
+                    if (thisEventAttended) {
+                        var userFavoriteID = thisItem.id;
+                        //console.log("User favorite ID: " + userFavoriteID);
+
+                        // Toggle the checkbox with the appropriate data attribute
+                        var $thisCheckbox = $("#history-form").find("input[data-user-favorite-id=" + userFavoriteID + "]");
+
+                        if (!$thisCheckbox.attr("checked")) {
+                            $thisCheckbox.trigger("click");
+                        }
+                    }
+                });
+
+                // Debugging: Quick check to list out which are checked after sync
+                var allCheckboxes = $("#history-form").find(".customize-checkbox");
+                $.each(allCheckboxes, function(i, value) {
+                    var tempIsCheckboxChecked = $(this).prop("checked");
+                    var tempUserFavoriteID = $(this).attr("data-user-favorite-id");
+                    console.log("User favorite: " + tempUserFavoriteID + ", Value of property 'checked' after syncing: " + tempIsCheckboxChecked);
+                });
+                
+                Artbot.historyList.bindAttendanceCheckboxes();
+
+            }  
         }
     },
 };
@@ -25530,7 +25522,7 @@ Artbot.geolocation = {
         Artbot.geolocation.vars.currentLongitude = position.coords.longitude;
         Artbot.geolocation.successCallback();
     },
-    showError: function() {
+    showError: function(error) {
         console.log("Geolocation error:");
         switch(error.code) {
             case error.PERMISSION_DENIED:
@@ -25740,9 +25732,10 @@ Artbot.byLocation = {
             console.log("Show map zoomed to show all locations");
             Artbot.byLocation.vars.mapInstance.setView([42.3581, -71.0636], 12);
             
-            var bounds = L.latLngBounds(Artbot.byLocation.vars.boundsArray);
+            // If we wanted to limit the map so that it contained all pins:
+            //var bounds = L.latLngBounds(Artbot.byLocation.vars.boundsArray);
             //console.log(bounds);
-            Artbot.byLocation.vars.mapInstance.fitBounds(bounds, { padding: [10, 10]});
+            //Artbot.byLocation.vars.mapInstance.fitBounds(bounds, { padding: [10, 10]});
         }
 
         Artbot.footerSlider.init();

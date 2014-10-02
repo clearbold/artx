@@ -1759,6 +1759,9 @@ Artbot.settings = {
 /* Setting up History list functionality
    ========================================================================== */
 Artbot.historyList = {
+    vars: {
+        historyData: []
+    },
     init: function() {
         if ($("#target-historylist").length > 0) {
             if ($.cookie('token') !== undefined) {
@@ -1783,7 +1786,9 @@ Artbot.historyList = {
             success: function( data ) {
                 console.log("Successfully fetched History data");
                 
-                jsonDataString = JSON.stringify(data.favorites);
+                Artbot.historyList.vars.historyData = data;
+
+                jsonDataString = JSON.stringify(Artbot.historyList.vars.historyData.favorites);
 
                 //console.log(jsonDataString);
 
@@ -1793,7 +1798,7 @@ Artbot.historyList = {
                     Artbot.historyList.hideErrorMsg();
 
                     $("#target-historylist").fadeOut(400, function() {
-                        Artbot.historyList.buildList(data);
+                        Artbot.historyList.buildList(Artbot.historyList.vars.historyData);
                     });
 
                 } else {
@@ -1823,7 +1828,9 @@ Artbot.historyList = {
 
         $(historyHtml).appendTo($("#target-historylist"));
 
+        Artbot.historyList.unbindAttendanceCheckboxes();
         Artbot.historyList.addEventHandlers();
+        Artbot.historyList.showList();
     },
     addEventHandlers: function() {
         // Initialize favorite stars and history checkbox selected states
@@ -1867,9 +1874,7 @@ Artbot.historyList = {
         });
     },
     bindAttendanceCheckboxes: function() {
-        Artbot.historyList.unbindAttendanceCheckboxes();
-
-        Artbot.customCheckboxes.init("#history-form");
+        //Artbot.customCheckboxes.init("#history-form");
 
         // Set up click event for History Attendance checkboxes
         $("#history-form").find("input[type=checkbox]").click(function() {
@@ -1878,7 +1883,7 @@ Artbot.historyList = {
     },
     unbindAttendanceCheckboxes: function() {
         
-        Artbot.customCheckboxes.destroy("#history-form");
+        //Artbot.customCheckboxes.destroy("#history-form");
 
         // Remove click event for History Attendance checkboxes
         $("#history-form").find("input[type=checkbox]").unbind("click");
@@ -1919,80 +1924,58 @@ Artbot.historyList = {
     syncAttended : function() {
         /* This function checks all attended checkboxes currently present in the page, and compares them against the current user's saved favorites (if logged in).  If there's a match, that box will be checked. */
 
-        if (($("#history-form").find("input[type=checkbox]").length > 0) && ($.cookie('token') !== undefined)) {
+        if (($("#history-form").find("input[type=checkbox]").length > 0)) {
             console.log("Syncing attendance checkboxes with user's attended records");
 
             // Reset the form, in case of caching (we want a fresh copy)
             document.getElementById("history-form").reset();
 
-            // Fetch the list of user's history to check against.
-            $.ajax({
-                type: "GET",
-                dataType: "json",
-                url: Artbot.var.jsonDomain + "/favorites/history/",
-                beforeSend: function (request) {
-                    request.setRequestHeader("authentication_token", $.cookie('token'));
-                },
-                success: function( data ) {
-                    console.log("Successfully fetched History data for syncing");
-                    
-                    jsonDataString = JSON.stringify(data.favorites);
-
-                    //console.log(jsonDataString);
-
-                    if (jsonDataString.length > 2) {
-                        // There are history items, so we may need to sync them up
-
-                        var userHistoryItems = data.favorites;
-
-                        // Iterate through each history item
-                        $.each(userHistoryItems, function(i, value) {
-                            var thisItem = userHistoryItems[i];
-                            var thisEventAttended;
-                            
-                            if (thisItem.attended === true) {
-                                thisEventAttended = true;
-                            } else {
-                                thisEventAttended = false;
-                            }
-                            //console.log("This event attended? " + thisEventAttended);
-
-                            if (thisEventAttended) {
-                                var userFavoriteID = thisItem.id;
-                                //console.log("User favorite ID: " + userFavoriteID);
-
-                                // Toggle the checkbox with the appropriate data attribute
-                                var $thisCheckbox = $("#history-form").find("input[data-user-favorite-id=" + userFavoriteID + "]");
-
-                                if (!$thisCheckbox.attr("checked")) {
-                                    $thisCheckbox.trigger("click");
-                                }
-                            }
-                        });
-
-                        // Debugging: Quick check to list out which are checked after sync
-                        var allCheckboxes = $("#history-form").find(".customize-checkbox");
-                        $.each(allCheckboxes, function(i, value) {
-                            var tempIsCheckboxChecked = $(this).prop("checked");
-                            var tempUserFavoriteID = $(this).attr("data-user-favorite-id");
-                            console.log("User favorite: " + tempUserFavoriteID + ", Value of property 'checked' after syncing: " + tempIsCheckboxChecked);
-                        });
-                        
-                        Artbot.historyList.bindAttendanceCheckboxes();
-
-                    } 
-                },
-                error: function (jqXHR, error, errorThrown) {
-                    console.log("Error fetching History data");
-                    Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
-                },
-                complete: function() {
-                    Artbot.historyList.showList();
-                    $.mobile.loading('hide');
-                }
-            });
-
             
+            jsonDataString = JSON.stringify(Artbot.historyList.vars.historyData.favorites);
+
+            //console.log(jsonDataString);
+
+            if (jsonDataString.length > 2) {
+                // There are history items, so we may need to sync them up
+
+                var userHistoryItems = Artbot.historyList.vars.historyData.favorites;
+
+                // Iterate through each history item
+                $.each(userHistoryItems, function(i, value) {
+                    var thisItem = userHistoryItems[i];
+                    var thisEventAttended;
+                    
+                    if (thisItem.attended === true) {
+                        thisEventAttended = true;
+                    } else {
+                        thisEventAttended = false;
+                    }
+                    //console.log("This event attended? " + thisEventAttended);
+
+                    if (thisEventAttended) {
+                        var userFavoriteID = thisItem.id;
+                        //console.log("User favorite ID: " + userFavoriteID);
+
+                        // Toggle the checkbox with the appropriate data attribute
+                        var $thisCheckbox = $("#history-form").find("input[data-user-favorite-id=" + userFavoriteID + "]");
+
+                        if (!$thisCheckbox.attr("checked")) {
+                            $thisCheckbox.trigger("click");
+                        }
+                    }
+                });
+
+                // Debugging: Quick check to list out which are checked after sync
+                var allCheckboxes = $("#history-form").find(".customize-checkbox");
+                $.each(allCheckboxes, function(i, value) {
+                    var tempIsCheckboxChecked = $(this).prop("checked");
+                    var tempUserFavoriteID = $(this).attr("data-user-favorite-id");
+                    console.log("User favorite: " + tempUserFavoriteID + ", Value of property 'checked' after syncing: " + tempIsCheckboxChecked);
+                });
+                
+                Artbot.historyList.bindAttendanceCheckboxes();
+
+            }  
         }
     },
 };
@@ -2793,7 +2776,6 @@ Artbot.startup = {
         Artbot.historyList.init();
 
         Artbot.loadMore.init();
-        Artbot.customCheckboxes.init();
         Artbot.setupTextTruncation();
         Artbot.favoriteStars.init();
 
