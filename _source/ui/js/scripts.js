@@ -1875,7 +1875,7 @@ Artbot.historyList = {
         });
     },
     bindAttendanceCheckboxes: function() {
-        //Artbot.customCheckboxes.init("#history-form");
+        Artbot.customCheckboxes.init("#history-form");
 
         // Set up click event for History Attendance checkboxes
         $("#history-form").find("input[type=checkbox]").click(function() {
@@ -1884,7 +1884,7 @@ Artbot.historyList = {
     },
     unbindAttendanceCheckboxes: function() {
         
-        //Artbot.customCheckboxes.destroy("#history-form");
+        Artbot.customCheckboxes.destroy("#history-form");
 
         // Remove click event for History Attendance checkboxes
         $("#history-form").find("input[type=checkbox]").unbind("click");
@@ -1963,8 +1963,7 @@ Artbot.historyList = {
                         var $thisCheckbox = $("#history-form").find("input[data-user-favorite-id=" + userFavoriteID + "]");
 
                         if ($thisCheckbox.prop("checked") !== true) {
-                            //$thisCheckbox.trigger("click");
-                            $thisCheckbox.prop("checked", true);
+                            $thisCheckbox.prop("checked", true).trigger("updateState");
                             console.log("Double-checking: is the checkbox checked as expected after the click event? " + $thisCheckbox.prop("checked"));
                         }
                     }
@@ -2174,7 +2173,6 @@ Artbot.interests = {
                     }
 
                     /* Make the actual Ajax request to handle the interest
-                    TODO: add success/fail/error handling, etc.
                     No Load More functionality, possibly a future enhancement. */
                     $.mobile.loading('show');
 
