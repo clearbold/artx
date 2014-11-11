@@ -387,7 +387,8 @@ Artbot.footerSlider = {
             slideWidth:200,
             slideMargin:0,
             oneToOneTouch:false,
-            pager:false
+            pager:false,
+            infiniteLoop: false
         },
         pageSize: 15,
         slideTemplate: "",
