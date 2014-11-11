@@ -25748,6 +25748,17 @@ Artbot.byLocation = {
     }
 };
 
+Artbot.webAppStatusBar = {
+    init: function() {
+        // We only want to apply style changes if it's a standalone app.
+        // The only meta tag that works for iOS 8 is black-translucent, but there's a bug which makes it not take up any space.
+        // We're combating that with certain styles and media queries in the CSS.  We need a hook for them.
+        if (window.navigator.standalone) { 
+            $("html").addClass("standalone-app");
+        }
+    }
+};
+
 /* Initialize/Fire
    ========================================================================== */
 Artbot.startup = {
@@ -25755,6 +25766,8 @@ Artbot.startup = {
         //console.log("**Beginning of scripts initializing");
 
         $('a[href="#"]').click(function(e){e.preventDefault();});
+
+        Artbot.webAppStatusBar.init();
 
         Artbot.discoverSlider.init();
         Artbot.login.init();

@@ -585,7 +585,6 @@ button, .ui-page-theme-a button.ui-btn {
     }
 }
 
-
 // Color swatches for styleguide
 .swatches {
     margin-left:0;
@@ -1497,4 +1496,23 @@ html body .ui-group-theme-a a {
     width: 2em;
     height: 2em;
     background: #ddd;
+}
+
+/* Adjustments for iOS problems with status bar */
+/* iPhone only shows the status bar in portrait orientation */
+/* iPad shows the status bar in both orientations */
+@media screen and (orientation: portrait),
+       screen and (min-width:768px) and (orientation: landscape) {
+    
+    .standalone-app {
+        .ui-popup-container {
+            top:20px !important;
+        }
+        body {
+            padding-top:20px;
+        }
+        &.positionfixed .masthead {
+            top:20px;
+        }
+    }
 }

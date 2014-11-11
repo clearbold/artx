@@ -23273,6 +23273,7 @@ Artbot.discoverSlider = {
     init: function() {
         // Assumption -- there will only ever be one peek-style slider per page/screen
         if ($("#discover-slider").find("ul").length > 0) {
+            console.log("Discover slider initializing");
             Artbot.discoverSlider.populateSlider();
         }
     },
@@ -23297,9 +23298,9 @@ Artbot.discoverSlider = {
             url: Artbot.var.jsonDomain + "/discoveries/",
             beforeSend: beforeSendFunction,
             success: function( data ) {
-                console.log("Discover slider data successfully fetched");
+                //console.log("Discover slider data successfully fetched");
                 //console.log(JSON.stringify(data.events));
-                console.log("Number of discover events fetched: " + data.events.length);
+                //console.log("Number of discover events fetched: " + data.events.length);
                 Artbot.discoverSlider.buildSlider(data);
             },
             error: function (jqXHR, error, errorThrown) {
@@ -23313,7 +23314,7 @@ Artbot.discoverSlider = {
         });
     },
     buildSlider: function(data) {
-        console.log("Building discover slider");
+        //console.log("Building discover slider");
         var eventArray = data.events;
         var slideTemplate = $('#template-discoverslider').html();
         
@@ -23331,7 +23332,7 @@ Artbot.discoverSlider = {
         Artbot.footerSlider.init();
     },
     initSlider: function() {
-        console.log("More than one slide -- initializing Discover slider functionality");
+        //console.log("More than one slide -- initializing Discover slider functionality");
         var peekSlideInstance = $("#discover-slider").find("ul").bxSlider({
             oneToOneTouch:false,
             pager:false,
@@ -23374,7 +23375,8 @@ Artbot.footerSlider = {
             slideWidth:200,
             slideMargin:0,
             oneToOneTouch:false,
-            pager:false
+            pager:false,
+            infiniteLoop: false
         },
         pageSize: 15,
         slideTemplate: "",
@@ -23413,7 +23415,7 @@ Artbot.footerSlider = {
         if ($("#favorites-slider").length > 0) {
             /* Favorites slider */
 
-            console.log("Initializing Favorites slider");
+            //console.log("Initializing Favorites slider");
             
             // Check if the user is logged in
             if ($.cookie('token') !== undefined) {
@@ -23431,7 +23433,7 @@ Artbot.footerSlider = {
                         request.setRequestHeader("authentication_token", $.cookie('token'));
                     },
                     success: function( data ) {
-                        console.log("Footer slider data successfully fetched");
+                        //console.log("Footer slider data successfully fetched");
                         
                         var jsonString = JSON.stringify(data.favorites);
 
@@ -23464,12 +23466,12 @@ Artbot.footerSlider = {
         } else if ($("#venue-events-slider").length > 0) {
             /* Related Events slider for Venue pages */
 
-            console.log("Initializing Related Events slider");
+            //console.log("Initializing Related Events slider");
 
             // Get the Venue ID from the .venue-detail div
             //var venueID = $(".venue-detail").attr("data-venue-id");
             var venueID = Artbot.var.venueDetailID;
-            console.log("Venue ID: " + venueID);
+            //console.log("Venue ID: " + venueID);
 
             $.ajax({
                 type: "GET",
@@ -23479,7 +23481,7 @@ Artbot.footerSlider = {
                 },
                 url: Artbot.var.jsonDomain + "/locations/" + venueID + "/events",
                 success: function( data ) {
-                    console.log("Footer slider data successfully fetched");
+                    //console.log("Footer slider data successfully fetched");
                     
                     var jsonString = JSON.stringify(data.events);
 
@@ -23506,7 +23508,7 @@ Artbot.footerSlider = {
         } else if ($("#related-interest-slider").length > 0) {
             /* Related Interest slider for Event Detail pages */
 
-            console.log("Initializing Related Interest slider");
+            //console.log("Initializing Related Interest slider");
 
             var jsonString = JSON.stringify(Artbot.var.relatedInterests);
 
@@ -23543,7 +23545,7 @@ Artbot.footerSlider = {
         } else if ($("#near-you-slider").length > 0) {
             /* Near You slider for map page */
 
-            console.log("Initializing Near You slider");
+            //console.log("Initializing Near You slider");
 
             // First, we have to try to get the user's current position.
             Artbot.geolocation.getLocation(Artbot.footerSlider.processNearbyEvents, Artbot.footerSlider.showGeolocationError);
@@ -23552,11 +23554,11 @@ Artbot.footerSlider = {
     },
     processNearbyEvents: function() {
         // Check if we were successful
-        console.log("Location call made, checking if values are correct");
+        //console.log("Location call made, checking if values are correct");
 
         if ((Artbot.geolocation.vars.currentLatitude !== "") && (Artbot.geolocation.vars.currentLongitude !== "")) {
             
-            console.log("My latitude: " + Artbot.geolocation.vars.currentLatitude);
+            //console.log("My latitude: " + Artbot.geolocation.vars.currentLatitude);
 
             // We have a position; fetch events
             $.ajax({
@@ -23570,7 +23572,7 @@ Artbot.footerSlider = {
                     "per_page": Artbot.footerSlider.vars.pageSize
                 },
                 success: function( data ) {
-                    console.log("Footer slider data successfully fetched");
+                    //console.log("Footer slider data successfully fetched");
                     
                     var jsonString = JSON.stringify(data.events);
                     //console.log(jsonString);
@@ -23605,14 +23607,14 @@ Artbot.footerSlider = {
         }
     },
     hideFooter: function() {
-        console.log("Hiding the footer");
+        //console.log("Hiding the footer");
         $(".content.layout-footer").removeClass("layout-footer");
         $(".footer").hide();
     },
     cycleRelatedInterests: function(data) {
         var currentInterest = data[Artbot.footerSlider.vars.relatedInterestCounter];
 
-        console.log("Interest counter going into the function: " + Artbot.footerSlider.vars.relatedInterestCounter);
+        //console.log("Interest counter going into the function: " + Artbot.footerSlider.vars.relatedInterestCounter);
         //console.log("Here's the current interest:");
         //console.log(JSON.stringify(currentInterest));
 
@@ -23654,25 +23656,25 @@ Artbot.footerSlider = {
     },
     buildSlider: function(data) {
 
-        console.log("Building footer slider");
+        //console.log("Building footer slider");
         var itemArray;
         var slideTemplate;
 
         if ($("#favorites-slider").length > 0) {
             /* Favorites slider */
             
-            console.log("Initializing Favorites slider");
+            //console.log("Initializing Favorites slider");
             itemArray = data.favorites;  
 
         } else if ($("#related-interest-slider").length > 0) {
             /* Related Interest slider for Event Detail pages */
 
-            console.log("Initializing Related Interest slider");
+            //console.log("Initializing Related Interest slider");
             itemArray = data; // TODO: Get the correct data structure
         } else {
             /* Events slider for Venue and By Location pages */
 
-            console.log("Initializing Events slider");
+            //console.log("Initializing Events slider");
             itemArray = data.events;
 
         }
@@ -23688,7 +23690,7 @@ Artbot.footerSlider = {
         $(".footer-slider").removeClass("not-enough-slides");
 
         var numberOfSlides = $("#footer-slider").children("li:not(.bx-clone)").length;
-        console.log("Number of footer slides: " + numberOfSlides);
+        //console.log("Number of footer slides: " + numberOfSlides);
 
         $('#footer-slider-next').unbind("click");
         $('#footer-slider-previous').unbind("click");
@@ -23709,7 +23711,7 @@ Artbot.footerSlider = {
     },
     addFavorite: function(favoriteData) {
         // Add a new favorite to the slider 
-        console.log("Adding a new favorite to the footer slider");   
+        //console.log("Adding a new favorite to the footer slider");   
 
         if (Artbot.footerSlider.vars.footSlideInstance === "") {
             // There were no favorites before, so we need to initialize the slider
@@ -23735,7 +23737,7 @@ Artbot.footerSlider = {
 
         // Count how many non-cloned children the footer slider now has
         var numberOfSlides = $("#footer-slider").children("li:not(.bx-clone)").length;
-        console.log("Number of non-cloned children: " + numberOfSlides);
+        //console.log("Number of non-cloned children: " + numberOfSlides);
 
         if (numberOfSlides > 0) {
             // Reload the slider
@@ -23749,7 +23751,7 @@ Artbot.footerSlider = {
     reload: function() {
         if (($("#footer-slider").length > 0) && (Artbot.footerSlider.vars.footSlideInstance !== "")) {
             
-            console.log("Reloading footer slider");
+            //console.log("Reloading footer slider");
   
             Artbot.footerSlider.vars.footSlideInstance.reloadSlider(Artbot.footerSlider.vars.footSlideOptions);
             Artbot.footerSlider.initSliderNav();
@@ -23767,7 +23769,7 @@ Artbot.footerSlider = {
     },
     destroy: function() {
         if (($("#footer-slider").length > 0) && (Artbot.footerSlider.vars.footSlideInstance !== "")) {
-            console.log("Destroying footer slider");
+            //console.log("Destroying footer slider");
             $("#footer-slider").fadeOut(400, function() {
                 Artbot.footerSlider.vars.footSlideInstance.destroySlider();
                 Artbot.footerSlider.vars.footSlideInstance = "";
@@ -23786,7 +23788,7 @@ Artbot.footerSlider = {
 Artbot.favoriteStars = {
     init: function() {
         if ($(".favorite-star").length > 0) {
-            console.log("Initializing favorite stars");
+            //console.log("Initializing favorite stars");
 
             // First, destroy any current star bindings so that we can call this
             // wherever we want, without duplicating events
@@ -23799,7 +23801,7 @@ Artbot.favoriteStars = {
                 if ($.cookie('token') === undefined) {
                     // The user is not logged in, we can't save a favorite
 
-                    console.log("We can't toggle a favorite because the user is not logged in.");
+                    //console.log("We can't toggle a favorite because the user is not logged in.");
 
                     Artbot.signupModal.open();
 
@@ -23825,7 +23827,7 @@ Artbot.favoriteStars = {
                                 request.setRequestHeader("authentication_token", $.cookie('token'));
                             },
                             success: function(data, textStatus, jqXHR) {
-                                console.log("New favorite successfully saved");
+                                //console.log("New favorite successfully saved");
 
                                 var selectedFavoriteID = data.favorite.id;
                                 // Swap the star
@@ -23852,7 +23854,7 @@ Artbot.favoriteStars = {
                         // Capture the User Favorite ID from the data-attribute on the clicked link
                         var selectedUserEventID = $(this).attr("data-user-favorite-id");
 
-                        console.log("ID to delete: " + selectedUserEventID);
+                        //console.log("ID to delete: " + selectedUserEventID);
 
                         $.ajax({
                             type: "POST",
@@ -23864,7 +23866,7 @@ Artbot.favoriteStars = {
                                 request.setRequestHeader("authentication_token", $.cookie('token'));
                             },
                             success: function(data, textStatus, jqXHR) {
-                                console.log("Favorite successfully deleted");
+                                //console.log("Favorite successfully deleted");
                                 // Swap the star
                                 Artbot.favoriteStars.unhighlightStar($thisStarLink);
                                 // If favorites slider exists, remove favorite from slider
@@ -23901,7 +23903,7 @@ Artbot.favoriteStars = {
     },
     destroy : function() {
         if ($(".favorite-star").length > 0) {
-            console.log("Destroying favorite star click events");
+            //console.log("Destroying favorite star click events");
             $(".favorite-star").unbind("click");
         }
     },
@@ -23909,7 +23911,7 @@ Artbot.favoriteStars = {
         /* This function checks all favorite stars currently present in the page, and compares them against the current user's saved favorites (if logged in).  If there's a match, that star will be highlighted. */
 
         if (($(".favorite-star").length > 0) && ($.cookie('token') !== undefined)) {
-            console.log("Syncing stars with user's favorites");
+            //console.log("Syncing stars with user's favorites");
 
             // Fetch the list of user's favorites to check against.
             $.ajax({
@@ -23923,7 +23925,7 @@ Artbot.favoriteStars = {
                     request.setRequestHeader("authentication_token", $.cookie('token'));
                 },
                 success: function(data, textStatus, jqXHR) {
-                    console.log("Successfully fetched Favorites data for syncing stars");
+                    //console.log("Successfully fetched Favorites data for syncing stars");
                     //console.log(JSON.stringify(data));
 
                     var userFavorites = data.favorites;
@@ -23961,7 +23963,7 @@ Artbot.favoriteStars = {
                             per_page: 10000
                         },
                         success: function(data, textStatus, jqXHR) {
-                            console.log("Successfully fetched History data for syncing stars");
+                            //console.log("Successfully fetched History data for syncing stars");
                             //console.log(JSON.stringify(data));
 
                             var userHistories = data.favorites;
@@ -24000,7 +24002,7 @@ Artbot.favoriteStars = {
         var $thisStarLink = $(starLinkObj);
         var $thisStarIcon = $thisStarLink.find(".icon");
 
-        console.log("Highlighting a favorite star!  User favorite ID: " + userFavoriteID);
+        //console.log("Highlighting a favorite star!  User favorite ID: " + userFavoriteID);
 
         // Swap the star icon
         $thisStarIcon.removeClass("icon-star").addClass("icon-star2");
@@ -24020,7 +24022,7 @@ Artbot.favoriteStars = {
 /* Set up Text Truncation
    ========================================================================== */
 Artbot.setupTextTruncation = function() {
-    console.log("Initializing text truncation");
+    //console.log("Initializing text truncation");
 
     $(".truncate").trunk8({
         lines: 2,
@@ -24043,7 +24045,7 @@ Artbot.signupModal = {
         returnToPage: ""
     },
     init: function() {
-        console.log("Setting up Signup Modal window");
+        //console.log("Setting up Signup Modal window");
 
         // Set up some click events for the sign up links
         $(document).on("click", ".signup-trigger", function() {
@@ -24064,7 +24066,7 @@ Artbot.signupModal = {
                 zipcode:  $("#zipcode").val()
             },
             success: function( data ){
-                console.log(data);
+                //console.log(data);
                 $.cookie('token', data.user.authentication_token);
                 $.cookie('currentuser', $("#email").val());
                 $.cookie('signedup', true, { expires: 3650 });
@@ -24086,7 +24088,7 @@ Artbot.signupModal = {
             Artbot.signupModal.vars.returnToPage = "/index.html";
         }
         
-        console.log("Return to page: " + Artbot.signupModal.vars.returnToPage);
+        //console.log("Return to page: " + Artbot.signupModal.vars.returnToPage);
 
         // Load up the form into the modal window
         $.mobile.loading('show');
@@ -24178,7 +24180,7 @@ Artbot.eventdetail = {
             },
             url: Artbot.var.jsonDomain + "/events/" + Artbot.var.eventDetailID,
             success: function( data ){
-                console.log("Event detail data fetch successful");
+                //console.log("Event detail data fetch successful");
                 
                 //console.log(JSON.stringify(data));
                 var eventArray = data;
@@ -24198,7 +24200,7 @@ Artbot.eventdetail = {
         });
     },
     displayPage: function(jsonData) {
-        console.log("Displaying event detail page content");
+        //console.log("Displaying event detail page content");
         var eventArray = jsonData;
         var eventTemplate = $('#template-eventdetail').html();
 
@@ -24245,7 +24247,7 @@ Artbot.venuedetail = {
             },
             url: Artbot.var.jsonDomain + "/locations/" + Artbot.var.venueDetailID,
             success: function( data ){
-                console.log("Venue detail data fetch successful");
+                //console.log("Venue detail data fetch successful");
                 
                 //console.log(JSON.stringify(data));
                 var venueArray = data;
@@ -24261,13 +24263,13 @@ Artbot.venuedetail = {
         });
     },
     displayPage: function(jsonData) {
-        console.log("Displaying venue detail page content");
+        //console.log("Displaying venue detail page content");
         var venueArray = jsonData;
         var venueTemplate = $('#template-venuedetail').html();
         $("#target-venuedetail").fadeOut(400, function() {
             $("#target-venuedetail").html(_.template(venueTemplate, {venueArray:venueArray}));
             $("#target-venuedetail").fadeIn(400);
-            console.log("Venue page content finished displaying");
+            //console.log("Venue page content finished displaying");
 
             Artbot.footerSlider.init();
         });
@@ -24292,7 +24294,7 @@ Artbot.calendar = {
             },
             url: jsonURL,
             success: function( data ){
-                console.log("Initial calendar event fetch successful");
+                //console.log("Initial calendar event fetch successful");
 
                 //console.log(JSON.stringify(data));
 
@@ -24352,7 +24354,7 @@ Artbot.calendar = {
                                     per_page: 1000
                                 },
                                 success: function( data ){
-                                    console.log("Events for " + chosenMonth + " " + chosenYear + " retrieved successfully");
+                                    //console.log("Events for " + chosenMonth + " " + chosenYear + " retrieved successfully");
 
                                     //console.log(JSON.stringify(data));
                                     //console.log("Number of events returned: " + data.events.length);
@@ -24404,7 +24406,7 @@ Artbot.calendar = {
         });
     },
     displayEventList: function(target) {
-        console.log("Displaying event list");
+        //console.log("Displaying event list");
 
         // hide any current error messages
         $("#event-list-messages").find("p").fadeOut(400);
@@ -24429,7 +24431,7 @@ Artbot.calendar = {
     },
     init: function() {
         if ($("#event-calendar").length > 0) {
-            console.log("Setting up event calendar");
+            //console.log("Setting up event calendar");
 
             var eventArray = [],
                 thisMonth = moment().month(), // integer from 0 to 11
@@ -24456,7 +24458,7 @@ Artbot.loadMore = {
         nextPage : 2
     },
     setupLoadMoreLink: function() {
-        console.log("Setting up the Load More link click events");
+        //console.log("Setting up the Load More link click events");
 
         Artbot.loadMore.vars.loadMoreLink
             .removeClass("btn-hidden") // Show the Load More link
@@ -24618,7 +24620,7 @@ Artbot.settings = {
         if ($("#settings-form").length > 0) {
 
             if ($.cookie('token') !== undefined) {
-                console.log("Initializing app settings");
+                //console.log("Initializing app settings");
 
                 // Preload the field values from the back-end API
                 Artbot.settings.fetchFieldValues();
@@ -24645,7 +24647,7 @@ Artbot.settings = {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
             },
             success: function ( data, textStatus, jqXHR ) {
-                console.log("User preferences retrieved successfully.");
+                //console.log("User preferences retrieved successfully.");
                 Artbot.settings.populateFieldValues(data);
             },
             error: function (jqXHR, error, errorThrown) {
@@ -24661,7 +24663,7 @@ Artbot.settings = {
         $allInputs.each(function() {
             var key = $(this).attr("id");
             if (userInfo[key] !== undefined ) {
-                console.log(key + ": " + userInfo[key]);
+                //console.log(key + ": " + userInfo[key]);
 
                 if ($(this).attr("type") == "checkbox") {
                     if (userInfo[key] === true) {
@@ -24711,7 +24713,7 @@ Artbot.settings = {
         });
     },
     ajaxSubmit: function() {
-        console.log("Submitting the changes to the Settings form");
+        //console.log("Submitting the changes to the Settings form");
 
         var $this = $("#settings-form"),
             viewArr = $this.serializeArray(),
@@ -24818,11 +24820,12 @@ Artbot.historyList = {
 
         Artbot.historyList.unbindAttendanceCheckboxes();
         Artbot.historyList.addEventHandlers();
+        Artbot.historyList.showList();
     },
     addEventHandlers: function() {
         // Initialize favorite stars and history checkbox selected states
-        Artbot.favoriteStars.init();
         Artbot.historyList.syncAttended();
+        Artbot.favoriteStars.init();
     },
     showList: function() {
         $("#target-historylist").fadeIn(400, function() {
@@ -24861,7 +24864,7 @@ Artbot.historyList = {
         });
     },
     bindAttendanceCheckboxes: function() {
-        //Artbot.customCheckboxes.init("#history-form");
+        Artbot.customCheckboxes.init("#history-form");
 
         // Set up click event for History Attendance checkboxes
         $("#history-form").find("input[type=checkbox]").click(function() {
@@ -24870,7 +24873,7 @@ Artbot.historyList = {
     },
     unbindAttendanceCheckboxes: function() {
         
-        //Artbot.customCheckboxes.destroy("#history-form");
+        Artbot.customCheckboxes.destroy("#history-form");
 
         // Remove click event for History Attendance checkboxes
         $("#history-form").find("input[type=checkbox]").unbind("click");
@@ -24880,9 +24883,10 @@ Artbot.historyList = {
 
         $thisCheckbox = $(checkboxObj);
         var isCheckboxChecked = $thisCheckbox.prop("checked");
-        console.log("Value of property 'checked': " + isCheckboxChecked);
         var eventID = $(checkboxObj).attr("data-event-id");
         var userFavoriteID = $(checkboxObj).attr("data-user-favorite-id");
+        console.log("User favorite: " + userFavoriteID + ", Value of property 'checked': " + isCheckboxChecked);
+        
 
         var ajaxDataToSend = {
             attended: isCheckboxChecked
@@ -24920,8 +24924,6 @@ Artbot.historyList = {
             
             jsonDataString = JSON.stringify(Artbot.historyList.vars.historyData.favorites);
 
-            //console.log(jsonDataString);
-
             if (jsonDataString.length > 2) {
                 // There are history items, so we may need to sync them up
 
@@ -24932,28 +24934,33 @@ Artbot.historyList = {
                     var thisItem = userHistoryItems[i];
                     var thisEventAttended;
                     
+                    console.log("Checking user favorite " + thisItem.id + "; This event attended? " + thisItem.attended);
+
                     if (thisItem.attended === true) {
                         thisEventAttended = true;
                     } else {
                         thisEventAttended = false;
                     }
-                    //console.log("This event attended? " + thisEventAttended);
+                    
 
                     if (thisEventAttended) {
+                        console.log("Since this event is attended, toggle the checkbox to be checked.");
                         var userFavoriteID = thisItem.id;
                         //console.log("User favorite ID: " + userFavoriteID);
 
                         // Toggle the checkbox with the appropriate data attribute
                         var $thisCheckbox = $("#history-form").find("input[data-user-favorite-id=" + userFavoriteID + "]");
 
-                        if (!$thisCheckbox.attr("checked")) {
-                            $thisCheckbox.trigger("click");
+                        if ($thisCheckbox.prop("checked") !== true) {
+                            $thisCheckbox.prop("checked", true).trigger("updateState");
+                            console.log("Double-checking: is the checkbox checked as expected after the click event? " + $thisCheckbox.prop("checked"));
                         }
                     }
                 });
 
                 // Debugging: Quick check to list out which are checked after sync
                 var allCheckboxes = $("#history-form").find(".customize-checkbox");
+                console.log("Double-checking all the checkbox values now that things are synched:");
                 $.each(allCheckboxes, function(i, value) {
                     var tempIsCheckboxChecked = $(this).prop("checked");
                     var tempUserFavoriteID = $(this).attr("data-user-favorite-id");
@@ -24974,7 +24981,7 @@ Artbot.favoriteList = {
     init: function() {
         if ($("#target-favoritelist").length > 0) {
             if ($.cookie('token') !== undefined) {
-                console.log("Initializing Favorites list");
+                //console.log("Initializing Favorites list");
                 Artbot.favoriteList.fetchData();
             }
         }
@@ -24993,7 +25000,7 @@ Artbot.favoriteList = {
                 request.setRequestHeader("authentication_token", $.cookie('token'));
             },
             success: function( data ) {
-                console.log("Successfully fetched Favorites data");
+                //console.log("Successfully fetched Favorites data");
                 
                 jsonDataString = JSON.stringify(data.favorites);
 
@@ -25024,7 +25031,7 @@ Artbot.favoriteList = {
         });
     },
     buildList: function(data) {
-        console.log("Building favorites list");
+        //console.log("Building favorites list");
         var jsonArray = data.favorites;
 
         //console.log(JSON.stringify(jsonArray));
@@ -25064,7 +25071,7 @@ Artbot.favoriteList = {
 
             // Count how many items the now has
             var numberOfFavorites = $("#target-favoritelist").children(".item-block").length;
-            console.log("Number of favorites left: " + numberOfFavorites);
+            //console.log("Number of favorites left: " + numberOfFavorites);
 
             if (numberOfFavorites === 0) {
                 // We removed all the favorites; show the "no favorites yet" message
@@ -25109,7 +25116,7 @@ Artbot.interests = {
                 $("#interest-form-list").on("click", "input[type=checkbox]", function() {
                     isCheckboxChecked = $(this).prop("checked");
                     checkboxID = $(this).data("interest-id");
-                    console.log("checkboxID: " + checkboxID);
+                    //console.log("checkboxID: " + checkboxID);
                     checkboxValue = $(this).val();
 
                     $thisCheckbox = $(this);
@@ -25155,7 +25162,6 @@ Artbot.interests = {
                     }
 
                     /* Make the actual Ajax request to handle the interest
-                    TODO: add success/fail/error handling, etc.
                     No Load More functionality, possibly a future enhancement. */
                     $.mobile.loading('show');
 
@@ -25742,13 +25748,25 @@ Artbot.byLocation = {
     }
 };
 
+Artbot.webAppStatusBar = {
+    init: function() {
+        // We only want to apply style changes if it's a standalone app:
+        if (window.navigator.standalone) { 
+            //$("html").addClass("standalone-app");
+        }
+
+    }
+};
+
 /* Initialize/Fire
    ========================================================================== */
 Artbot.startup = {
     init : function () {
-        console.log("**Beginning of scripts initializing");
+        //console.log("**Beginning of scripts initializing");
 
         $('a[href="#"]').click(function(e){e.preventDefault();});
+
+        Artbot.webAppStatusBar.init();
 
         Artbot.discoverSlider.init();
         Artbot.login.init();
@@ -25763,14 +25781,13 @@ Artbot.startup = {
         Artbot.historyList.init();
 
         Artbot.loadMore.init();
-        Artbot.customCheckboxes.init();
         Artbot.setupTextTruncation();
         Artbot.favoriteStars.init();
 
-        console.log("**End of scripts initializing");
+        //console.log("**End of scripts initializing");
     },
     finalize : function() {
-        console.log("**Beginning of scripts finalizing");
+        //console.log("**Beginning of scripts finalizing");
 
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
@@ -25806,12 +25823,12 @@ Artbot.startup = {
             }
         }
 
-        console.log("**End of scripts finalizing");
+        //console.log("**End of scripts finalizing");
     }
 };
 
 $(document).ready(function() {
-    console.log("****jQuery DOM Ready event firing");
+    //console.log("****jQuery DOM Ready event firing");
     handleAppCache();
 
     // Since the modal Signup popup is outside jQM's "pages", we need to instantiate it separately and only once
@@ -25832,10 +25849,11 @@ $(document).ready(function() {
  */
 
 $(document).on( "mobileinit", function( event ) {
-    console.log("****JQM mobileinit event firing");
+    //console.log("****JQM mobileinit event firing");
     $.mobile.popup.prototype.options.history = false;
 });
 
+/*
 $(document).on( "pagecontainerbeforechange", function( event, ui ) {
     console.log("****JQM pagecontainerbeforechange event firing");
 });
@@ -25859,10 +25877,11 @@ $(document).on( "pagebeforecreate", function( event ) {
 $(document).on( "pagecreate", function( event ) {
     console.log("****JQM pagecreate event firing");
 });
+*/
 
 
 $(document).on( "pagebeforehide", function( event ) {
-    console.log("****JQM pagebeforehide event firing");
+    //console.log("****JQM pagebeforehide event firing");
 
     /* Destroying sliders before hiding a page */
     Artbot.footerSlider.destroy();
@@ -25876,24 +25895,24 @@ $(document).on( "pagebeforehide", function( event ) {
 
 
 $(document).on("pagehide", "div[data-role=page]", function(event){
-    console.log("****JQM pagehide event firing");
+    //console.log("****JQM pagehide event firing");
 
     /* Removing the prior page on page hide, so that we don't have multiple versions of pages cluttering the DOM */
-    console.log("Hiding the previous page");
+    //console.log("Hiding the previous page");
     $(event.target).remove();
 });
 
-
+/*
 $(document).on( "pagecontainerbeforeshow", function( event ) {
     console.log("****JQM pagecontainerbeforeshow event firing");
 });
-
+*/
 
 $(document).on( "pagecontainershow", function( event ) {
 
-    console.log("****JQM pagecontainershow event firing");
+    //console.log("****JQM pagecontainershow event firing");
 
-    console.log("***Beginning of new page load scripts");
+    //console.log("***Beginning of new page load scripts");
 
     /* Fire based on document context
     ========================================================================== */
@@ -25903,13 +25922,13 @@ $(document).on( "pagecontainershow", function( event ) {
         namespace.init();
     }
 
-    console.log("Cookie value: " + $.cookie('priorvisit'));
+    //console.log("Cookie value: " + $.cookie('priorvisit'));
 
     // Check for a cookie that says that they've visited before.
     if ($.cookie('priorvisit') === undefined) {
-        console.log("Checking cookie -- new visitor");
+        //console.log("Checking cookie -- new visitor");
     } else {
-        console.log("Checking cookie -- they've been here before");
+        //console.log("Checking cookie -- they've been here before");
         Artbot.var.hasVisitedBefore = true;
     }
 
@@ -25917,11 +25936,12 @@ $(document).on( "pagecontainershow", function( event ) {
         namespace.finalize();
     }
 
-    console.log("***End of new page load scripts");
+    //console.log("***End of new page load scripts");
 
 });
 
-
+/*
 $(document).on( "pagecontainertransition", function( event ) {
     console.log("****JQM pagecontainertransition event firing");
 });
+*/
