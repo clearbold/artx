@@ -6,6 +6,10 @@
  * Written while drinking Belgian ales and listening to jazz
  *
  * Released under the MIT license - http://opensource.org/licenses/MIT
+ *
+ * 11/12/2014: Altered slightly to fix issues with Prev/Next when all carousel items are showing
+ * Sherri Alexander, sherri@sherri-alexander.com
+ *
  */
 
 ;(function($){
@@ -849,7 +853,13 @@
 				// if first slide
 				if (slider.active.index == 0){
 					slider.controls.prev.addClass('disabled');
-					slider.controls.next.removeClass('disabled');
+					
+					// in case it's a carousel with all items showing
+					if (slider.active.index == getPagerQty() - 1){
+						slider.controls.next.addClass('disabled');
+					} else {
+						slider.controls.next.removeClass('disabled');
+					}
 				// if last slide
 				}else if(slider.active.index == getPagerQty() - 1){
 					slider.controls.next.addClass('disabled');

@@ -382,13 +382,22 @@ Artbot.footerSlider = {
     vars: {
         footSlideInstance: "",
         footSlideOptions: {
-            minSlides:2,
-            maxSlides:4,
-            slideWidth:200,
-            slideMargin:0,
+            minSlides:3,
+            maxSlides:30,
+            slideWidth:86,
+            slideMargin:10,
             oneToOneTouch:false,
             pager:false,
-            infiniteLoop: false
+            infiniteLoop: false,
+            nextSelector: '#footer-slider-next',
+            nextText: '<i class="icon icon-fast-forward"></i><span class="visuallyhidden">Next</span>',
+            prevSelector: '#footer-slider-previous',
+            prevText: '<i class="icon icon-rewind"></i><span class="visuallyhidden">Previous</span>',
+            hideControlOnEnd: true,
+            onSliderLoad: function() {
+                $("#footer-slider-previous").find("a").addClass("btn").addClass("btn-round").attr("title", "Previous");
+                $("#footer-slider-next").find("a").addClass("btn").addClass("btn-round").attr("title", "Next");
+            }
         },
         pageSize: 15,
         slideTemplate: "",
@@ -398,7 +407,6 @@ Artbot.footerSlider = {
     },
     init: function() {
         if ($("#footer-slider").length > 0) {
-            
             Artbot.footerSlider.vars.relatedInterestCounter = 0; // on startup
 
             // Set up some variables
@@ -448,6 +456,8 @@ Artbot.footerSlider = {
                         //console.log("Footer slider data successfully fetched");
                         
                         var jsonString = JSON.stringify(data.favorites);
+
+                        //console.log(jsonString);
 
                         // Hide any existing messages
                         $(".footer-slider-msg").hide();
@@ -696,7 +706,7 @@ Artbot.footerSlider = {
     },
     initSlider: function() {
         Artbot.footerSlider.vars.footSlideInstance = $("#footer-slider").bxSlider(Artbot.footerSlider.vars.footSlideOptions);
-        Artbot.footerSlider.initSliderNav();
+        //Artbot.footerSlider.initSliderNav();
     },
     initSliderNav: function() {
         $(".footer-slider").removeClass("not-enough-slides");
@@ -944,19 +954,24 @@ Artbot.favoriteStars = {
 
                     // We'll start by iterating through each favorite
                     $.each(userFavorites, function(i, value) {
+                        
                         var userFavorite = userFavorites[i];
-                        var userFavoriteEventID = userFavorite.event.id;
                         var userFavoriteID = userFavorite.id;
 
-                        // Then let's compare that favorite ID to the corresponding ones on the page
-                        $(".favorite-star").each(function() {
-                            var pageFavoriteEventID = $(this).attr("data-event-id");
+                        if (userFavoriteID != -1) {
 
-                            // If they match, highlight the star
-                            if (pageFavoriteEventID == userFavoriteEventID) {
-                                Artbot.favoriteStars.highlightStar($(this), userFavoriteID);
-                            }
-                        });
+                            var userFavoriteEventID = userFavorite.event.id;
+
+                            // Then let's compare that favorite ID to the corresponding ones on the page
+                            $(".favorite-star").each(function() {
+                                var pageFavoriteEventID = $(this).attr("data-event-id");
+
+                                // If they match, highlight the star
+                                if (pageFavoriteEventID == userFavoriteEventID) {
+                                    Artbot.favoriteStars.highlightStar($(this), userFavoriteID);
+                                }
+                            });
+                        }
                     });
 
                     // Now we have to do the same for History, because Favorites is now only future and present events, and our event might be in the past.
@@ -983,18 +998,21 @@ Artbot.favoriteStars = {
                             // We'll start by iterating through each history item
                             $.each(userHistories, function(i, value) {
                                 var userHistory = userHistories[i];
-                                var userHistoryEventID = userHistory.event.id;
                                 var userHistoryID = userHistory.id;
 
-                                // Then let's compare that favorite ID to the corresponding ones on the page
-                                $(".favorite-star").each(function() {
-                                    var pageHistoryEventID = $(this).attr("data-event-id");
+                                if (userHistoryID != -1) {
+                                    var userHistoryEventID = userHistory.event.id;
 
-                                    // If they match, highlight the star
-                                    if (pageHistoryEventID == userHistoryEventID) {
-                                        Artbot.favoriteStars.highlightStar($(this), userHistoryID);
-                                    }
-                                });
+                                    // Then let's compare that favorite ID to the corresponding ones on the page
+                                    $(".favorite-star").each(function() {
+                                        var pageHistoryEventID = $(this).attr("data-event-id");
+
+                                        // If they match, highlight the star
+                                        if (pageHistoryEventID == userHistoryEventID) {
+                                            Artbot.favoriteStars.highlightStar($(this), userHistoryID);
+                                        }
+                                    });
+                                }
                             });
                         },
                         error: function (jqXHR, error, errorThrown) {

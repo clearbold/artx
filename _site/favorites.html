@@ -93,7 +93,7 @@
 
                 <script type="text/template" id="template-favoritelist">
                     <% _.each(jsonArray, function(favoriteObj, key){ %>
-                           
+                    <% if (favoriteObj.id != -1) { %>
                     <div class="item-block cf">
                         <div class="item-image">
                             <a href="event.html?eventid=<%= favoriteObj.event.id %>">
@@ -110,7 +110,7 @@
                             <a href="#" class="favorite-star item-symbol" data-event-id="<%= favoriteObj.event.id %>" title="Toggle as a favorite"><i class="icon icon-star2"></i><span class="visuallyhidden">Toggle as a favorite</span></a>
                         </div>
                     </div>
-
+                    <% } %>
                     <% }); %>
                 </script>
             </div>
