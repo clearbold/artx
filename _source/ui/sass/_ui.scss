@@ -1510,5 +1510,18 @@ html body .ui-group-theme-a a {
         &.positionfixed .masthead {
             top:20px;
         }
+
+        // iOS7 fix for missing statusbar background
+        &.ios7 body:before {
+            display:block;
+            content: "";
+            height:20px;
+            top:0;
+            left:0;
+            right:0;
+            background:rgba(0,0,0,0.8);
+            position:-webkit-sticky;
+            position:sticky;
+        }
     }
 }

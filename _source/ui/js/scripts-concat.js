@@ -25784,6 +25784,11 @@ Artbot.webAppStatusBar = {
         if (window.navigator.standalone) { 
             $("html").addClass("standalone-app");
         }
+
+        // We need to aim an additional fix at iOS7, where the status bar has no background
+        if (navigator.userAgent.match(/(iPad|iPhone|iPod touch);.*CPU.*OS 7_\d/i)) {
+            $("html").addClass("ios7");
+        }
     }
 };
 
