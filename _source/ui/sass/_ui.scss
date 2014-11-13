@@ -1510,23 +1510,32 @@ html body .ui-group-theme-a a {
         &.positionfixed .masthead {
             top:20px;
         }
+    }
+}
 
-        // iOS7 fix for missing statusbar background
-        //&.ios7 
-        body:before {
-            display:block;
-            content: "";
-            height:20px;
-            //width:100%;
-            top:0;
-            left:0;
-            right:0;
-            //background:rgba(0,0,0,0.8);
-            //position:-webkit-sticky;
-            //position:sticky;
-            background:pink;
-            position:fixed;
-            z-index:3;
-        }
+/* iOS7 has the status bar for both portrait and landscape */
+.standalone-app.ios7 {
+    .ui-popup-container {
+        top:20px !important;
+    }
+    body {
+        padding-top:20px;
+    }
+    &.positionfixed .masthead {
+        top:20px;
+    }
+
+    // iOS7 fix for missing statusbar background
+    body:before {
+        display:block;
+        content: "";
+        height:20px;
+        top:0;
+        left:0;
+        right:0;
+        //background:rgba(0,0,0,0.8);
+        background:yellow;
+        position:fixed;
+        z-index:3;
     }
 }
