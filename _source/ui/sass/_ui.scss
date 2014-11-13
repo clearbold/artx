@@ -1520,8 +1520,9 @@ html body .ui-group-theme-a a {
             left:0;
             right:0;
             background:rgba(0,0,0,0.8);
-            position:-webkit-sticky;
-            position:sticky;
+            //position:-webkit-sticky;
+            //position:sticky;
+            position:fixed;
         }
     }
 }
