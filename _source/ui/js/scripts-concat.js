@@ -23180,7 +23180,10 @@ Artbot.util = {
         }
     },
     findQuerystring: function(qs) {
-        hu = window.location.search.substring(1);
+        //hu = window.location.search.substring(1);
+        url = $("[data-role=page]").attr("data-url");
+        hu = url.substring(url.indexOf('?') + 1);
+        //console.log("Querystring URL: " + hu);
         gy = hu.split("&");
         for (i = 0; i < gy.length; i++) {
             ft = gy[i].split("=");
