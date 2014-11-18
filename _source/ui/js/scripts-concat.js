@@ -23317,6 +23317,7 @@ Artbot.discoverSlider = {
                 console.log("Error fetching Discover slider data");
                 console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
                 console.log("jqXHR response: " + jqXHR.responseText);
+                Artbot.discoverSlider.showErrorMsg("ajax");
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -23371,6 +23372,12 @@ Artbot.discoverSlider = {
           peekSlideInstance.goToPrevSlide();
           return false;
         });
+    },
+    showErrorMsg: function(errorID) {
+        $("#discover-slider").fadeOut( 400, function() {
+            $("#discover-slider-msg-"+errorID).fadeIn(400);
+            $("#discover-slider").show();
+        });  
     }
 };
 

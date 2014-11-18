@@ -307,7 +307,7 @@ Artbot.discoverSlider = {
             data: {
                 per_page: 10
             },
-            url: Artbot.var.jsonDomain + "/discoveries/",
+            url: Artbot.var.jsonDomain + "/discoveriesfoo/",
             beforeSend: beforeSendFunction,
             success: function( data ) {
                 //console.log("Discover slider data successfully fetched");
@@ -319,6 +319,7 @@ Artbot.discoverSlider = {
                 console.log("Error fetching Discover slider data");
                 console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
                 console.log("jqXHR response: " + jqXHR.responseText);
+                Artbot.discoverSlider.showErrorMsg("generic");
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -373,6 +374,12 @@ Artbot.discoverSlider = {
           peekSlideInstance.goToPrevSlide();
           return false;
         });
+    },
+    showErrorMsg: function(errorID) {
+        $("#discover-slider").fadeOut( 400, function() {
+            $("#discover-slider-msg-"+errorID).fadeIn(400);
+            $("#discover-slider").show();
+        });  
     }
 };
 
@@ -2785,6 +2792,11 @@ Artbot.webAppStatusBar = {
         // We're combating that with certain styles and media queries in the CSS.  We need a hook for them.
         if (window.navigator.standalone) { 
             $("html").addClass("standalone-app");
+        }
+
+        // We need to aim an additional fix at iOS7, where the status bar has no background
+        if (navigator.userAgent.match(/(iPad|iPhone|iPod touch);.*CPU.*OS 7_\d/i)) {
+            $("html").addClass("ios7");
         }
     }
 };
