@@ -683,6 +683,10 @@ div#event-map {
     height: 200px;
     margin-bottom: 10px;
     width: 100%;
+    
+    @include mq($lap-start) {
+        height:340px;
+    }
 }
 
 .leaflet-control-attribution {
@@ -748,8 +752,8 @@ div#event-map {
 
     .item-image {
         overflow:hidden;
-        //max-height:320px;
-        max-height:200px;
+        max-height:340px;
+        //max-height:200px;
     }
 }
 
