@@ -1515,6 +1515,18 @@ html body .ui-group-theme-a a {
         }
         body {
             padding-top:20px;
+            
+            &:before {
+                display:block;
+                content: "";
+                height:20px;
+                top:0;
+                left:0;
+                right:0;
+                background:rgb(0,0,0);
+                position:fixed;
+                z-index:3;
+            }
         }
         &.positionfixed .masthead {
             top:20px;
@@ -1542,7 +1554,7 @@ html body .ui-group-theme-a a {
         top:0;
         left:0;
         right:0;
-        background:rgba(0,0,0,0.8);
+        background:rgb(0,0,0);
         position:fixed;
         z-index:3;
     }
