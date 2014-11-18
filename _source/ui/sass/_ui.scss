@@ -998,8 +998,10 @@ div#event-map {
         }
     }
     li {
-        width:100px;
-        height:100px;
+        //width:86px;
+        width:140px;
+        //height:86px;
+        height:70px;
         overflow:hidden;
         float:left;
 
@@ -1047,15 +1049,18 @@ div#event-map {
 
         li {
             overflow:hidden;
-            width:86px;
-            height:86px;
+            //width:86px;
+            width:140px;
+            height:70px;
         }
 
         a  {
             position:relative;
             display:block;
-            width:86px;
-            height:86px;
+            //width:86px;
+            width:140px;
+            //height:86px;
+            height:140px;
             overflow:hidden;
 
             img {
@@ -1063,7 +1068,7 @@ div#event-map {
                 width:auto;
                 height:100%;
                 left:50%;
-                top:50%;
+                top:25%;
                 max-width:none;
                 
                 -webkit-transform: translate(-50%,-50%);

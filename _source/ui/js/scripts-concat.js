@@ -23387,9 +23387,10 @@ Artbot.footerSlider = {
     vars: {
         footSlideInstance: "",
         footSlideOptions: {
-            minSlides:3,
+            minSlides:2,
             maxSlides:30,
-            slideWidth:86,
+            //slideWidth:86,
+            slideWidth:140,
             slideMargin:10,
             oneToOneTouch:false,
             pager:false,
