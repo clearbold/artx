@@ -752,8 +752,11 @@ div#event-map {
 
     .item-image {
         overflow:hidden;
-        max-height:340px;
-        //max-height:200px;
+        max-height:200px;
+        
+        @include mq($lap-start) {
+            max-height:340px;
+        }
     }
 }
 
