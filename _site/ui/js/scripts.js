@@ -182,7 +182,10 @@ Artbot.util = {
         }
     },
     findQuerystring: function(qs) {
-        hu = window.location.search.substring(1);
+        //hu = window.location.search.substring(1);
+        url = $("[data-role=page]").attr("data-url");
+        hu = url.substring(url.indexOf('?') + 1);
+        //console.log("Querystring URL: " + hu);
         gy = hu.split("&");
         for (i = 0; i < gy.length; i++) {
             ft = gy[i].split("=");
@@ -307,7 +310,7 @@ Artbot.discoverSlider = {
             data: {
                 per_page: 10
             },
-            url: Artbot.var.jsonDomain + "/discoveriesfoo/",
+            url: Artbot.var.jsonDomain + "/discoveries/",
             beforeSend: beforeSendFunction,
             success: function( data ) {
                 //console.log("Discover slider data successfully fetched");
@@ -319,7 +322,7 @@ Artbot.discoverSlider = {
                 console.log("Error fetching Discover slider data");
                 console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
                 console.log("jqXHR response: " + jqXHR.responseText);
-                Artbot.discoverSlider.showErrorMsg("generic");
+                Artbot.discoverSlider.showErrorMsg("ajax");
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -389,9 +392,10 @@ Artbot.footerSlider = {
     vars: {
         footSlideInstance: "",
         footSlideOptions: {
-            minSlides:3,
+            minSlides:2,
             maxSlides:30,
-            slideWidth:86,
+            //slideWidth:86,
+            slideWidth:140,
             slideMargin:10,
             oneToOneTouch:false,
             pager:false,
