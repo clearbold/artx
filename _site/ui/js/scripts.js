@@ -2789,6 +2789,8 @@ Artbot.byLocation = {
     }
 };
 
+/* Standalone status bar fixes
+   ========================================================================== */
 Artbot.webAppStatusBar = {
     init: function() {
         // We only want to apply style changes if it's a standalone app.
@@ -2805,6 +2807,44 @@ Artbot.webAppStatusBar = {
     }
 };
 
+/* Forgot Password functionality
+   ========================================================================== */
+Artbot.forgotPassword = {
+    init: function() {
+        if ($("#forgotpassword-form").length > 0) {
+            // Set up validation and Ajax submit
+            $("#forgotpassword-form").validate({
+                rules: {
+                    "email": "email"
+                },
+                submitHandler: Artbot.forgotPassword.ajaxSubmit
+            });
+        }
+    },
+    ajaxSubmit: function() {
+        $.mobile.loading('show');
+        $.ajax({
+            type: "PATCH",
+            dataType: "json",
+            url: Artbot.var.jsonDomain + "/registrations/",
+            data: {
+                email: $("#email").val()
+            },
+            success: function(data, textStatus, jqXHR) {
+                console.log("Password reset request sent");
+                $.mobile.pageContainer.pagecontainer ("change", "forgot-password-confirm.html", {reloadPage: true});
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error sending password reset request");
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
+        });
+    }
+};
+
 /* Initialize/Fire
    ========================================================================== */
 Artbot.startup = {
@@ -2818,6 +2858,7 @@ Artbot.startup = {
         Artbot.discoverSlider.init();
         Artbot.login.init();
         Artbot.logout.init();
+        Artbot.forgotPassword.init();
         Artbot.interests.init();
         Artbot.calendar.init();
         Artbot.settings.init();

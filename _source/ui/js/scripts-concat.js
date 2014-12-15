@@ -25787,6 +25787,8 @@ Artbot.byLocation = {
     }
 };
 
+/* Standalone status bar fixes
+   ========================================================================== */
 Artbot.webAppStatusBar = {
     init: function() {
         // We only want to apply style changes if it's a standalone app.
@@ -25803,6 +25805,62 @@ Artbot.webAppStatusBar = {
     }
 };
 
+/* Forgot Password functionality
+   ========================================================================== */
+Artbot.forgotPassword = {
+    init: function() {
+        if ($("#forgotpassword-form").length > 0) {
+            // Set up validation and Ajax submit
+            $("#forgotpassword-form").validate({
+                submitHandler: Artbot.forgotPassword.ajaxSubmit
+            });
+        }
+    },
+    ajaxSubmit: function() {
+        $.mobile.loading('show');
+        $.ajax({
+            type: "PATCH",
+            url: Artbot.var.jsonDomain + "/registrations/",
+            data: {
+                email: $("#email").val()
+            },
+            success: function(data, textStatus, jqXHR) {
+                console.log("Password reset request sent");
+                $.mobile.pageContainer.pagecontainer ("change", "forgot-password-confirm.html", {reloadPage: true});
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error sending password reset request");
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
+
+                /* If the request fails with a 404 error, it will return a generic error payload and we can't run it through the usual showFormError because there's no form field ID provided */
+
+                if (jqXHR.status == 404) { 
+                    var errorText;
+                    var $errorLabel;
+
+                    errorText = "Email address not found in our system.";
+
+                    if ($("#email-error").length > 0) {
+                        $errorLabel = $("#email-error");
+                        $errorLabel.addClass("error").html(errorText).show();
+                    } else {
+                        $errorLabel = $("<label>")
+                            .attr("id", "email-error")
+                            .addClass("error")
+                            .html(errorText)
+                            .attr( "for", "email");
+                        $errorLabel.insertAfter( $("#email") );
+                    }
+                    $("#email").addClass("error");
+                }
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
+        });
+    }
+};
+
 /* Initialize/Fire
    ========================================================================== */
 Artbot.startup = {
@@ -25816,6 +25874,7 @@ Artbot.startup = {
         Artbot.discoverSlider.init();
         Artbot.login.init();
         Artbot.logout.init();
+        Artbot.forgotPassword.init();
         Artbot.interests.init();
         Artbot.calendar.init();
         Artbot.settings.init();
