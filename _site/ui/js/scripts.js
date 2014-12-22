@@ -2814,9 +2814,6 @@ Artbot.forgotPassword = {
         if ($("#forgotpassword-form").length > 0) {
             // Set up validation and Ajax submit
             $("#forgotpassword-form").validate({
-                rules: {
-                    "email": "email"
-                },
                 submitHandler: Artbot.forgotPassword.ajaxSubmit
             });
         }
@@ -2825,7 +2822,6 @@ Artbot.forgotPassword = {
         $.mobile.loading('show');
         $.ajax({
             type: "PATCH",
-            dataType: "json",
             url: Artbot.var.jsonDomain + "/registrations/",
             data: {
                 email: $("#email").val()
@@ -2837,6 +2833,28 @@ Artbot.forgotPassword = {
             error: function (jqXHR, error, errorThrown) {
                 console.log("Error sending password reset request");
                 Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
+
+                /* If the request fails with a 404 error, it will return a generic error payload and we can't run it through the usual showFormError because there's no form field ID provided */
+
+                if (jqXHR.status == 404) { 
+                    var errorText;
+                    var $errorLabel;
+
+                    errorText = "Email address not found in our system.";
+
+                    if ($("#email-error").length > 0) {
+                        $errorLabel = $("#email-error");
+                        $errorLabel.addClass("error").html(errorText).show();
+                    } else {
+                        $errorLabel = $("<label>")
+                            .attr("id", "email-error")
+                            .addClass("error")
+                            .html(errorText)
+                            .attr( "for", "email");
+                        $errorLabel.insertAfter( $("#email") );
+                    }
+                    $("#email").addClass("error");
+                }
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -2844,6 +2862,64 @@ Artbot.forgotPassword = {
         });
     }
 };
+
+/* Reset Password functionality
+   ========================================================================== */
+Artbot.resetPassword = {
+    token: "",
+    init: function() {
+        // TODO: see if there's a way to disable the signup popup on this page?
+
+        if ($("#passwordreset-form").length > 0) {
+            console.log("Initializing Reset Password form");
+
+            // Get the password change token from a querystring
+            Artbot.resetPassword.token = Artbot.util.findQuerystring("p");
+            
+            if (typeof Artbot.resetPassword.token != 'undefined') {
+                console.log("Reset password token passed in via querystring: " + Artbot.resetPassword.token);
+
+                // Set up validation and Ajax submit
+                $("#passwordreset-form").validate({
+                    submitHandler: Artbot.resetPassword.ajaxSubmit
+                });
+            } else {
+                // What should we do if the token is not accepted for any reason?
+            }
+        }
+    },
+    ajaxSubmit: function() {
+        // Testing
+        console.log("New password: " + $("#passwordreset-password").val());
+        console.log("New password confirmed: " + $("#passwordreset-confirmpassword").val());
+        console.log("Password reset token from querystring: " + Artbot.resetPassword.token);
+
+        /*$.mobile.loading('show');
+        $.ajax({
+            type: "PUT",
+            url: Artbot.var.jsonDomain + "/registrations/",
+            data: {
+                password: $("#passwordreset-password").val(),
+                password_confirmation: $("#passwordreset-confirmpassword").val(),
+                reset_password_token: Artbot.resetPassword.token
+            },
+            success: function(data, textStatus, jqXHR) {
+                console.log("Password reset successful");
+                $.mobile.pageContainer.pagecontainer ("change", "forgot-password-reset-confirm.html", {reloadPage: true});
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error resetting password");
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
+
+                // TODO: error handling?
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
+        });*/
+    }
+};
+
 
 /* Initialize/Fire
    ========================================================================== */
@@ -2859,6 +2935,7 @@ Artbot.startup = {
         Artbot.login.init();
         Artbot.logout.init();
         Artbot.forgotPassword.init();
+        Artbot.resetPassword.init();
         Artbot.interests.init();
         Artbot.calendar.init();
         Artbot.settings.init();

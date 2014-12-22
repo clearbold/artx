@@ -2863,6 +2863,66 @@ Artbot.forgotPassword = {
     }
 };
 
+/* Reset Password functionality
+   ========================================================================== */
+Artbot.resetPassword = {
+    token: "",
+    init: function() {
+        // TODO: see if there's a way to disable the signup popup on this page?
+
+        if ($("#passwordreset-form").length > 0) {
+            console.log("Initializing Reset Password form");
+
+            // Get the password change token from a querystring
+            Artbot.resetPassword.token = Artbot.util.findQuerystring("p");
+            
+            if (typeof Artbot.resetPassword.token != 'undefined') {
+                console.log("Reset password token passed in via querystring: " + Artbot.resetPassword.token);
+
+                // Set up validation and Ajax submit
+                $("#passwordreset-form").validate({
+                    submitHandler: Artbot.resetPassword.ajaxSubmit
+                });
+            } else {
+                // What should we do if the token is not accepted for any reason?
+            }
+        }
+    },
+    ajaxSubmit: function() {
+        // Testing
+        //console.log("New password: " + $("#password").val());
+        //console.log("New password confirmed: " + $("#password_confirmation").val());
+        //console.log("Password reset token from querystring: " + Artbot.resetPassword.token);
+
+        $.mobile.loading('show');
+        $.ajax({
+            type: "PUT",
+            url: Artbot.var.jsonDomain + "/registrations",
+            data: {
+                password: $("#password").val(),
+                password_confirmation: $("#password_confirmation").val()
+            },
+            beforeSend: function (request) {
+                request.setRequestHeader("reset_password_token", Artbot.resetPassword.token);
+            },
+            success: function(data, textStatus, jqXHR) {
+                console.log("Password reset successful");
+                $.mobile.pageContainer.pagecontainer ("change", "forgot-password-reset-confirm.html", {reloadPage: true});
+            },
+            error: function (jqXHR, error, errorThrown) {
+                console.log("Error resetting password");
+                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
+
+                // TODO: error handling?
+            },
+            complete: function() {
+                $.mobile.loading('hide');
+            }
+        });
+    }
+};
+
+
 /* Initialize/Fire
    ========================================================================== */
 Artbot.startup = {
@@ -2877,6 +2937,7 @@ Artbot.startup = {
         Artbot.login.init();
         Artbot.logout.init();
         Artbot.forgotPassword.init();
+        Artbot.resetPassword.init();
         Artbot.interests.init();
         Artbot.calendar.init();
         Artbot.settings.init();
