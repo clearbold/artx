@@ -3037,123 +3037,7 @@ if (typeof define !== 'undefined' && define.amd) {
 		return this;
 	}
 
-})(jQuery);;/*!
- * jQuery Cookie Plugin v1.4.1
- * https://github.com/carhartl/jquery-cookie
- *
- * Copyright 2006, 2014 Klaus Hartl
- * Released under the MIT license
- */
-(function (factory) {
-    if (typeof define === 'function' && define.amd) {
-        // AMD
-        define(['jquery'], factory);
-    } else if (typeof exports === 'object') {
-        // CommonJS
-        factory(require('jquery'));
-    } else {
-        // Browser globals
-        factory(jQuery);
-    }
-}(function ($) {
-
-    var pluses = /\+/g;
-
-    function encode(s) {
-        return config.raw ? s : encodeURIComponent(s);
-    }
-
-    function decode(s) {
-        return config.raw ? s : decodeURIComponent(s);
-    }
-
-    function stringifyCookieValue(value) {
-        return encode(config.json ? JSON.stringify(value) : String(value));
-    }
-
-    function parseCookieValue(s) {
-        if (s.indexOf('"') === 0) {
-            // This is a quoted cookie as according to RFC2068, unescape...
-            s = s.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-        }
-
-        try {
-            // Replace server-side written pluses with spaces.
-            // If we can't decode the cookie, ignore it, it's unusable.
-            // If we can't parse the cookie, ignore it, it's unusable.
-            s = decodeURIComponent(s.replace(pluses, ' '));
-            return config.json ? JSON.parse(s) : s;
-        } catch(e) {}
-    }
-
-    function read(s, converter) {
-        var value = config.raw ? s : parseCookieValue(s);
-        return $.isFunction(converter) ? converter(value) : value;
-    }
-
-    var config = $.cookie = function (key, value, options) {
-
-        // Write
-
-        if (arguments.length > 1 && !$.isFunction(value)) {
-            options = $.extend({}, config.defaults, options);
-
-            if (typeof options.expires === 'number') {
-                var days = options.expires, t = options.expires = new Date();
-                t.setTime(+t + days * 864e+5);
-            }
-
-            return (document.cookie = [
-                encode(key), '=', stringifyCookieValue(value),
-                options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
-                options.path    ? '; path=' + options.path : '',
-                options.domain  ? '; domain=' + options.domain : '',
-                options.secure  ? '; secure' : ''
-            ].join(''));
-        }
-
-        // Read
-
-        var result = key ? undefined : {};
-
-        // To prevent the for loop in the first place assign an empty array
-        // in case there are no cookies at all. Also prevents odd result when
-        // calling $.cookie().
-        var cookies = document.cookie ? document.cookie.split('; ') : [];
-
-        for (var i = 0, l = cookies.length; i < l; i++) {
-            var parts = cookies[i].split('=');
-            var name = decode(parts.shift());
-            var cookie = parts.join('=');
-
-            if (key && key === name) {
-                // If second argument (value) is a function it's a converter...
-                result = read(cookie, value);
-                break;
-            }
-
-            // Prevent storing a cookie that we couldn't decode.
-            if (!key && (cookie = read(cookie)) !== undefined) {
-                result[name] = cookie;
-            }
-        }
-
-        return result;
-    };
-
-    config.defaults = {};
-
-    $.removeCookie = function (key, options) {
-        if ($.cookie(key) === undefined) {
-            return false;
-        }
-
-        // Must not alter options, thus extending a fresh object...
-        $.cookie(key, '', $.extend({}, options, { expires: -1 }));
-        return !$.cookie(key);
-    };
-
-}));;/**
+})(jQuery);;/**
  * --------------------------------------------------------------------
  * jQuery customInput plugin
  * Author: Maggie Costello Wachs maggie@filamentgroup.com, Scott Jehl, scott@filamentgroup.com
@@ -23293,11 +23177,16 @@ Artbot.discoverSlider = {
     populateSlider: function() {
 
         var beforeSendFunction = function() {}; // blank function for now
+        var authtoken;
 
-        if ($.cookie('token') !== undefined) {
-            beforeSendFunction = function(request) {
-                request.setRequestHeader("authentication_token", $.cookie('token'));
-            };
+        if (typeof window.localStorage != "undefined") {
+            authtoken = localStorage.authentication_token;
+
+            if (typeof authtoken !== "undefined") {
+                beforeSendFunction = function(request) {
+                    request.setRequestHeader("authentication_token", authtoken);
+                };
+            }
         }
 
         $.mobile.loading('show');
@@ -23447,8 +23336,13 @@ Artbot.footerSlider = {
             //console.log("Initializing Favorites slider");
             
             // Check if the user is logged in
-            if ($.cookie('token') !== undefined) {
-                
+            var authtoken;
+
+            if (typeof window.localStorage != "undefined") {
+                authtoken = localStorage.authentication_token;
+            }
+
+            if (typeof authtoken !== "undefined") {
                 // User is logged in, so we can fetch the favorites
 
                 $.ajax({
@@ -23459,7 +23353,7 @@ Artbot.footerSlider = {
                     },
                     url: Artbot.var.jsonDomain + "/favorites/",
                     beforeSend: function(request) {
-                        request.setRequestHeader("authentication_token", $.cookie('token'));
+                        request.setRequestHeader("authentication_token", authtoken);
                     },
                     success: function( data ) {
                         //console.log("Footer slider data successfully fetched");
@@ -23829,14 +23723,13 @@ Artbot.favoriteStars = {
 
             $(".favorite-star").click(function() {
 
-                if ($.cookie('token') === undefined) {
-                    // The user is not logged in, we can't save a favorite
+                var authtoken;
 
-                    //console.log("We can't toggle a favorite because the user is not logged in.");
+                if (typeof window.localStorage != "undefined") {
+                    authtoken = localStorage.authentication_token;
+                }
 
-                    Artbot.signupModal.open();
-
-                } else {
+                if (typeof authtoken !== "undefined") {
                     // The user is logged in, so we can save or delete the favorite
 
                     // Capture the Event ID from the data-attribute on the clicked link
@@ -23855,7 +23748,7 @@ Artbot.favoriteStars = {
                             type: "POST",
                             url: Artbot.var.jsonDomain + "/events/" + selectedEventID + "/favorite/",
                             beforeSend: function (request) {
-                                request.setRequestHeader("authentication_token", $.cookie('token'));
+                                request.setRequestHeader("authentication_token", authtoken);
                             },
                             success: function(data, textStatus, jqXHR) {
                                 //console.log("New favorite successfully saved");
@@ -23894,7 +23787,7 @@ Artbot.favoriteStars = {
                                 "_method":"delete"
                             },
                             beforeSend: function (request) {
-                                request.setRequestHeader("authentication_token", $.cookie('token'));
+                                request.setRequestHeader("authentication_token", authtoken);
                             },
                             success: function(data, textStatus, jqXHR) {
                                 //console.log("Favorite successfully deleted");
@@ -23926,6 +23819,11 @@ Artbot.favoriteStars = {
                             }
                         });
                     }
+
+                } else {
+                    // The user is not logged in, we can't save a favorite
+                    //console.log("We can't toggle a favorite because the user is not logged in.");
+                    Artbot.signupModal.open();
                 }
 
                 return false;
@@ -23940,8 +23838,13 @@ Artbot.favoriteStars = {
     },
     sync : function() {
         /* This function checks all favorite stars currently present in the page, and compares them against the current user's saved favorites (if logged in).  If there's a match, that star will be highlighted. */
+        var authtoken;
 
-        if (($(".favorite-star").length > 0) && ($.cookie('token') !== undefined)) {
+        if (typeof window.localStorage != "undefined") {
+            authtoken = localStorage.authentication_token;
+        }
+        
+        if (($(".favorite-star").length > 0) && (typeof authtoken !== "undefined")) {
             //console.log("Syncing stars with user's favorites");
 
             // Fetch the list of user's favorites to check against.
@@ -23953,7 +23856,7 @@ Artbot.favoriteStars = {
                     per_page: 10000
                 },
                 beforeSend: function (request) {
-                    request.setRequestHeader("authentication_token", $.cookie('token'));
+                    request.setRequestHeader("authentication_token", authtoken);
                 },
                 success: function(data, textStatus, jqXHR) {
                     //console.log("Successfully fetched Favorites data for syncing stars");
@@ -23992,7 +23895,7 @@ Artbot.favoriteStars = {
                         type: "GET",
                         url: Artbot.var.jsonDomain + "/favorites/history/",
                         beforeSend: function (request) {
-                            request.setRequestHeader("authentication_token", $.cookie('token'));
+                            request.setRequestHeader("authentication_token", authtoken);
                         },
                         data: {
                             page: 1,
@@ -24106,9 +24009,12 @@ Artbot.signupModal = {
             },
             success: function( data ){
                 //console.log(data);
-                $.cookie('token', data.user.authentication_token);
-                $.cookie('currentuser', $("#email").val());
-                $.cookie('signedup', true, { expires: 3650 });
+
+                if (typeof window.localStorage != "undefined") {
+                    localStorage.authentication_token = data.user.authentication_token;
+                    localStorage.current_user = $("#email").val();
+                    localStorage.signed_up = true;
+                }
                 $.mobile.pageContainer.pagecontainer ("change", "interests.html", {reloadPage: true});
             },
             error: function (jqXHR, error, errorThrown) {
@@ -24658,7 +24564,13 @@ Artbot.settings = {
     init: function() {
         if ($("#settings-form").length > 0) {
 
-            if ($.cookie('token') !== undefined) {
+            var authtoken;
+
+            if (typeof window.localStorage != "undefined") {
+                authtoken = localStorage.authentication_token;
+            }
+
+            if (typeof authtoken !== "undefined") {
                 //console.log("Initializing app settings");
 
                 // Preload the field values from the back-end API
@@ -24679,11 +24591,12 @@ Artbot.settings = {
         }
     },
     fetchFieldValues: function() {
+        var authtoken = localStorage.authentication_token;
         $.ajax({
             type: "GET",
             url: Artbot.var.jsonDomain + "/preferences/",
             beforeSend: function (request) {
-                request.setRequestHeader("authentication_token", $.cookie('token'));
+                request.setRequestHeader("authentication_token", authtoken);
             },
             success: function ( data, textStatus, jqXHR ) {
                 //console.log("User preferences retrieved successfully.");
@@ -24731,13 +24644,19 @@ Artbot.settings = {
         var ajaxDataToSend = {};
         ajaxDataToSend[checkboxID] = isCheckboxChecked;
 
+        var authtoken;
+
+        if (typeof window.localStorage != "undefined") {
+            authtoken = localStorage.authentication_token;
+        }
+
         $.mobile.loading('show');
         $.ajax({
             type: "PUT",
             url: Artbot.var.jsonDomain + "/preferences/",
             data: ajaxDataToSend,
             beforeSend: function (request) {
-                request.setRequestHeader("authentication_token", $.cookie('token'));
+                request.setRequestHeader("authentication_token", authtoken);
             },
             success: function(data, textStatus, jqXHR) {
                 console.log("Toggle change successfully saved");
@@ -24763,12 +24682,19 @@ Artbot.settings = {
         }
 
         $.mobile.loading('show');
+
+        var authtoken;
+
+        if (typeof window.localStorage != "undefined") {
+            authtoken = localStorage.authentication_token;
+        }
+
         $.ajax({
             type: "PATCH",
             url: Artbot.var.jsonDomain + "/preferences/",
             data: formData,
             beforeSend: function (request) {
-                request.setRequestHeader("authentication_token", $.cookie('token'));
+                request.setRequestHeader("authentication_token", authtoken);
             },
             success: function(data, textStatus, jqXHR) {
                 console.log("All user preferences successfully saved");
@@ -24793,7 +24719,13 @@ Artbot.historyList = {
     },
     init: function() {
         if ($("#target-historylist").length > 0) {
-            if ($.cookie('token') !== undefined) {
+            var authtoken;
+
+            if (typeof window.localStorage != "undefined") {
+                authtoken = localStorage.authentication_token;
+            }
+
+            if (typeof authtoken !== undefined) {
                 console.log("Initializing History list");
                 Artbot.historyList.fetchData();
             }
@@ -24801,6 +24733,13 @@ Artbot.historyList = {
     },
     fetchData: function() {
         $.mobile.loading('show');
+
+        var authtoken;
+
+        if (typeof window.localStorage != "undefined") {
+            authtoken = localStorage.authentication_token;
+        }
+
         $.ajax({
             type: "GET",
             dataType: "json",
@@ -24810,7 +24749,7 @@ Artbot.historyList = {
                 per_page:10000
             },
             beforeSend: function (request) {
-                request.setRequestHeader("authentication_token", $.cookie('token'));
+                request.setRequestHeader("authentication_token", authtoken);
             },
             success: function( data ) {
                 console.log("Successfully fetched History data");
@@ -24932,12 +24871,19 @@ Artbot.historyList = {
         };
 
         $.mobile.loading('show');
+
+        var authtoken;
+
+        if (typeof window.localStorage != "undefined") {
+            authtoken = localStorage.authentication_token;
+        }
+
         $.ajax({
             type: "PUT",
             url: Artbot.var.jsonDomain + "/favorites/" + userFavoriteID,
             data: ajaxDataToSend,
             beforeSend: function (request) {
-                request.setRequestHeader("authentication_token", $.cookie('token'));
+                request.setRequestHeader("authentication_token", authtoken);
             },
             success: function(data, textStatus, jqXHR) {
                 console.log("Attendance data successfully saved");
@@ -25019,13 +24965,25 @@ Artbot.historyList = {
 Artbot.favoriteList = {
     init: function() {
         if ($("#target-favoritelist").length > 0) {
-            if ($.cookie('token') !== undefined) {
+            var authtoken;
+
+            if (typeof window.localStorage != "undefined") {
+                authtoken = localStorage.authentication_token;
+            }
+
+            if (typeof authtoken !== undefined) {
                 //console.log("Initializing Favorites list");
                 Artbot.favoriteList.fetchData();
             }
         }
     },
     fetchData: function() {
+        var authtoken;
+
+        if (typeof window.localStorage != "undefined") {
+            authtoken = localStorage.authentication_token;
+        }
+
         $.mobile.loading('show');
         $.ajax({
             type: "GET",
@@ -25036,7 +24994,7 @@ Artbot.favoriteList = {
                 per_page:10000
             },
             beforeSend: function (request) {
-                request.setRequestHeader("authentication_token", $.cookie('token'));
+                request.setRequestHeader("authentication_token", authtoken);
             },
             success: function( data ) {
                 //console.log("Successfully fetched Favorites data");
@@ -25141,7 +25099,13 @@ Artbot.interests = {
     init: function() {
         if ($("#interest-form").length > 0) {
             
-            if ($.cookie('token') !== undefined) {
+            var authtoken;
+
+            if (typeof window.localStorage != "undefined") {
+                authtoken = localStorage.authentication_token;
+            }
+
+            if (typeof authtoken !== undefined) {
 
                 console.log("Initializing functionality for My Interests");
 
@@ -25209,7 +25173,7 @@ Artbot.interests = {
                         url: Artbot.interests.vars.ajaxURL,
                         data: Artbot.interests.vars.ajaxData,
                         beforeSend: function (request) {
-                            request.setRequestHeader("authentication_token", $.cookie('token'));
+                            request.setRequestHeader("authentication_token", authtoken);
                         },
                         success: function ( data, textStatus, jqXHR ) {
                             console.log(Artbot.interests.vars.ajaxSuccessMsg);
@@ -25242,11 +25206,17 @@ Artbot.interests = {
         Artbot.interests.vars.ajaxSuccessMsg = "Successfully checked list of user's interests";
         Artbot.interests.vars.ajaxErrorMsg = "Check of user's interest list failed";
 
+        var authtoken;
+
+        if (typeof window.localStorage != "undefined") {
+            authtoken = localStorage.authentication_token;
+        }
+
         $.ajax({
             type: Artbot.interests.vars.ajaxType,
             url: Artbot.interests.vars.ajaxURL,
             beforeSend: function (request) {
-                request.setRequestHeader("authentication_token", $.cookie('token'));
+                request.setRequestHeader("authentication_token", authtoken);
             },
             success: function ( data, textStatus, jqXHR ) {
                 console.log(Artbot.interests.vars.ajaxSuccessMsg);
@@ -25338,12 +25308,18 @@ Artbot.interests = {
                 allTags = allTagsData.tags;
                 //console.log("Total number of tags: " + allTags.length);
 
+                var authtoken;
+
+                if (typeof window.localStorage != "undefined") {
+                    authtoken = localStorage.authentication_token;
+                }
+
                 // User's interests Ajax call
                 $.ajax({
                     type: "GET",
                     url: Artbot.var.jsonDomain + "/interests/",
                     beforeSend: function (request) {
-                        request.setRequestHeader("authentication_token", $.cookie('token'));
+                        request.setRequestHeader("authentication_token", authtoken);
                     },
                     success: function ( userTagsData, textStatus, jqXHR ) {
                         console.log("Successfully retrieved list of user's interests for subsetting");
@@ -25399,11 +25375,17 @@ Artbot.interests = {
         return unchecked;
     },
     getUserInterests: function() {
+        var authtoken;
+
+        if (typeof window.localStorage != "undefined") {
+            authtoken = localStorage.authentication_token;
+        }
+
         $.ajax({
             type: "GET",
             url: Artbot.var.jsonDomain + "/interests/",
             beforeSend: function (request) {
-                request.setRequestHeader("authentication_token", $.cookie('token'));
+                request.setRequestHeader("authentication_token", authtoken);
             },
             success: function ( data, textStatus, jqXHR ) {
                 console.log("Successfully retrieved list of user's interests");
@@ -25425,7 +25407,6 @@ Artbot.login = {
     init: function() {
         if ($("#signin-form").length > 0) {
             console.log("Initializing sign-in form");
-            console.log("Value of token cookie: " + $.cookie('token'));
 
             $("#signin-form").validate({
                 submitHandler: Artbot.login.ajaxSubmit
@@ -25450,11 +25431,15 @@ Artbot.login = {
                 password:  $("#signin-password").val()
             },
             success: function( data ){
-                console.log("Login successful! Saving a cookie");
-                $.cookie('token', data.authentication_token);
-                $.cookie('currentuser', $("#email").val());
-                $.cookie('currentuser', $("#signin-email").val());
-                $.cookie('signedup', true, { expires: 3650 });
+                console.log("Login successful! Saving our signin info");
+
+                if (typeof window.localStorage != "undefined") {
+                    localStorage.authentication_token = data.authentication_token;
+                    localStorage.current_user = $("#email").val();
+                    localStorage.current_user = $("#signin-email").val();
+                    localStorage.signed_up = true;
+                }
+
                 if (!Artbot.el.html.hasClass("is-logged-in")) {
                     Artbot.el.html.addClass("is-logged-in");
                 }
@@ -25524,9 +25509,11 @@ Artbot.logout = {
             console.log("Log out link clicked!");
             // Remove any existing "remember last page" value for signup
             Artbot.signupModal.vars.returnToPage = "";
-            // Remove the authorization token and username cookies
-            $.removeCookie('token');
-            $.removeCookie('currentuser');
+            
+            // Remove the authorization token and username localStorage
+            localStorage.removeItem("authentication_token");
+            localStorage.removeItem("current_user");
+
             // Remove the "is-logged-in" class from the HTML element
             Artbot.el.html.removeClass("is-logged-in");
             // Send them back to the main Discover page
@@ -25888,18 +25875,20 @@ Artbot.resetPassword = {
     },
     ajaxSubmit: function() {
         // Testing
-        console.log("New password: " + $("#passwordreset-password").val());
-        console.log("New password confirmed: " + $("#passwordreset-confirmpassword").val());
-        console.log("Password reset token from querystring: " + Artbot.resetPassword.token);
+        //console.log("New password: " + $("#password").val());
+        //console.log("New password confirmed: " + $("#password_confirmation").val());
+        //console.log("Password reset token from querystring: " + Artbot.resetPassword.token);
 
-        /*$.mobile.loading('show');
+        $.mobile.loading('show');
         $.ajax({
             type: "PUT",
-            url: Artbot.var.jsonDomain + "/registrations/",
+            url: Artbot.var.jsonDomain + "/registrations",
             data: {
-                password: $("#passwordreset-password").val(),
-                password_confirmation: $("#passwordreset-confirmpassword").val(),
-                reset_password_token: Artbot.resetPassword.token
+                password: $("#password").val(),
+                password_confirmation: $("#password_confirmation").val()
+            },
+            beforeSend: function (request) {
+                request.setRequestHeader("reset_password_token", Artbot.resetPassword.token);
             },
             success: function(data, textStatus, jqXHR) {
                 console.log("Password reset successful");
@@ -25914,7 +25903,7 @@ Artbot.resetPassword = {
             complete: function() {
                 $.mobile.loading('hide');
             }
-        });*/
+        });
     }
 };
 
@@ -25955,9 +25944,20 @@ Artbot.startup = {
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
 
+        var authtoken;
+        var signedup;
+
+        if (typeof window.localStorage != "undefined") {
+            authtoken = localStorage.authentication_token;
+            signedup = localStorage.signed_up;
+        }
+
+        console.log("Auth token: " + authtoken);
+        console.log("Signed up: " + signedup);
+
         // If it's the Discover page, we need to pop the signup modal every visit but only if not logged in and haven't signed up yet
         if ($("#discover-slider").length > 0) {
-            if (($.cookie('token') === undefined) && ($.cookie('signedup') === undefined)) {
+            if ((typeof authtoken === "undefined") && (typeof signedup === "undefined")) {
                 console.log("Popping the new visitor sign up window");
                 setTimeout(function(){
                     Artbot.signupModal.open();
@@ -25965,22 +25965,25 @@ Artbot.startup = {
             }
         } else {
             // If they're a new visitor, pop the Sign Up window
-            if (($.cookie('token') === undefined) && (Artbot.var.hasVisitedBefore !== true) && ($(".ui-page-active").attr("data-url") != "/sign-in.html")) {
+            if ((typeof authtoken === "undefined") && (Artbot.var.hasVisitedBefore !== true) && ($(".ui-page-active").attr("data-url") != "/sign-in.html")) {
 
                 console.log("Popping the new visitor sign up window");
                 setTimeout(function(){
                     Artbot.signupModal.open();
                 },1000);
 
-                // Plant the cookie for next time
-                $.cookie('priorvisit', 'yes', { expires: 365 * 10, path: '/' });
+                // Plant the localStorage for next time
+                if (typeof window.localStorage != "undefined") {
+                    localStorage.prior_visit = true;
+                }
+                
                 // Set the variable to true as well
                 Artbot.var.hasVisitedBefore = true;
             }
         }
 
         // If they're already logged in, let's add the CSS class for that
-        if ($.cookie('token') !== undefined) {
+        if (typeof authtoken !== "undefined") {
             if (!Artbot.el.html.hasClass("is-logged-in")) {
                 Artbot.el.html.addClass("is-logged-in");
             }
@@ -26085,13 +26088,17 @@ $(document).on( "pagecontainershow", function( event ) {
         namespace.init();
     }
 
-    //console.log("Cookie value: " + $.cookie('priorvisit'));
+    // Check for a localStorage value that says that they've visited before.
+    var prior_visit;
 
-    // Check for a cookie that says that they've visited before.
-    if ($.cookie('priorvisit') === undefined) {
-        //console.log("Checking cookie -- new visitor");
+    if (typeof window.localStorage != "undefined") {
+        prior_visit = localStorage.prior_visit;
+    }
+
+    if (typeof prior_visit === "undefined") {
+        //console.log("Checking localStorage -- new visitor");
     } else {
-        //console.log("Checking cookie -- they've been here before");
+        //console.log("Checking localStorage -- they've been here before");
         Artbot.var.hasVisitedBefore = true;
     }
 
