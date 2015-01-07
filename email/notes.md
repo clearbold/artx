@@ -23,6 +23,8 @@ When the layout gets below 600px, these images flip to stacked and become 100% w
 
 It might be best to generate images at 564x376 with quality set to 60 or 70. That will provide enough pixel density at most resolutions or layouts while also aiming to keep file size in check. It's important to be mindful of file size in email, where users are more like to open something up on a cellular connection and incur data charges. (With the web app, they can choose not to browse to it.)
 
+One possibility to support this would be an API endpoint that would take width & height parameters on the URL along with an event ID *or* img name, and would return the resized image.
+
 It's also recommended that we populate the @alt attribute on these images, as that will display in email clients where images are turned off.
 
 #### Links
