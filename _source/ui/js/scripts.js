@@ -273,8 +273,6 @@ Artbot.dataService = {
 // Variables that can be used throughout
 Artbot.var = {
     itemsPerPage : 5,
-    isInitialLoad: true,
-    hasVisitedBefore: false,
     jsonDomain: "http://artx-staging.herokuapp.com",
     eventDetailID: 1, // acts as a fallback in case for some reason the Events data doesn't load
     venueDetailID: 1, // acts as a fallback in case for some reason the Venue data doesn't load
@@ -1131,6 +1129,7 @@ Artbot.signupModal = {
                 if (typeof window.localStorage != "undefined") {
                     localStorage.authentication_token = data.user.authentication_token;
                     localStorage.current_user = $("#email").val();
+
                     localStorage.signed_up = true;
                 }
                 $.mobile.pageContainer.pagecontainer ("change", "interests.html", {reloadPage: true});
@@ -2534,7 +2533,15 @@ Artbot.login = {
         // Record the page you're on when a signin link is clicked
         $(".signin-link").click(function() {
             //console.log("Clicking the sign in link!");
+            
             Artbot.signupModal.vars.returnToPage = $(".ui-page-active").attr("data-url");
+
+            // If that page was one of the Forgot Password pages, redirect to Discover
+            if (Artbot.signupModal.vars.returnToPage.substring(0, 7) == "/forgot") {
+                
+                Artbot.signupModal.vars.returnToPage = "/index.html";
+            }
+
             //console.log("Artbot.signupModal.vars.returnToPage: " + Artbot.signupModal.vars.returnToPage);
         });
     },
@@ -2555,7 +2562,12 @@ Artbot.login = {
                     localStorage.authentication_token = data.authentication_token;
                     localStorage.current_user = $("#email").val();
                     localStorage.current_user = $("#signin-email").val();
-                    localStorage.signed_up = true;
+                    
+                    // If it's a pre-existing user without a signed_up variable, create one now
+                    if (typeof localStorage.signed_up == "undefined") {
+                        console.log("Adding a 'signed_up' localStorage variable");
+                        localStorage.signed_up = true;
+                    }
                 }
 
                 if (!Artbot.el.html.hasClass("is-logged-in")) {
@@ -3067,38 +3079,37 @@ Artbot.startup = {
 
         if (typeof window.localStorage != "undefined") {
             authtoken = localStorage.authentication_token;
+            currentuser = localStorage.current_user;
             signedup = localStorage.signed_up;
             priorvisit = localStorage.prior_visit;
+            //rememberme = localStorage.remember_me;
         }
 
-        //console.log("Auth token: " + authtoken);
+        console.log("Auth token: " + authtoken);
+        console.log("Current user: " + currentuser);
         console.log("Signed up: " + signedup);
         console.log("Prior visit: " + priorvisit);
+        //console.log("Remember Me: " + rememberme);
 
-        // If it's the Discover page, we need to pop the signup modal every visit but only if not logged in and haven't signed up yet
-        if ($("#discover-slider").length > 0) {
-            if ((typeof authtoken === "undefined") && (typeof signedup === "undefined")) {
-                console.log("Popping the new visitor sign up window");
-                setTimeout(function(){
-                    Artbot.signupModal.open();
-                },1000);
-            }
-        } else {
-            // If they're a new visitor, pop the Sign Up window
-            if ((typeof authtoken === "undefined") && (Artbot.var.hasVisitedBefore !== true) && ($(".ui-page-active").attr("data-url") != "/sign-in.html")) {
+        // If they aren't logged in and haven't signed up and it's not a login-related page...
+        if ((typeof authtoken == "undefined") && (typeof signedup == "undefined")  && ($(".ui-page-active").attr("data-url") != "/sign-in.html") && ($(".ui-page-active").attr("data-url") != "/forgot-password.html") && ($(".ui-page-active").attr("data-url") != "/forgot-password-confirm.html") && ($(".ui-page-active").attr("data-url") != "/forgot-password-reset.html") && ($(".ui-page-active").attr("data-url") != "/forgot-password-reset-confirm.html")) {
 
+            if ($("#discover-slider").length > 0) {
+                // If it's the Discover page, always pop the modal.
                 console.log("Popping the new visitor sign up window");
                 setTimeout(function(){
                     Artbot.signupModal.open();
                 },1000);
 
-                // Plant the localStorage for next time
-                if (typeof window.localStorage != "undefined") {
-                    localStorage.prior_visit = true;
-                }
-                
-                // Set the variable to true as well
-                Artbot.var.hasVisitedBefore = true;
+            } else {
+                // If it's not the Discover page,
+                // Check for priorvisit
+                if ((typeof priorvisit === "undefined")) {
+                    console.log("Popping the new visitor sign up window");
+                    setTimeout(function(){
+                        Artbot.signupModal.open();
+                    },1000);
+                } 
             }
         }
 
@@ -3135,7 +3146,7 @@ $(document).ready(function() {
  */
 
 $(document).on( "mobileinit", function( event ) {
-    //console.log("****JQM mobileinit event firing");
+    console.log("****JQM mobileinit event firing");
     $.mobile.popup.prototype.options.history = false;
 });
 
@@ -3175,8 +3186,10 @@ $(document).on( "pagebeforehide", function( event ) {
     /* Destroying interest checkbox bindings before hiding a page */
     Artbot.interests.destroy();
 
-    // Setting the initial load variable to false, as we're moving to another page
-    Artbot.var.isInitialLoad = false;
+    // Setting the Prior Visit variable if it doesn't already exist
+    if ((typeof window.localStorage != "undefined") && (typeof localStorage.prior_visit == "undefined")) {
+        localStorage.prior_visit = true;
+    }
 });
 
 
@@ -3208,22 +3221,14 @@ $(document).on( "pagecontainershow", function( event ) {
         namespace.init();
     }
 
-    // Check for a localStorage value that says that they've visited before.
-    var prior_visit;
-
-    if (typeof window.localStorage != "undefined") {
-        prior_visit = localStorage.prior_visit;
-    }
-
-    if (typeof prior_visit === "undefined") {
-        //console.log("Checking localStorage -- new visitor");
-    } else {
-        //console.log("Checking localStorage -- they've been here before");
-        Artbot.var.hasVisitedBefore = true;
-    }
-
     if (typeof namespace.finalize === 'function') {
         namespace.finalize();
+    }
+
+    // Check for a localStorage value that says that they've visited before 
+    // (in case they only hit one page and the pagehide event never fires)
+    if ((typeof window.localStorage != "undefined") && (typeof localStorage.prior_visit == "undefined")) {
+        localStorage.prior_visit = true;
     }
 
     //console.log("***End of new page load scripts");
