@@ -1,6 +1,6 @@
-### Content Questions
+### Content
 
-* What's the difference between
+Regarding the "See more..." links under "Your upcoming events" and "Your exhibitions" list, we're not distinguishing events & exhibitions in Favorites, so there's no way to link to those separately.
 
 ### Recommended and "Don't Miss" Events
 
@@ -23,6 +23,8 @@ When the layout gets below 600px, these images flip to stacked and become 100% w
 
 It might be best to generate images at 564x376 with quality set to 60 or 70. That will provide enough pixel density at most resolutions or layouts while also aiming to keep file size in check. It's important to be mindful of file size in email, where users are more like to open something up on a cellular connection and incur data charges. (With the web app, they can choose not to browse to it.)
 
+One possibility to support this would be an API endpoint that would take width & height parameters on the URL along with an event ID *or* img name, and would return the resized image.
+
 It's also recommended that we populate the @alt attribute on these images, as that will display in email clients where images are turned off.
 
 #### Links
@@ -32,3 +34,13 @@ Note that all individual elements are linked. For example, each Recommended even
 #### Preheader
 
 The email has a hidden preheader table at the top. This is hidden text that we don't reveal in the email, but which shows up in the inbox preview. You may customize this or make it dynamic, but do a personal inbox test to review it as you won't see it without doing so.
+
+### CAN-SPAM
+
+CAN-SPAM law requires that you identify the sender with a real address, which I've accommodated in the footer.
+
+See https://en.wikipedia.org/wiki/CAN-SPAM_Act_of_2003#The_mechanics_of_CAN-SPAM
+
+### Analytics
+
+You might want to explore how Mandrill supports click and open analytics. If we were sending these through an ESP there'd be more robust support on that front. Litmus has a more robust email analytics platform that can be included, but would cost additional money.
