@@ -2977,7 +2977,7 @@ Artbot.resetPassword = {
             console.log("Initializing Reset Password form");
 
             // Get the password change token from a querystring
-            Artbot.resetPassword.token = Artbot.util.findQuerystring("p");
+            Artbot.resetPassword.token = Artbot.util.findQuerystring("reset_password_token");
             
             if (typeof Artbot.resetPassword.token != 'undefined') {
                 console.log("Reset password token passed in via querystring: " + Artbot.resetPassword.token);

@@ -3068,10 +3068,12 @@ Artbot.startup = {
         if (typeof window.localStorage != "undefined") {
             authtoken = localStorage.authentication_token;
             signedup = localStorage.signed_up;
+            priorvisit = localStorage.prior_visit;
         }
 
-        console.log("Auth token: " + authtoken);
+        //console.log("Auth token: " + authtoken);
         console.log("Signed up: " + signedup);
+        console.log("Prior visit: " + priorvisit);
 
         // If it's the Discover page, we need to pop the signup modal every visit but only if not logged in and haven't signed up yet
         if ($("#discover-slider").length > 0) {
