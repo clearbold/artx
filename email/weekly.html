@@ -69,11 +69,15 @@
     .event-name {
         font-size: 18px;
     }
-    .event-museum {
+    .event-museum,
+    .event-misc {
         font-size: 14px;
+    }
+    .event-museum {
         text-transform: uppercase;
     }
-        .event-museum a {
+        .event-museum,
+        .event-misc a {
             color: #FFFFFF;
         }
     .footer {
@@ -110,16 +114,36 @@
             width: 100% !important;
         }
         td[class=header],
+        td[class=text],
         td[class=event-name],
         td[class=event-museum],
         td[class=footer] {
             padding-right: 20px !important;
             padding-left: 20px !important;
         }
+        td[class=list-thumbnail] {
+            width: 100px !important;
+        }
+        td[class=list-thumbnail] img {
+            height: 66px !important;
+            width: 94px !important;
+        }
+        td[class=list-text] td[class=event-name] {
+            font-size: 16px;
+            padding-left: 0px !important;
+        }
+        td[class=list-text] td[class=event-museum],
+        td[class=list-text] td[class=event-misc] {
+            font-size: 12px;
+            padding-left: 0px !important;
+        }
     }
 </style>
 </head>
 <body bgcolor="#373737" style="margin: 0; padding: 0;">
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr><td bgcolor="#373737" width="100%" style="padding: 40px 0 0 0">
+
     <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="display: none; max-height: 0px; max-width: 600px; overflow: hidden; visibility: hidden;" class="preheader">
         <tr>
             <td><p style="font-size: 0; line-height: 0; max-height: 0px; overflow: hidden; visibility: hidden;">Your weekly update from Artbotapp.com.</p></td>
@@ -132,7 +156,95 @@
                 <div align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
                     <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
                         <tr>
-                            <td align="left" class="header">Artbot thinks you might like</td>
+                            <td align="left" class="text">This is your weekly update from Artbot. To change which emails you receive, you may <a href="http://artbotapp.com/settings.html">update your Artbot settings</a>.</td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+    </table>
+
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td width="100%" style="padding: 0px 0px 20px 0px;">
+                <div align="center">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
+                        <tr>
+                            <td align="left" class="header">Artbot thinks you might like:</td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+    </table>
+
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <!-- top & bottom padding -->
+            <td width="100%" style="padding: 0px 0px 0px 0px;">
+                <!-- left/right padding + centering of table -->
+                <div align="center" style="padding: 0px 0px 0px 0px;">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
+                        <tr>
+                            <td align="center" valign="top" width="300" style="padding: 0px 0px 40px 0px;" class="mobile-stack">
+                                <div align="left" style="padding: 0px 0px 0px 0px;">
+                                    <table border="0" cellpadding="0" cellspacing="0" width="282" class="wrapper">
+                                        <tr>
+                                            <td style="padding: 0px 0px 10px 0px;">
+                                                <a href="#"><img src="http://placeimg.com/282/188/arch" width="282" height="188" alt="Innovations: The Harvard Rothko Murals Project" class="responsive" /></a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 0px 0px 8px 0px;" class="event-name"><a href="#">Innovations: The Harvard Rothko Murals Project</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="event-museum"><a href="#">Harvard Art Museums</a></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </td>
+                            <td align="center" valign="top" width="300" style="padding: 0px 0px 40px 0px;" class="mobile-stack">
+                                <div align="right" style="padding: 0px 0px 0px 0px;">
+                                    <table border="0" cellpadding="0" cellspacing="0" width="282" class="wrapper">
+                                        <tr>
+                                            <td style="padding: 0px 0px 10px 0px;">
+                                                <a href="#"><img src="http://placeimg.com/282/188/arch" width="282" height="188" alt="Innovations: The Harvard Rothko Murals Project" class="responsive" /></a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 0px 0px 8px 0px;" class="event-name"><a href="#">Innovations: The Harvard Rothko Murals Project</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="event-museum"><a href="#">Harvard Art Museums</a></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td width="100%" style="padding: 0px 0px 40px 0px;">
+                <div align="center">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
+                        <tr>
+                            <td align="left" class="header"><a href="http://artbotapp.com/bylocation.html">Discover more events &amp; exhibitions near you &raquo;</a></td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+    </table>
+
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td width="100%" style="padding: 0px 0px 20px 0px;">
+                <div align="center">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
+                        <tr>
+                            <td align="left" class="header">Don&rsquo;t Miss These!</td>
                         </tr>
                     </table>
                 </div>
@@ -191,21 +303,7 @@
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
         <tr>
             <td width="100%" style="padding: 0px 0px 20px 0px;">
-                <div align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
-                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
-                        <tr>
-                            <td align="left" class="header">Don&rsquo;t Miss These!</td>
-                        </tr>
-                    </table>
-                </div>
-            </td>
-    </table>
-
-
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-        <tr>
-            <td width="100%" style="padding: 0px 0px 20px 0px;">
-                <div align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
+                <div align="center">
                     <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
                         <tr>
                             <td align="left" class="header">Your Upcoming Events</td>
@@ -218,7 +316,69 @@
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
         <tr>
             <td width="100%" style="padding: 0px 0px 20px 0px;">
-                <div align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
+                <div align="center">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
+                        <tr>
+                            <td align="left" valign="top" width="160" style="padding: 0px 0px 20px 0px;" class="list-thumbnail"><a href="#"><img src="http://placeimg.com/141/99/arch" width="141" height="99" alt="Innovations: The Harvard Rothko Murals Project" /></a></td>
+                            <td valign="top" style="padding: 0px 0px 20px 0px;" class="list-text">
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td style="padding: 0px 0px 8px 0px;" class="event-name"><a href="#">Innovations: The Harvard Rothko Murals Project</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="event-museum"><a href="#">Harvard Art Museums</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="event-misc"><a href="#">Friday, December 5, 2014</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="event-misc"><a href="#">11:00am-12:00pm</a></td>
+                                    </tr>
+                                </table>
+                            </td>
+                    </table>
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
+                        <tr>
+                            <td align="left" valign="top" width="160" style="padding: 0px 0px 20px 0px;" class="list-thumbnail"><a href="#"><img src="http://placeimg.com/141/99/arch" width="141" height="99" alt="Innovations: The Harvard Rothko Murals Project" /></a></td>
+                            <td valign="top" style="padding: 0px 0px 20px 0px;" class="list-text">
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td style="padding: 0px 0px 8px 0px;" class="event-name"><a href="#">Celebrating the Release of American Paintings at Harvard, Volume One</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="event-museum"><a href="#">Harvard Art Museums</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="event-misc"><a href="#">Friday, December 5, 2014</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="event-misc"><a href="#">11:00am-12:00pm</a></td>
+                                    </tr>
+                                </table>
+                            </td>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td width="100%" style="padding: 0px 0px 40px 0px;">
+                <div align="center">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
+                        <tr>
+                            <td align="left" class="header"><a href="http://artbotapp.com/favorites.html">View all your saved events &raquo;</a></td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+    </table>
+
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td width="100%" style="padding: 0px 0px 20px 0px;">
+                <div align="center">
                     <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
                         <tr>
                             <td align="left" class="header">Your Upcoming Exhibitions</td>
@@ -230,8 +390,51 @@
 
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
         <tr>
+            <td width="100%" style="padding: 0px 0px 20px 0px;">
+                <div align="center">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
+                        <tr>
+                            <td align="left" valign="top" width="160" style="padding: 0px 0px 20px 0px;" class="list-thumbnail"><a href="#"><img src="http://placeimg.com/141/99/arch" width="141" height="99" alt="Innovations: The Harvard Rothko Murals Project" /></a></td>
+                            <td valign="top" style="padding: 0px 0px 20px 0px;" class="list-text">
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td style="padding: 0px 0px 8px 0px;" class="event-name"><a href="#">Shinique Smith: Bright Matter</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="event-museum"><a href="#">Museum of Fine Arts</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="event-misc"><a href="#">On view until March 1, 2015</a></td>
+                                    </tr>
+                                </table>
+                            </td>
+                    </table>
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
+                        <tr>
+                            <td align="left" valign="top" width="160" style="padding: 0px 0px 20px 0px;" class="list-thumbnail"><a href="#"><img src="http://placeimg.com/141/99/arch" width="141" height="99" alt="Innovations: The Harvard Rothko Murals Project" /></a></td>
+                            <td valign="top" style="padding: 0px 0px 20px 0px;" class="list-text">
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td style="padding: 0px 0px 8px 0px;" class="event-name"><a href="#">FreePort [No. 005]: Michael Lin</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="event-museum"><a href="#">Peabody Essex Museum</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="event-misc"><a href="#">On view until December 1, 2014 </a></td>
+                                    </tr>
+                                </table>
+                            </td>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
             <td width="100%" style="padding: 0px 0px 0px 0px;">
-                <div align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
+                <div align="center">
                     <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper">
                         <tr>
                             <td align="left" class="footer">
@@ -247,6 +450,7 @@
             </td>
         </tr>
     </table>
-
+</td></tr>
+</table>
 </body>
 </html>
