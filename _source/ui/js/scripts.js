@@ -225,6 +225,26 @@ Artbot.util = {
             console.log("No more results");
             return false;
         }
+    },
+    getAuthToken: function() {
+        // First, try to load up the variable from sessionStorage
+        authtoken = sessionStorage.authentication_token;
+
+        // If it doesn't exist in sessionStorage, use localStorage
+        if (typeof authtoken == "undefined") {
+            authtoken = localStorage.authentication_token;
+        }
+        return authtoken;
+    },
+    getCurrentUser: function() {
+        // First, try to load up the variables from sessionStorage
+        currentuser = sessionStorage.current_user;
+
+        // If it doesn't exist in sessionStorage, use localStorage
+        if (typeof currentuser == "undefined") {
+            currentuser = localStorage.current_user;
+        }
+        return currentuser;
     }
 };
 
@@ -293,16 +313,12 @@ Artbot.discoverSlider = {
     populateSlider: function() {
 
         var beforeSendFunction = function() {}; // blank function for now
-        var authtoken;
+        var authtoken = Artbot.util.getAuthToken();
 
-        if (typeof window.localStorage != "undefined") {
-            authtoken = localStorage.authentication_token;
-
-            if (typeof authtoken !== "undefined") {
-                beforeSendFunction = function(request) {
-                    request.setRequestHeader("authentication_token", authtoken);
-                };
-            }
+        if (typeof authtoken !== "undefined") {
+            beforeSendFunction = function(request) {
+                request.setRequestHeader("authentication_token", authtoken);
+            };
         }
 
         $.mobile.loading('show');
@@ -452,11 +468,7 @@ Artbot.footerSlider = {
             //console.log("Initializing Favorites slider");
             
             // Check if the user is logged in
-            var authtoken;
-
-            if (typeof window.localStorage != "undefined") {
-                authtoken = localStorage.authentication_token;
-            }
+            var authtoken = Artbot.util.getAuthToken();
 
             if (typeof authtoken !== "undefined") {
                 // User is logged in, so we can fetch the favorites
@@ -839,11 +851,7 @@ Artbot.favoriteStars = {
 
             $(".favorite-star").click(function() {
 
-                var authtoken;
-
-                if (typeof window.localStorage != "undefined") {
-                    authtoken = localStorage.authentication_token;
-                }
+                var authtoken = Artbot.util.getAuthToken();
 
                 if (typeof authtoken !== "undefined") {
                     // The user is logged in, so we can save or delete the favorite
@@ -954,11 +962,7 @@ Artbot.favoriteStars = {
     },
     sync : function() {
         /* This function checks all favorite stars currently present in the page, and compares them against the current user's saved favorites (if logged in).  If there's a match, that star will be highlighted. */
-        var authtoken;
-
-        if (typeof window.localStorage != "undefined") {
-            authtoken = localStorage.authentication_token;
-        }
+        var authtoken = Artbot.util.getAuthToken();
         
         if (($(".favorite-star").length > 0) && (typeof authtoken !== "undefined")) {
             //console.log("Syncing stars with user's favorites");
@@ -1126,12 +1130,11 @@ Artbot.signupModal = {
             success: function( data ){
                 //console.log(data);
 
-                if (typeof window.localStorage != "undefined") {
-                    localStorage.authentication_token = data.user.authentication_token;
-                    localStorage.current_user = $("#email").val();
-
-                    localStorage.signed_up = true;
-                }
+                // On signup, we're always using localStorage because "Remember Me" is assumed to be true.
+                localStorage.authentication_token = data.user.authentication_token;
+                localStorage.current_user = $("#email").val();
+                localStorage.signed_up = true;
+                
                 $.mobile.pageContainer.pagecontainer ("change", "interests.html", {reloadPage: true});
             },
             error: function (jqXHR, error, errorThrown) {
@@ -1679,13 +1682,31 @@ Artbot.loadMore = {
    ========================================================================== */
 Artbot.settings = {
     init: function() {
+        // On every page load, define a Remember Me default for the current user if it doesn't exist yet
+        
+        if ((typeof localStorage.remember_me == "undefined") && (typeof localStorage.current_user != "undefined")) {
+
+            // Remember Me variable doesn't exist at all yet, set up a default value
+            Artbot.settings.setRememberMe(localStorage.current_user, true);
+
+        } else if ((typeof localStorage.remember_me != "undefined") && (typeof localStorage.current_user != "undefined")) {
+            
+            // Remember Me variable exists and we have a logged-in user
+            // Check to see if we already have a Remember Me setting for this user
+            var userSetting = Artbot.settings.getRememberMe(localStorage.current_user);
+
+            console.log("User setting: " + userSetting);
+            if (typeof userSetting == "undefined") {
+                console.log("Setting a default Remember Me value for " + localStorage.current_user);
+                Artbot.settings.setRememberMe(localStorage.current_user, true);
+            }
+        }
+        
+
+        // If it's the Settings page, more setup is needed
         if ($("#settings-form").length > 0) {
 
-            var authtoken;
-
-            if (typeof window.localStorage != "undefined") {
-                authtoken = localStorage.authentication_token;
-            }
+            var authtoken = Artbot.util.getAuthToken();
 
             if (typeof authtoken !== "undefined") {
                 //console.log("Initializing app settings");
@@ -1707,8 +1728,45 @@ Artbot.settings = {
             } 
         }
     },
+    setRememberMe: function(remembermeuser, remembermevalue) {
+        var rememberMeValue = remembermevalue;
+        var rememberMeUser = remembermeuser;
+
+        /*
+        We want the remember me data to look something like this:
+        rememberme = {
+            sma@clearbold.com: true,
+            user2@example.com: true,
+            user3@example.com: false
+        }
+        */
+
+        // Get any current data from the remember me variable
+        var rememberMeData = JSON.parse(localStorage.getItem("remember_me"));
+        if (rememberMeData === null) {
+            rememberMeData = {};
+        }
+        console.log("Existing Remember Me data: " + JSON.stringify(rememberMeData));
+
+        rememberMeData[rememberMeUser] = rememberMeValue;
+        console.log("New Remember Me data: " + JSON.stringify(rememberMeData));
+
+        localStorage.remember_me = JSON.stringify(rememberMeData);
+    },
+    getRememberMe: function(remembermeuser) {
+        var rememberMeValue,
+        rememberMeUser = remembermeuser;
+    
+        var rememberMeData = JSON.parse(localStorage.getItem("remember_me"));
+        if (rememberMeData === null) {
+            rememberMeData = {};
+        }
+
+        rememberMeValue = rememberMeData[rememberMeUser];
+        return rememberMeValue;
+    },
     fetchFieldValues: function() {
-        var authtoken = localStorage.authentication_token;
+        var authtoken = Artbot.util.getAuthToken();
         $.ajax({
             type: "GET",
             url: Artbot.var.jsonDomain + "/preferences/",
@@ -1761,11 +1819,7 @@ Artbot.settings = {
         var ajaxDataToSend = {};
         ajaxDataToSend[checkboxID] = isCheckboxChecked;
 
-        var authtoken;
-
-        if (typeof window.localStorage != "undefined") {
-            authtoken = localStorage.authentication_token;
-        }
+        var authtoken = Artbot.util.getAuthToken();
 
         $.mobile.loading('show');
         $.ajax({
@@ -1800,11 +1854,7 @@ Artbot.settings = {
 
         $.mobile.loading('show');
 
-        var authtoken;
-
-        if (typeof window.localStorage != "undefined") {
-            authtoken = localStorage.authentication_token;
-        }
+        var authtoken = Artbot.util.getAuthToken();
 
         $.ajax({
             type: "PATCH",
@@ -1836,11 +1886,7 @@ Artbot.historyList = {
     },
     init: function() {
         if ($("#target-historylist").length > 0) {
-            var authtoken;
-
-            if (typeof window.localStorage != "undefined") {
-                authtoken = localStorage.authentication_token;
-            }
+            var authtoken = Artbot.util.getAuthToken();
 
             if (typeof authtoken !== undefined) {
                 console.log("Initializing History list");
@@ -1851,11 +1897,7 @@ Artbot.historyList = {
     fetchData: function() {
         $.mobile.loading('show');
 
-        var authtoken;
-
-        if (typeof window.localStorage != "undefined") {
-            authtoken = localStorage.authentication_token;
-        }
+        var authtoken = Artbot.util.getAuthToken();
 
         $.ajax({
             type: "GET",
@@ -1989,11 +2031,7 @@ Artbot.historyList = {
 
         $.mobile.loading('show');
 
-        var authtoken;
-
-        if (typeof window.localStorage != "undefined") {
-            authtoken = localStorage.authentication_token;
-        }
+        var authtoken = Artbot.util.getAuthToken();
 
         $.ajax({
             type: "PUT",
@@ -2082,11 +2120,7 @@ Artbot.historyList = {
 Artbot.favoriteList = {
     init: function() {
         if ($("#target-favoritelist").length > 0) {
-            var authtoken;
-
-            if (typeof window.localStorage != "undefined") {
-                authtoken = localStorage.authentication_token;
-            }
+            var authtoken = Artbot.util.getAuthToken();
 
             if (typeof authtoken !== undefined) {
                 //console.log("Initializing Favorites list");
@@ -2095,11 +2129,7 @@ Artbot.favoriteList = {
         }
     },
     fetchData: function() {
-        var authtoken;
-
-        if (typeof window.localStorage != "undefined") {
-            authtoken = localStorage.authentication_token;
-        }
+        var authtoken = Artbot.util.getAuthToken();
 
         $.mobile.loading('show');
         $.ajax({
@@ -2216,11 +2246,7 @@ Artbot.interests = {
     init: function() {
         if ($("#interest-form").length > 0) {
             
-            var authtoken;
-
-            if (typeof window.localStorage != "undefined") {
-                authtoken = localStorage.authentication_token;
-            }
+            var authtoken = Artbot.util.getAuthToken();
 
             if (typeof authtoken !== undefined) {
 
@@ -2323,11 +2349,7 @@ Artbot.interests = {
         Artbot.interests.vars.ajaxSuccessMsg = "Successfully checked list of user's interests";
         Artbot.interests.vars.ajaxErrorMsg = "Check of user's interest list failed";
 
-        var authtoken;
-
-        if (typeof window.localStorage != "undefined") {
-            authtoken = localStorage.authentication_token;
-        }
+        var authtoken = Artbot.util.getAuthToken();
 
         $.ajax({
             type: Artbot.interests.vars.ajaxType,
@@ -2425,11 +2447,7 @@ Artbot.interests = {
                 allTags = allTagsData.tags;
                 //console.log("Total number of tags: " + allTags.length);
 
-                var authtoken;
-
-                if (typeof window.localStorage != "undefined") {
-                    authtoken = localStorage.authentication_token;
-                }
+                var authtoken = Artbot.util.getAuthToken();
 
                 // User's interests Ajax call
                 $.ajax({
@@ -2492,11 +2510,7 @@ Artbot.interests = {
         return unchecked;
     },
     getUserInterests: function() {
-        var authtoken;
-
-        if (typeof window.localStorage != "undefined") {
-            authtoken = localStorage.authentication_token;
-        }
+        var authtoken = Artbot.util.getAuthToken();
 
         $.ajax({
             type: "GET",
@@ -2558,17 +2572,25 @@ Artbot.login = {
             success: function( data ){
                 console.log("Login successful! Saving our signin info");
 
-                if (typeof window.localStorage != "undefined") {
+                var emailAddress = $("#signin-email").val();
+                var rememberMe = Artbot.settings.getRememberMe(emailAddress);
+                
+                if (rememberMe === false) {
+                    console.log("Remember Me: false; using sessionStorage");
+                    sessionStorage.authentication_token = data.authentication_token;
+                    sessionStorage.current_user = $("#signin-email").val();
+                } else {
+                    console.log("Remember Me: true; using localStorage");
                     localStorage.authentication_token = data.authentication_token;
-                    localStorage.current_user = $("#email").val();
                     localStorage.current_user = $("#signin-email").val();
-                    
-                    // If it's a pre-existing user without a signed_up variable, create one now
-                    if (typeof localStorage.signed_up == "undefined") {
-                        console.log("Adding a 'signed_up' localStorage variable");
-                        localStorage.signed_up = true;
-                    }
                 }
+
+                // If it's a pre-existing user without a signed_up variable, create one now
+                if (typeof localStorage.signed_up == "undefined") {
+                    console.log("Adding a 'signed_up' localStorage variable");
+                    localStorage.signed_up = true;
+                }
+        
 
                 if (!Artbot.el.html.hasClass("is-logged-in")) {
                     Artbot.el.html.addClass("is-logged-in");
@@ -2640,9 +2662,11 @@ Artbot.logout = {
             // Remove any existing "remember last page" value for signup
             Artbot.signupModal.vars.returnToPage = "";
             
-            // Remove the authorization token and username localStorage
+            // Remove the authorization token and username variables
             localStorage.removeItem("authentication_token");
             localStorage.removeItem("current_user");
+            sessionStorage.removeItem("authentication_token");
+            sessionStorage.removeItem("current_user");
 
             // Remove the "is-logged-in" class from the HTML element
             Artbot.el.html.removeClass("is-logged-in");
@@ -3074,16 +3098,10 @@ Artbot.startup = {
         // Initialize FastClick on certain items, to remove the 300ms delay on touch events
         FastClick.attach(document.body);
 
-        var authtoken;
-        var signedup;
-
-        if (typeof window.localStorage != "undefined") {
-            authtoken = localStorage.authentication_token;
-            currentuser = localStorage.current_user;
-            signedup = localStorage.signed_up;
+        var authtoken = Artbot.util.getAuthToken(),
+            currentuser = Artbot.util.getCurrentUser(),
+            signedup = localStorage.signed_up,
             priorvisit = localStorage.prior_visit;
-            //rememberme = localStorage.remember_me;
-        }
 
         console.log("Auth token: " + authtoken);
         console.log("Current user: " + currentuser);
@@ -3092,7 +3110,7 @@ Artbot.startup = {
         //console.log("Remember Me: " + rememberme);
 
         // If they aren't logged in and haven't signed up and it's not a login-related page...
-        if ((typeof authtoken == "undefined") && (typeof signedup == "undefined")  && ($(".ui-page-active").attr("data-url") != "/sign-in.html") && ($(".ui-page-active").attr("data-url") != "/forgot-password.html") && ($(".ui-page-active").attr("data-url") != "/forgot-password-confirm.html") && ($(".ui-page-active").attr("data-url") != "/forgot-password-reset.html") && ($(".ui-page-active").attr("data-url") != "/forgot-password-reset-confirm.html")) {
+        if ((typeof authtoken == "undefined") && (typeof signedup == "undefined")  && ($(".ui-page-active").attr("data-url") != "/sign-in.html") && ($(".ui-page-active").attr("data-url").substring(0, 7) != "/forgot")) {
 
             if ($("#discover-slider").length > 0) {
                 // If it's the Discover page, always pop the modal.
@@ -3187,7 +3205,7 @@ $(document).on( "pagebeforehide", function( event ) {
     Artbot.interests.destroy();
 
     // Setting the Prior Visit variable if it doesn't already exist
-    if ((typeof window.localStorage != "undefined") && (typeof localStorage.prior_visit == "undefined")) {
+    if (typeof localStorage.prior_visit == "undefined") {
         localStorage.prior_visit = true;
     }
 });
@@ -3227,7 +3245,7 @@ $(document).on( "pagecontainershow", function( event ) {
 
     // Check for a localStorage value that says that they've visited before 
     // (in case they only hit one page and the pagehide event never fires)
-    if ((typeof window.localStorage != "undefined") && (typeof localStorage.prior_visit == "undefined")) {
+    if (typeof localStorage.prior_visit == "undefined") {
         localStorage.prior_visit = true;
     }
 
