@@ -26105,6 +26105,10 @@ Artbot.startup = {
             if (!Artbot.el.html.hasClass("is-logged-in")) {
                 Artbot.el.html.addClass("is-logged-in");
             }
+            // Add in any dynamic usernames
+            if ($(".dynamic-username").length > 0) {
+                $(".dynamic-username").html(currentuser);
+            }
         }
 
         //console.log("**End of scripts finalizing");

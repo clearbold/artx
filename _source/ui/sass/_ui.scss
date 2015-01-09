@@ -1143,7 +1143,7 @@ div#event-map {
         li {
             display: block;
             margin: 0;
-            line-height:3em;
+            line-height:2.75em;
             border-top: 1px solid lighten($panel-background, 10%);
             border-bottom: 1px solid darken($panel-background, 10%);
 
@@ -1151,11 +1151,15 @@ div#event-map {
             &.active,
             &.sidr-class-active {
                 border-top:1px solid transparent;
-                line-height:3em;
+                line-height:2.75em;
 
-                > a, > span {
+                > a {
                     background:darken($panel-background, 5%);
                 }
+            }
+
+            &.menu-user-greeting:hover {
+                border-top: 1px solid lighten($panel-background, 10%);
             }
 
             a, span {
@@ -1164,10 +1168,20 @@ div#event-map {
                 text-decoration: none;
                 color: $panel-text-color;
                 font-weight:300;
-                
+            }
+            a {
                 &:hover {
                     color:$link-hover-color;
                 }
+            }
+            span {
+                display:block;
+                overflow:hidden;
+                white-space:nowrap;
+                text-overflow:ellipsis;
+            }
+            b {
+                font-weight:inherit;
             }
 
             ul {
@@ -1200,9 +1214,10 @@ div#event-map {
             }
         }
 
-        /* Menu changes when logged in */
+        /* Menu changes when not logged in */
         .menu-settings,
-        .menu-logout {
+        .menu-logout,
+        .menu-user-greeting {
             display:none;
         }
 
@@ -1213,7 +1228,8 @@ div#event-map {
 /* Toggling some logged-in/logged-out differences */
 .is-logged-in .menu-panel ul {
     .menu-settings,
-    .menu-logout {
+    .menu-logout,
+    .menu-user-greeting {
         display:block;
     }
     .menu-signin {
