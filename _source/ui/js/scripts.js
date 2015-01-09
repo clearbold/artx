@@ -233,6 +233,11 @@ Artbot.util = {
         // If it doesn't exist in sessionStorage, use localStorage
         if (typeof authtoken == "undefined") {
             authtoken = localStorage.authentication_token;
+            if (typeof authtoken != "undefined") {
+                console.log("Auth token is in localStorage");
+            }
+        } else {
+            console.log("Auth token is in sessionStorage");
         }
         return authtoken;
     },
@@ -243,6 +248,12 @@ Artbot.util = {
         // If it doesn't exist in sessionStorage, use localStorage
         if (typeof currentuser == "undefined") {
             currentuser = localStorage.current_user;
+
+            if (typeof currentuser != "undefined") {
+                console.log("Current user is in localStorage");
+            }
+        } else {
+            console.log("Current user is in sessionStorage");
         }
         return currentuser;
     }
@@ -1765,6 +1776,33 @@ Artbot.settings = {
         rememberMeValue = rememberMeData[rememberMeUser];
         return rememberMeValue;
     },
+    swapLocalAndSession: function(rememberme) {
+        var rememberMeValue = rememberme;
+        // Switch Remember Me if needed
+        if ((rememberMeValue === false) && (typeof localStorage.authentication_token != "undefined")) {
+            console.log("Switching to sessionStorage");
+            sessionStorage.authentication_token = localStorage.authentication_token;
+            sessionStorage.current_user = $("#email").val();
+            localStorage.removeItem("authentication_token");
+            localStorage.removeItem("current_user");
+
+            Artbot.settings.setRememberMe(sessionStorage.current_user, false);
+        } else if ((rememberMeValue === true) && (typeof sessionStorage.authentication_token != "undefined")) {
+            console.log("Switching to localStorage");
+            localStorage.authentication_token = sessionStorage.authentication_token;
+            localStorage.current_user = $("#email").val();
+            sessionStorage.removeItem("authentication_token");
+            sessionStorage.removeItem("current_user");
+
+            Artbot.settings.setRememberMe(localStorage.current_user, true);
+        }
+    },
+    bindCustomCheckboxes: function() {
+        Artbot.customCheckboxes.init("#settings-form");
+    },
+    unbindCustomCheckboxes: function() {
+        Artbot.customCheckboxes.destroy("#settings-form");
+    },
     fetchFieldValues: function() {
         var authtoken = Artbot.util.getAuthToken();
         $.ajax({
@@ -1785,14 +1823,21 @@ Artbot.settings = {
     },
     populateFieldValues: function(data) {
         var userInfo = data.user;
+        //console.log(JSON.stringify(data.user));
         var $allInputs = $("#settings-form").find("input");
+
+        // Reset the form, in case of caching (we want a fresh copy)
+        document.getElementById("settings-form").reset();
+
+        // Unbind the custom checkboxes, just in case
+        Artbot.settings.unbindCustomCheckboxes();
 
         $allInputs.each(function() {
             var key = $(this).attr("id");
             if (userInfo[key] !== undefined ) {
                 //console.log(key + ": " + userInfo[key]);
 
-                if ($(this).attr("type") == "checkbox") {
+                if ($(this).attr("data-role") == "flipswitch") {
                     if (userInfo[key] === true) {
                         $(this).attr("checked", "checked").flipswitch("refresh");
                     }
@@ -1800,10 +1845,36 @@ Artbot.settings = {
                     $(this).val(userInfo[key]);
                 }
             }
+
         });
 
+        // Sync up the custom checkbox for Remember Me
+        var rememberMeDate = userInfo.remember_created_at;
+        var $thisCheckbox = $("#remember_me");
+        var rememberMeValue;
+        console.log("Remember Me Date: " + rememberMeDate);
+
+        if (rememberMeDate !== null) {
+            //console.log("Remember Me should be set to true");
+            rememberMeValue = true;
+            if ($thisCheckbox.prop("checked") !== true) {
+                $thisCheckbox.prop("checked", true);
+            }
+        } else {
+            //console.log("Remember Me should be set to false");
+            rememberMeValue = false;
+            if ($thisCheckbox.prop("checked") === true) {
+                $thisCheckbox.prop("checked", false);
+            }
+        }
+        Artbot.settings.bindCustomCheckboxes();
+
+        // Switch local/session storage if needed
+        Artbot.settings.swapLocalAndSession(rememberMeValue);
+
+
         // Set up change event handling for the flip-switches
-        var $ajaxInputs = $("#settings-form").find("input[type=checkbox]");
+        var $ajaxInputs = $("#settings-form").find("input[data-role=flipswitch]");
         $ajaxInputs.change(function() {
             Artbot.settings.toggleThisOption(this);
         });
@@ -1846,11 +1917,24 @@ Artbot.settings = {
 
         var $this = $("#settings-form"),
             viewArr = $this.serializeArray(),
-            formData = {};
+            formData = {},
+            rememberMeValue;
 
         for (var i in viewArr) {
-            formData[viewArr[i].name] = viewArr[i].value;
+            if (viewArr[i].name != "remember_me") { // Remember Me has to be handled separately
+                formData[viewArr[i].name] = viewArr[i].value;
+            }
         }
+
+        // Add Remember Me
+        var $thisCheckbox = $("#remember_me");
+        if ($thisCheckbox.prop("checked") === true) {
+            rememberMeValue = true;
+        } else {
+            rememberMeValue = false;
+        }
+
+        formData.remember_me = rememberMeValue;
 
         $.mobile.loading('show');
 
@@ -1865,6 +1949,9 @@ Artbot.settings = {
             },
             success: function(data, textStatus, jqXHR) {
                 console.log("All user preferences successfully saved");
+
+                // Switch local/session storage if needed
+                Artbot.settings.swapLocalAndSession(rememberMeValue);
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Error saving all user preferences");
