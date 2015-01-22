@@ -1,3 +1,13 @@
+### Completed Files
+
+* `email/weekly.html` is the *source* HTML email.
+* `email/weekly_inline.html` is the *live* HTML email that you'll want to use for integration. It's very dense with lots of inlined styles (from [inliner.cm](http://inliner.cm)). Such is email.
+* `email/weekly_plaintext.txt` is the plaintext version you'll want to populate and include in a multipart package. Email services/clients look favorably upon multipart.
+
+### To Do
+
+* Font colors in AOL/Explorer
+
 ### Content
 
 Regarding the "See more..." links under "Your upcoming events" and "Your exhibitions" list, we're not distinguishing events & exhibitions in Favorites, so there's no way to link to those separately.
