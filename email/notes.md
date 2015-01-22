@@ -7,6 +7,7 @@
 ### To Do
 
 * Font colors in AOL/Explorer
+* Font colors in Outlook.com
 
 ### Content
 
