@@ -2692,6 +2692,7 @@ Artbot.login = {
                 console.log("User login submit failed");
                 Artbot.errors.logAjaxError(jqXHR, error, errorThrown, true);
 
+
                 /* If authentication fails with a 403 or 404 error, it will return a generic error payload and we can't run it through the usual showFormError because there's no form field ID provided */
 
                 if ((jqXHR.status == 403) || (jqXHR.status == 404)) { 
@@ -2709,21 +2710,44 @@ Artbot.login = {
                     });
 
                     if (jqXHR.status == 403) { // Password wrong
-                        $errorLabel = $("<label>")
-                            .attr("id", "signin-password-error")
+                        
+                        if ($("#signin-password-error").length > 0) {
+                            console.log("Error already exists");
+                            $errorLabel = $("#signin-password-error");
+                            $errorLabel.html(errorText).show();
+                        } else {
+                            console.log("Error is new");
+                            $errorLabel = $("<label>")
+                                .attr("id", "signin-password-error")
+                                .addClass("error")
+                                .html(errorText)
+                                .attr( "for", "signin-password");
+                            $errorLabel.insertAfter( $("#signin-password") );
+                        }
+                        
+                        $("#signin-password")
+                            .removeClass("valid")
                             .addClass("error")
-                            .html(errorText)
-                            .attr( "for", "signin-password");
-                        $("#signin-password").addClass("error");
-                        $errorLabel.insertAfter( $("#signin-password") );
+                            .attr( "aria-invalid", true );
+                        
                     } else if (jqXHR.status == 404) { // Email doesn't exist
-                        $errorLabel = $("<label>")
-                            .attr("id", "signin-email-error")
+                        if ($("#signin-email-error").length > 0) {
+                            $errorLabel = $("#signin-email-error");
+                            $errorLabel.html(errorText).show();
+                        } else {
+                            $errorLabel = $("<label>")
+                                .attr("id", "signin-email-error")
+                                .addClass("error")
+                                .html(errorText)
+                                .attr( "for", "signin-email");
+                            $errorLabel.insertAfter( $("#signin-email") );
+                        }
+                        
+                        $("#signin-email")
+                            .removeClass("valid")
                             .addClass("error")
-                            .html(errorText)
-                            .attr( "for", "signin-email");
-                        $("#signin-email").addClass("error");
-                        $errorLabel.insertAfter( $("#signin-email") );
+                            .attr( "aria-invalid", true );
+                        
                     }
 
                 } else {
