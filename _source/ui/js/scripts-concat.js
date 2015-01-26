@@ -24164,9 +24164,7 @@ Artbot.eventdetail = {
 
         //console.log("Event type: " + eventArray.event.event_type);
 
-        if (eventArray.event.event_type == "event") {
-            $("h1").find("a").text("Event");
-        }
+        $("h1").find("a").text(eventArray.event.event_type.capitalize());
 
         $("#target-eventdetail").fadeOut(400, function() {
             $("#target-eventdetail").html(_.template(eventTemplate, {eventArray:eventArray}));
