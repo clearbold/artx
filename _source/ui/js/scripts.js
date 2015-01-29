@@ -268,25 +268,55 @@ Artbot.errors = {
             console.log("jqXHR response: " + jqXHR.responseText);
         }
     },
-    showFormError: function (jsonError) {
+    showFormError: function (jsonError, formID) {
         // Get results from JSON returned
         var result = $.parseJSON(jsonError);
+        console.log("Error JSON: " + JSON.stringify(result));
         var errorText;
         var $errorSource;
         var errorLabelHTML;
+        var $formWithError = $("#" + formID);
+        
+        // Remove any existing appended div labels before we start, to avoid stacking
+        $formWithError.find("div.error").remove();
+
         $.each(result, function(k, v) {
-            $errorSource = $("#" + k);
             errorText = k.capitalize() + ' ' + v;
             console.log("Error text: " + errorText);
 
-            $errorLabel = $("<label>")
-                .attr("id", k + "-error")
-                .addClass("error")
-                .html(errorText)
-                .attr( "for", k );
+            $errorSource = $("#" + k);
 
-            $errorSource.addClass("error");
-            $errorLabel.insertAfter( $errorSource );
+            if ($errorSource.length > 0) {
+                // there's a corresponding form field, add an error message to it
+                if ($("#"+k+"-error").length > 0) {
+                    // An error label already exists, alter it
+                    $errorLabel = $("#"+k+"-error");
+                    $errorLabel.html(errorText).show();
+                } else {
+                    // No error label exists, create a new one and insert
+                    $errorLabel = $("<label>")
+                        .attr("id", k+"-error")
+                        .addClass("error")
+                        .html(errorText)
+                        .attr( "for", k);
+                    $errorLabel.insertAfter( $errorSource );
+                }
+
+                // Alter the form field to show as invalid as well, mimicking jquery.validation functionality
+                $errorSource
+                    .removeClass("valid")
+                    .addClass("error")
+                    .attr( "aria-invalid", true );
+
+            } else {
+                // No corresponding form label
+                // Append a new error message to the end of the form
+                $errorDiv = $("<div>")
+                    .attr("id", k+"-error")
+                    .addClass("error")
+                    .html(errorText)
+                    .appendTo($formWithError);
+            }
         });
     }
 };
@@ -1151,7 +1181,7 @@ Artbot.signupModal = {
             error: function (jqXHR, error, errorThrown) {
                 console.log("User registration failed");
                 Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
-                Artbot.errors.showFormError(jqXHR.responseText);
+                Artbot.errors.showFormError(jqXHR.responseText, "signup-form");
                 $.mobile.loading('hide');
             }
         });
@@ -2693,65 +2723,53 @@ Artbot.login = {
                 Artbot.errors.logAjaxError(jqXHR, error, errorThrown, true);
 
 
-                /* If authentication fails with a 403 or 404 error, it will return a generic error payload and we can't run it through the usual showFormError because there's no form field ID provided */
+                /* If authentication fails, it will return a generic error payload and we can't run it through the usual showFormError because there's no form field ID provided */
 
-                if ((jqXHR.status == 403) || (jqXHR.status == 404)) { 
+                if ((jqXHR.status == 403) || (jqXHR.status == 404) || (jqXHR.status == 422)) { 
 
                     // Get results from JSON error
                     var result = $.parseJSON(jqXHR.responseText);
                     var errorText;
                     var $errorSource;
+                    var errorSourceId;
                     var errorLabelHTML;
                     var $errorLabel;
 
                     $.each(result, function(k, v) {
-                        errorText = v.capitalize();
-                        //console.log("Error text: " + errorText);
-                    });
-
-                    if (jqXHR.status == 403) { // Password wrong
                         
-                        if ($("#signin-password-error").length > 0) {
+                        errorText = k.capitalize() + " " + v.toString();
+                        console.log("Error text: " + errorText);
+
+                        if (k == "email") {
+                            $errorSource = $("#signin-email");
+                            errorSourceId = "signin-email";
+                        } else if (k == "password") {
+                            $errorSource = $("#signin-password");
+                            errorSourceId = "signin-password";
+                        }
+
+                        if ($("#" + errorSourceId + "-error").length > 0) {
                             console.log("Error already exists");
                             $errorLabel = $("#signin-password-error");
                             $errorLabel.html(errorText).show();
                         } else {
                             console.log("Error is new");
                             $errorLabel = $("<label>")
-                                .attr("id", "signin-password-error")
+                                .attr("id", "#" + errorSourceId + "-error")
                                 .addClass("error")
                                 .html(errorText)
-                                .attr( "for", "signin-password");
-                            $errorLabel.insertAfter( $("#signin-password") );
+                                .attr( "for", errorSourceId);
+                            $errorLabel.insertAfter( $errorSource );
                         }
-                        
-                        $("#signin-password")
+
+                        $errorSource
                             .removeClass("valid")
                             .addClass("error")
                             .attr( "aria-invalid", true );
-                        
-                    } else if (jqXHR.status == 404) { // Email doesn't exist
-                        if ($("#signin-email-error").length > 0) {
-                            $errorLabel = $("#signin-email-error");
-                            $errorLabel.html(errorText).show();
-                        } else {
-                            $errorLabel = $("<label>")
-                                .attr("id", "signin-email-error")
-                                .addClass("error")
-                                .html(errorText)
-                                .attr( "for", "signin-email");
-                            $errorLabel.insertAfter( $("#signin-email") );
-                        }
-                        
-                        $("#signin-email")
-                            .removeClass("valid")
-                            .addClass("error")
-                            .attr( "aria-invalid", true );
-                        
-                    }
+                    });
 
                 } else {
-                    Artbot.errors.showFormError(jqXHR.responseText);
+                    Artbot.errors.showFormError(jqXHR.responseText, "signin-form");
                 }
 
             },
@@ -3116,8 +3134,6 @@ Artbot.forgotPassword = {
 Artbot.resetPassword = {
     token: "",
     init: function() {
-        // TODO: see if there's a way to disable the signup popup on this page?
-
         if ($("#passwordreset-form").length > 0) {
             console.log("Initializing Reset Password form");
 
@@ -3132,7 +3148,7 @@ Artbot.resetPassword = {
                     submitHandler: Artbot.resetPassword.ajaxSubmit
                 });
             } else {
-                // What should we do if the token is not accepted for any reason?
+                // What should we do if the token is not present for any reason?
             }
         }
     },
@@ -3159,9 +3175,8 @@ Artbot.resetPassword = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Error resetting password");
-                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
-
-                // TODO: error handling?
+                //Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.showFormError(jqXHR.responseText, "passwordreset-form");
             },
             complete: function() {
                 $.mobile.loading('hide');
