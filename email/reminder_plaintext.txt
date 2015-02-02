@@ -1,0 +1,49 @@
+This is an upcoming event reminder from Artbot. To change which emails you receive, you may update your Artbot settings.
+
+http://artbotapp.com/settings.html
+
+
+
+
+///// Upcoming Event
+
+Innovations: The Harvard Rothko Murals Project
+HARVARD ART MUSEUMS
+Friday, December 5, 2014
+11:00am-12:00pm
+We'd like to include a two-line teaser of the event description in the email, below the location/date/time.
+http://artbot-email.10.0.1.100.xip.io:8888/weekly.html#
+
+
+
+
+///// More Upcoming Events
+
+Innovations: The Harvard Rothko Murals Project
+HARVARD ART MUSEUMS
+Friday, December 5, 2014
+11:00am-12:00pm
+http://artbot-email.10.0.1.100.xip.io:8888/weekly.html#
+
+Celebrating the Release of American Paintings at Harvard, Volume One
+HARVARD ART MUSEUMS
+Friday, December 5, 2014
+11:00am-12:00pm
+http://artbot-email.10.0.1.100.xip.io:8888/weekly.html#
+
+///// View all your favorites:
+
+http://artbotapp.com/favorites.html
+
+
+
+
+Copyright 2015, Artbot
+
+Address Line 1
+Address Line 2
+Boston, MA 02116
+
+To unsubscribe from these emails, update your Artbot settings.
+
+[unsubcribe]
