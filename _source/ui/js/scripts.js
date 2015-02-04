@@ -956,11 +956,9 @@ Artbot.favoriteStars = {
                             data:  {
                                 "_method":"delete"
                             },
-                            accept: {
-                              json: 'application/json'
-                            },
                             beforeSend: function (request) {
                                 request.setRequestHeader("authentication_token", authtoken);
+                                request.setRequestHeader("accept", "application/json");
                             },
                             success: function(data, textStatus, jqXHR) {
                                 //console.log("Favorite successfully deleted");
@@ -2441,6 +2439,7 @@ Artbot.interests = {
                         data: Artbot.interests.vars.ajaxData,
                         beforeSend: function (request) {
                             request.setRequestHeader("authentication_token", authtoken);
+                            request.setRequestHeader("accept", "application/json");
                         },
                         success: function ( data, textStatus, jqXHR ) {
                             console.log(Artbot.interests.vars.ajaxSuccessMsg);
@@ -3276,7 +3275,7 @@ Artbot.startup = {
         }
 
         /*
-        alert("Number of page divs: " + $("[data-role=page]").length);
+        alert("My Number of page divs: " + $("[data-role=page]").length);
         $("[data-role=page]").each(function() {
             alert("Data url: " + $(this).attr("data-url"));
         }); */

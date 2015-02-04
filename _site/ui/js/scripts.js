@@ -264,7 +264,7 @@ Artbot.errors = {
     logAjaxError: function (jqXHR, error, errorThrown, isErrorAjaxResponse) {
         console.log("Error: " + errorThrown);
         console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
-        alert("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+        //alert("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
         if (isErrorAjaxResponse) {
             console.log("jqXHR response: " + jqXHR.responseText);
         }
@@ -956,11 +956,9 @@ Artbot.favoriteStars = {
                             data:  {
                                 "_method":"delete"
                             },
-                            accept: {
-                              json: 'application/json'
-                            },
                             beforeSend: function (request) {
                                 request.setRequestHeader("authentication_token", authtoken);
+                                request.setRequestHeader("accept", "application/json");
                             },
                             success: function(data, textStatus, jqXHR) {
                                 //console.log("Favorite successfully deleted");
@@ -2441,6 +2439,7 @@ Artbot.interests = {
                         data: Artbot.interests.vars.ajaxData,
                         beforeSend: function (request) {
                             request.setRequestHeader("authentication_token", authtoken);
+                            request.setRequestHeader("accept", "application/json");
                         },
                         success: function ( data, textStatus, jqXHR ) {
                             console.log(Artbot.interests.vars.ajaxSuccessMsg);
@@ -3275,10 +3274,11 @@ Artbot.startup = {
             }
         }
 
-        alert("Number of page divs: " + $("[data-role=page]").length);
+        /*
+        alert("My Number of page divs: " + $("[data-role=page]").length);
         $("[data-role=page]").each(function() {
             alert("Data url: " + $(this).attr("data-url"));
-        });
+        }); */
 
         //console.log("**End of scripts finalizing");
     }
@@ -3310,7 +3310,7 @@ $(document).on( "mobileinit", function( event ) {
     $.mobile.popup.prototype.options.history = false;
 });
 
-
+/*
 $(document).on( "pagecontainerbeforechange", function( event, ui ) {
     console.log("****JQM pagecontainerbeforechange event firing");
 });
@@ -3334,7 +3334,7 @@ $(document).on( "pagebeforecreate", function( event ) {
 $(document).on( "pagecreate", function( event ) {
     console.log("****JQM pagecreate event firing");
 });
-
+*/
 
 
 $(document).on( "pagebeforehide", function( event ) {
@@ -3361,13 +3361,11 @@ $(document).on("pagehide", "div[data-role=page]", function(event){
     $(event.target).remove();
 });
 
-
+/*
 $(document).on( "pagecontainerbeforeshow", function( event ) {
     console.log("****JQM pagecontainerbeforeshow event firing");
-    //if ($("[data-role=page]").length > 1) {
-    //    $('[data-url="/"]').remove();
-    //}
 });
+*/
 
 
 $(document).on( "pagecontainershow", function( event ) {
@@ -3398,7 +3396,8 @@ $(document).on( "pagecontainershow", function( event ) {
 
 });
 
-
+/*
 $(document).on( "pagecontainertransition", function( event ) {
     console.log("****JQM pagecontainertransition event firing");
 });
+*/
