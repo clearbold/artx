@@ -183,7 +183,7 @@ Artbot.util = {
     },
     findQuerystring: function(qs) {
         //hu = window.location.search.substring(1);
-        url = $("[data-role=page]").attr("data-url");
+        url = $("[data-role=page].ui-page-active").attr("data-url");
         hu = url.substring(url.indexOf('?') + 1);
         //console.log("Querystring URL: " + hu);
         gy = hu.split("&");
@@ -264,6 +264,7 @@ Artbot.errors = {
     logAjaxError: function (jqXHR, error, errorThrown, isErrorAjaxResponse) {
         console.log("Error: " + errorThrown);
         console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+        //alert("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
         if (isErrorAjaxResponse) {
             console.log("jqXHR response: " + jqXHR.responseText);
         }
@@ -383,6 +384,7 @@ Artbot.discoverSlider = {
                 console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
                 console.log("jqXHR response: " + jqXHR.responseText);
                 Artbot.discoverSlider.showErrorMsg("ajax");
+
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -393,10 +395,12 @@ Artbot.discoverSlider = {
         //console.log("Building discover slider");
         var eventArray = data.events;
         var slideTemplate = $('#template-discoverslider').html();
+        //console.log(_.template(slideTemplate, {eventArray:eventArray}));
         
         $("#discover-slider").find("ul").html(_.template(slideTemplate, {eventArray:eventArray}));
 
         var numberOfSlides = $("#discover-slider").find("ul").children().length;
+        console.log("How many pages do we have right now? " + $("div[data-role=page]").length);
 
         if (numberOfSlides > 1) { // there's more than one slide to show
             Artbot.discoverSlider.initSlider();
@@ -933,6 +937,7 @@ Artbot.favoriteStars = {
                             },
                             complete: function() {
                                 $.mobile.loading('hide');
+                                $thisStarLink.blur();
                             }
                         });
 
@@ -950,6 +955,9 @@ Artbot.favoriteStars = {
                             url: Artbot.var.jsonDomain + "/favorites/" + selectedUserEventID,
                             data:  {
                                 "_method":"delete"
+                            },
+                            accept: {
+                              json: 'application/json'
                             },
                             beforeSend: function (request) {
                                 request.setRequestHeader("authentication_token", authtoken);
@@ -981,6 +989,7 @@ Artbot.favoriteStars = {
                             },
                             complete: function() {
                                 $.mobile.loading('hide');
+                                $thisStarLink.blur();
                             }
                         });
                     }
@@ -1191,7 +1200,7 @@ Artbot.signupModal = {
         if ($(".ui-page-active").attr("data-url") != "/sign-in.html") {
             Artbot.signupModal.vars.returnToPage = $(".ui-page-active").attr("data-url");
         } else {
-            Artbot.signupModal.vars.returnToPage = "/index.html";
+            Artbot.signupModal.vars.returnToPage = "/";
         }
         
         //console.log("Return to page: " + Artbot.signupModal.vars.returnToPage);
@@ -2360,7 +2369,7 @@ Artbot.interests = {
     },
     init: function() {
         if ($("#interest-form").length > 0) {
-            
+
             var authtoken = Artbot.util.getAuthToken();
 
             if (typeof authtoken !== undefined) {
@@ -2668,7 +2677,7 @@ Artbot.login = {
             // If that page was one of the Forgot Password pages, redirect to Discover
             if (Artbot.signupModal.vars.returnToPage.substring(0, 7) == "/forgot") {
                 
-                Artbot.signupModal.vars.returnToPage = "/index.html";
+                Artbot.signupModal.vars.returnToPage = "/";
             }
 
             //console.log("Artbot.signupModal.vars.returnToPage: " + Artbot.signupModal.vars.returnToPage);
@@ -2714,7 +2723,7 @@ Artbot.login = {
                 if ((Artbot.signupModal.vars.returnToPage !== undefined) && (Artbot.signupModal.vars.returnToPage !== "")) {
                     $.mobile.pageContainer.pagecontainer ("change", Artbot.signupModal.vars.returnToPage, {reloadPage: true});
                 } else {
-                    $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
+                    $.mobile.pageContainer.pagecontainer ("change", "/", {reloadPage: true});
                 }
                 
             },
@@ -2798,7 +2807,7 @@ Artbot.logout = {
             // Remove the "is-logged-in" class from the HTML element
             Artbot.el.html.removeClass("is-logged-in");
             // Send them back to the main Discover page
-            $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
+            $.mobile.pageContainer.pagecontainer ("change", "/", {reloadPage: true});
         });
     }
 };
@@ -3266,6 +3275,12 @@ Artbot.startup = {
             }
         }
 
+        /*
+        alert("Number of page divs: " + $("[data-role=page]").length);
+        $("[data-role=page]").each(function() {
+            alert("Data url: " + $(this).attr("data-url"));
+        }); */
+
         //console.log("**End of scripts finalizing");
     }
 };
@@ -3352,6 +3367,7 @@ $(document).on( "pagecontainerbeforeshow", function( event ) {
     console.log("****JQM pagecontainerbeforeshow event firing");
 });
 */
+
 
 $(document).on( "pagecontainershow", function( event ) {
 
