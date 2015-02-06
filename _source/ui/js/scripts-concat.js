@@ -22974,6 +22974,9 @@ jQuery.validator.addMethod("remoteEmail", function(value, element) {
             "email": value
         },
         url: Artbot.var.jsonDomain + "/registrations",
+        beforeSend: function (request) {
+            request.setRequestHeader("accept", "application/json");
+        },
         success: function(response){
             console.log("Checking: the user is in the system");
             return true;
@@ -23264,6 +23267,11 @@ Artbot.discoverSlider = {
         if (typeof authtoken !== "undefined") {
             beforeSendFunction = function(request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
+            };
+        } else {
+            beforeSendFunction = function (request) {
+                request.setRequestHeader("accept", "application/json");
             };
         }
 
@@ -23431,6 +23439,7 @@ Artbot.footerSlider = {
                     url: Artbot.var.jsonDomain + "/favorites/",
                     beforeSend: function(request) {
                         request.setRequestHeader("authentication_token", authtoken);
+                        request.setRequestHeader("accept", "application/json");
                     },
                     success: function( data ) {
                         //console.log("Footer slider data successfully fetched");
@@ -23482,6 +23491,9 @@ Artbot.footerSlider = {
                     "per_page": Artbot.footerSlider.vars.pageSize
                 },
                 url: Artbot.var.jsonDomain + "/locations/" + venueID + "/events",
+                beforeSend: function (request) {
+                    request.setRequestHeader("accept", "application/json");
+                },
                 success: function( data ) {
                     //console.log("Footer slider data successfully fetched");
                     
@@ -23572,6 +23584,9 @@ Artbot.footerSlider = {
                     longitude: Artbot.geolocation.vars.currentLongitude,
                     radius: Artbot.footerSlider.vars.locationRadius,
                     "per_page": Artbot.footerSlider.vars.pageSize
+                },
+                beforeSend: function (request) {
+                    request.setRequestHeader("accept", "application/json");
                 },
                 success: function( data ) {
                     //console.log("Footer slider data successfully fetched");
@@ -23822,6 +23837,7 @@ Artbot.favoriteStars = {
                             url: Artbot.var.jsonDomain + "/events/" + selectedEventID + "/favorite/",
                             beforeSend: function (request) {
                                 request.setRequestHeader("authentication_token", authtoken);
+                                request.setRequestHeader("accept", "application/json");
                             },
                             success: function(data, textStatus, jqXHR) {
                                 //console.log("New favorite successfully saved");
@@ -23929,6 +23945,7 @@ Artbot.favoriteStars = {
                 },
                 beforeSend: function (request) {
                     request.setRequestHeader("authentication_token", authtoken);
+                    request.setRequestHeader("accept", "application/json");
                 },
                 success: function(data, textStatus, jqXHR) {
                     //console.log("Successfully fetched Favorites data for syncing stars");
@@ -23966,12 +23983,13 @@ Artbot.favoriteStars = {
                     $.ajax({
                         type: "GET",
                         url: Artbot.var.jsonDomain + "/favorites/history/",
-                        beforeSend: function (request) {
-                            request.setRequestHeader("authentication_token", authtoken);
-                        },
                         data: {
                             page: 1,
                             per_page: 10000
+                        },
+                        beforeSend: function (request) {
+                            request.setRequestHeader("authentication_token", authtoken);
+                            request.setRequestHeader("accept", "application/json");
                         },
                         success: function(data, textStatus, jqXHR) {
                             //console.log("Successfully fetched History data for syncing stars");
@@ -24078,6 +24096,9 @@ Artbot.signupModal = {
                 password:  $("#password").val(),
                 password_confirmation: $("#confirmpassword").val(),
                 zipcode:  $("#zipcode").val()
+            },
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
             },
             success: function( data ){
                 //console.log(data);
@@ -24196,6 +24217,9 @@ Artbot.eventdetail = {
                 related: true
             },
             url: Artbot.var.jsonDomain + "/events/" + Artbot.var.eventDetailID,
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function( data ){
                 //console.log("Event detail data fetch successful");
                 
@@ -24261,6 +24285,9 @@ Artbot.venuedetail = {
                 related: true
             },
             url: Artbot.var.jsonDomain + "/locations/" + Artbot.var.venueDetailID,
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function( data ){
                 //console.log("Venue detail data fetch successful");
                 
@@ -24308,6 +24335,9 @@ Artbot.calendar = {
                 per_page: 1000
             },
             url: jsonURL,
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function( data ){
                 //console.log("Initial calendar event fetch successful");
 
@@ -24367,6 +24397,9 @@ Artbot.calendar = {
                                     year: chosenYear,
                                     month: chosenMonth,
                                     per_page: 1000
+                                },
+                                beforeSend: function (request) {
+                                    request.setRequestHeader("accept", "application/json");
                                 },
                                 success: function( data ){
                                     //console.log("Events for " + chosenMonth + " " + chosenYear + " retrieved successfully");
@@ -24749,6 +24782,7 @@ Artbot.settings = {
             url: Artbot.var.jsonDomain + "/preferences/",
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function ( data, textStatus, jqXHR ) {
                 //console.log("User preferences retrieved successfully.");
@@ -24838,6 +24872,7 @@ Artbot.settings = {
             data: ajaxDataToSend,
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function(data, textStatus, jqXHR) {
                 console.log("Toggle change successfully saved");
@@ -24885,6 +24920,7 @@ Artbot.settings = {
             data: formData,
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function(data, textStatus, jqXHR) {
                 console.log("All user preferences successfully saved");
@@ -24935,6 +24971,7 @@ Artbot.historyList = {
             },
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function( data ) {
                 console.log("Successfully fetched History data");
@@ -25065,6 +25102,7 @@ Artbot.historyList = {
             data: ajaxDataToSend,
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function(data, textStatus, jqXHR) {
                 console.log("Attendance data successfully saved");
@@ -25168,6 +25206,7 @@ Artbot.favoriteList = {
             },
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function( data ) {
                 //console.log("Successfully fetched Favorites data");
@@ -25383,6 +25422,7 @@ Artbot.interests = {
             url: Artbot.interests.vars.ajaxURL,
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function ( data, textStatus, jqXHR ) {
                 console.log(Artbot.interests.vars.ajaxSuccessMsg);
@@ -25447,6 +25487,10 @@ Artbot.interests = {
         $.ajax({
             type: "GET",
             url: Artbot.var.jsonDomain + "/possible_interests/",
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function( data ){
                 console.log("Successfully retrieved full list of possible interests");
                 Artbot.interests.buildInterestList(data, false);
@@ -25469,6 +25513,9 @@ Artbot.interests = {
         $.ajax({
             type: "GET",
             url: allTagsUrl,
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function ( allTagsData, textStatus, jqXHR ) {
                 console.log("Successfully retrieved full list of interests for subsetting");
                 allTags = allTagsData.tags;
@@ -25482,6 +25529,7 @@ Artbot.interests = {
                     url: Artbot.var.jsonDomain + "/interests/",
                     beforeSend: function (request) {
                         request.setRequestHeader("authentication_token", authtoken);
+                        request.setRequestHeader("accept", "application/json");
                     },
                     success: function ( userTagsData, textStatus, jqXHR ) {
                         console.log("Successfully retrieved list of user's interests for subsetting");
@@ -25544,6 +25592,7 @@ Artbot.interests = {
             url: Artbot.var.jsonDomain + "/interests/",
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function ( data, textStatus, jqXHR ) {
                 console.log("Successfully retrieved list of user's interests");
@@ -25595,6 +25644,9 @@ Artbot.login = {
             data: {
                 email: $("#signin-email").val(),
                 password:  $("#signin-password").val()
+            },
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
             },
             success: function( data ){
                 console.log("Login successful! Saving our signin info");
@@ -25811,6 +25863,9 @@ Artbot.byLocation = {
                 "per_page": 1000
             },
             url: Artbot.var.jsonDomain + "/locations/",
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function( data ){
                 console.log("Map data successfully fetched");
                 //console.log(JSON.stringify(data));
@@ -25838,6 +25893,9 @@ Artbot.byLocation = {
                 "per_page": 10
             },
             url: Artbot.var.jsonDomain + "/locations/" + locationID + "/events",
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function( data ){
                 console.log("Event data successfully fetched");
                 var eventData = JSON.stringify(data.events);
@@ -26004,6 +26062,9 @@ Artbot.forgotPassword = {
             data: {
                 email: $("#email").val()
             },
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function(data, textStatus, jqXHR) {
                 console.log("Password reset request sent");
                 $.mobile.pageContainer.pagecontainer ("change", "forgot-password-confirm.html", {reloadPage: true});
@@ -26080,6 +26141,7 @@ Artbot.resetPassword = {
             },
             beforeSend: function (request) {
                 request.setRequestHeader("reset_password_token", Artbot.resetPassword.token);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function(data, textStatus, jqXHR) {
                 console.log("Password reset successful");
