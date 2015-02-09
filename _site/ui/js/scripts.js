@@ -70,6 +70,9 @@ jQuery.validator.addMethod("remoteEmail", function(value, element) {
             "email": value
         },
         url: Artbot.var.jsonDomain + "/registrations",
+        beforeSend: function (request) {
+            request.setRequestHeader("accept", "application/json");
+        },
         success: function(response){
             console.log("Checking: the user is in the system");
             return true;
@@ -183,7 +186,7 @@ Artbot.util = {
     },
     findQuerystring: function(qs) {
         //hu = window.location.search.substring(1);
-        url = $("[data-role=page]").attr("data-url");
+        url = $("[data-role=page].ui-page-active").attr("data-url");
         hu = url.substring(url.indexOf('?') + 1);
         //console.log("Querystring URL: " + hu);
         gy = hu.split("&");
@@ -264,29 +267,60 @@ Artbot.errors = {
     logAjaxError: function (jqXHR, error, errorThrown, isErrorAjaxResponse) {
         console.log("Error: " + errorThrown);
         console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+        alert("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
         if (isErrorAjaxResponse) {
             console.log("jqXHR response: " + jqXHR.responseText);
         }
     },
-    showFormError: function (jsonError) {
+    showFormError: function (jsonError, formID) {
         // Get results from JSON returned
         var result = $.parseJSON(jsonError);
+        console.log("Error JSON: " + JSON.stringify(result));
         var errorText;
         var $errorSource;
         var errorLabelHTML;
+        var $formWithError = $("#" + formID);
+        
+        // Remove any existing appended div labels before we start, to avoid stacking
+        $formWithError.find("div.error").remove();
+
         $.each(result, function(k, v) {
-            $errorSource = $("#" + k);
             errorText = k.capitalize() + ' ' + v;
             console.log("Error text: " + errorText);
 
-            $errorLabel = $("<label>")
-                .attr("id", k + "-error")
-                .addClass("error")
-                .html(errorText)
-                .attr( "for", k );
+            $errorSource = $("#" + k);
 
-            $errorSource.addClass("error");
-            $errorLabel.insertAfter( $errorSource );
+            if ($errorSource.length > 0) {
+                // there's a corresponding form field, add an error message to it
+                if ($("#"+k+"-error").length > 0) {
+                    // An error label already exists, alter it
+                    $errorLabel = $("#"+k+"-error");
+                    $errorLabel.html(errorText).show();
+                } else {
+                    // No error label exists, create a new one and insert
+                    $errorLabel = $("<label>")
+                        .attr("id", k+"-error")
+                        .addClass("error")
+                        .html(errorText)
+                        .attr( "for", k);
+                    $errorLabel.insertAfter( $errorSource );
+                }
+
+                // Alter the form field to show as invalid as well, mimicking jquery.validation functionality
+                $errorSource
+                    .removeClass("valid")
+                    .addClass("error")
+                    .attr( "aria-invalid", true );
+
+            } else {
+                // No corresponding form label
+                // Append a new error message to the end of the form
+                $errorDiv = $("<div>")
+                    .attr("id", k+"-error")
+                    .addClass("error")
+                    .html(errorText)
+                    .appendTo($formWithError);
+            }
         });
     }
 };
@@ -329,6 +363,11 @@ Artbot.discoverSlider = {
         if (typeof authtoken !== "undefined") {
             beforeSendFunction = function(request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
+            };
+        } else {
+            beforeSendFunction = function (request) {
+                request.setRequestHeader("accept", "application/json");
             };
         }
 
@@ -353,6 +392,7 @@ Artbot.discoverSlider = {
                 console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
                 console.log("jqXHR response: " + jqXHR.responseText);
                 Artbot.discoverSlider.showErrorMsg("ajax");
+
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -363,10 +403,12 @@ Artbot.discoverSlider = {
         //console.log("Building discover slider");
         var eventArray = data.events;
         var slideTemplate = $('#template-discoverslider').html();
+        //console.log(_.template(slideTemplate, {eventArray:eventArray}));
         
         $("#discover-slider").find("ul").html(_.template(slideTemplate, {eventArray:eventArray}));
 
         var numberOfSlides = $("#discover-slider").find("ul").children().length;
+        console.log("How many pages do we have right now? " + $("div[data-role=page]").length);
 
         if (numberOfSlides > 1) { // there's more than one slide to show
             Artbot.discoverSlider.initSlider();
@@ -493,6 +535,7 @@ Artbot.footerSlider = {
                     url: Artbot.var.jsonDomain + "/favorites/",
                     beforeSend: function(request) {
                         request.setRequestHeader("authentication_token", authtoken);
+                        request.setRequestHeader("accept", "application/json");
                     },
                     success: function( data ) {
                         //console.log("Footer slider data successfully fetched");
@@ -544,6 +587,9 @@ Artbot.footerSlider = {
                     "per_page": Artbot.footerSlider.vars.pageSize
                 },
                 url: Artbot.var.jsonDomain + "/locations/" + venueID + "/events",
+                beforeSend: function (request) {
+                    request.setRequestHeader("accept", "application/json");
+                },
                 success: function( data ) {
                     //console.log("Footer slider data successfully fetched");
                     
@@ -634,6 +680,9 @@ Artbot.footerSlider = {
                     longitude: Artbot.geolocation.vars.currentLongitude,
                     radius: Artbot.footerSlider.vars.locationRadius,
                     "per_page": Artbot.footerSlider.vars.pageSize
+                },
+                beforeSend: function (request) {
+                    request.setRequestHeader("accept", "application/json");
                 },
                 success: function( data ) {
                     //console.log("Footer slider data successfully fetched");
@@ -884,6 +933,7 @@ Artbot.favoriteStars = {
                             url: Artbot.var.jsonDomain + "/events/" + selectedEventID + "/favorite/",
                             beforeSend: function (request) {
                                 request.setRequestHeader("authentication_token", authtoken);
+                                request.setRequestHeader("accept", "application/json");
                             },
                             success: function(data, textStatus, jqXHR) {
                                 //console.log("New favorite successfully saved");
@@ -903,6 +953,7 @@ Artbot.favoriteStars = {
                             },
                             complete: function() {
                                 $.mobile.loading('hide');
+                                $thisStarLink.blur();
                             }
                         });
 
@@ -923,6 +974,7 @@ Artbot.favoriteStars = {
                             },
                             beforeSend: function (request) {
                                 request.setRequestHeader("authentication_token", authtoken);
+                                request.setRequestHeader("accept", "application/json");
                             },
                             success: function(data, textStatus, jqXHR) {
                                 //console.log("Favorite successfully deleted");
@@ -951,6 +1003,7 @@ Artbot.favoriteStars = {
                             },
                             complete: function() {
                                 $.mobile.loading('hide');
+                                $thisStarLink.blur();
                             }
                         });
                     }
@@ -988,6 +1041,7 @@ Artbot.favoriteStars = {
                 },
                 beforeSend: function (request) {
                     request.setRequestHeader("authentication_token", authtoken);
+                    request.setRequestHeader("accept", "application/json");
                 },
                 success: function(data, textStatus, jqXHR) {
                     //console.log("Successfully fetched Favorites data for syncing stars");
@@ -1025,12 +1079,13 @@ Artbot.favoriteStars = {
                     $.ajax({
                         type: "GET",
                         url: Artbot.var.jsonDomain + "/favorites/history/",
-                        beforeSend: function (request) {
-                            request.setRequestHeader("authentication_token", authtoken);
-                        },
                         data: {
                             page: 1,
                             per_page: 10000
+                        },
+                        beforeSend: function (request) {
+                            request.setRequestHeader("authentication_token", authtoken);
+                            request.setRequestHeader("accept", "application/json");
                         },
                         success: function(data, textStatus, jqXHR) {
                             //console.log("Successfully fetched History data for syncing stars");
@@ -1138,6 +1193,9 @@ Artbot.signupModal = {
                 password_confirmation: $("#confirmpassword").val(),
                 zipcode:  $("#zipcode").val()
             },
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function( data ){
                 //console.log(data);
 
@@ -1151,7 +1209,7 @@ Artbot.signupModal = {
             error: function (jqXHR, error, errorThrown) {
                 console.log("User registration failed");
                 Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
-                Artbot.errors.showFormError(jqXHR.responseText);
+                Artbot.errors.showFormError(jqXHR.responseText, "signup-form");
                 $.mobile.loading('hide');
             }
         });
@@ -1161,7 +1219,7 @@ Artbot.signupModal = {
         if ($(".ui-page-active").attr("data-url") != "/sign-in.html") {
             Artbot.signupModal.vars.returnToPage = $(".ui-page-active").attr("data-url");
         } else {
-            Artbot.signupModal.vars.returnToPage = "/index.html";
+            Artbot.signupModal.vars.returnToPage = "/";
         }
         
         //console.log("Return to page: " + Artbot.signupModal.vars.returnToPage);
@@ -1255,6 +1313,9 @@ Artbot.eventdetail = {
                 related: true
             },
             url: Artbot.var.jsonDomain + "/events/" + Artbot.var.eventDetailID,
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function( data ){
                 //console.log("Event detail data fetch successful");
                 
@@ -1282,9 +1343,7 @@ Artbot.eventdetail = {
 
         //console.log("Event type: " + eventArray.event.event_type);
 
-        if (eventArray.event.event_type == "event") {
-            $("h1").find("a").text("Event");
-        }
+        $("h1").find("a").text(eventArray.event.event_type.capitalize());
 
         $("#target-eventdetail").fadeOut(400, function() {
             $("#target-eventdetail").html(_.template(eventTemplate, {eventArray:eventArray}));
@@ -1322,6 +1381,9 @@ Artbot.venuedetail = {
                 related: true
             },
             url: Artbot.var.jsonDomain + "/locations/" + Artbot.var.venueDetailID,
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function( data ){
                 //console.log("Venue detail data fetch successful");
                 
@@ -1369,6 +1431,9 @@ Artbot.calendar = {
                 per_page: 1000
             },
             url: jsonURL,
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function( data ){
                 //console.log("Initial calendar event fetch successful");
 
@@ -1428,6 +1493,9 @@ Artbot.calendar = {
                                     year: chosenYear,
                                     month: chosenMonth,
                                     per_page: 1000
+                                },
+                                beforeSend: function (request) {
+                                    request.setRequestHeader("accept", "application/json");
                                 },
                                 success: function( data ){
                                     //console.log("Events for " + chosenMonth + " " + chosenYear + " retrieved successfully");
@@ -1810,6 +1878,7 @@ Artbot.settings = {
             url: Artbot.var.jsonDomain + "/preferences/",
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function ( data, textStatus, jqXHR ) {
                 //console.log("User preferences retrieved successfully.");
@@ -1899,6 +1968,7 @@ Artbot.settings = {
             data: ajaxDataToSend,
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function(data, textStatus, jqXHR) {
                 console.log("Toggle change successfully saved");
@@ -1946,6 +2016,7 @@ Artbot.settings = {
             data: formData,
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function(data, textStatus, jqXHR) {
                 console.log("All user preferences successfully saved");
@@ -1996,6 +2067,7 @@ Artbot.historyList = {
             },
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function( data ) {
                 console.log("Successfully fetched History data");
@@ -2126,6 +2198,7 @@ Artbot.historyList = {
             data: ajaxDataToSend,
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function(data, textStatus, jqXHR) {
                 console.log("Attendance data successfully saved");
@@ -2229,6 +2302,7 @@ Artbot.favoriteList = {
             },
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function( data ) {
                 //console.log("Successfully fetched Favorites data");
@@ -2332,7 +2406,7 @@ Artbot.interests = {
     },
     init: function() {
         if ($("#interest-form").length > 0) {
-            
+
             var authtoken = Artbot.util.getAuthToken();
 
             if (typeof authtoken !== undefined) {
@@ -2404,6 +2478,7 @@ Artbot.interests = {
                         data: Artbot.interests.vars.ajaxData,
                         beforeSend: function (request) {
                             request.setRequestHeader("authentication_token", authtoken);
+                            request.setRequestHeader("accept", "application/json");
                         },
                         success: function ( data, textStatus, jqXHR ) {
                             console.log(Artbot.interests.vars.ajaxSuccessMsg);
@@ -2443,6 +2518,7 @@ Artbot.interests = {
             url: Artbot.interests.vars.ajaxURL,
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function ( data, textStatus, jqXHR ) {
                 console.log(Artbot.interests.vars.ajaxSuccessMsg);
@@ -2507,6 +2583,10 @@ Artbot.interests = {
         $.ajax({
             type: "GET",
             url: Artbot.var.jsonDomain + "/possible_interests/",
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function( data ){
                 console.log("Successfully retrieved full list of possible interests");
                 Artbot.interests.buildInterestList(data, false);
@@ -2529,6 +2609,9 @@ Artbot.interests = {
         $.ajax({
             type: "GET",
             url: allTagsUrl,
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function ( allTagsData, textStatus, jqXHR ) {
                 console.log("Successfully retrieved full list of interests for subsetting");
                 allTags = allTagsData.tags;
@@ -2542,6 +2625,7 @@ Artbot.interests = {
                     url: Artbot.var.jsonDomain + "/interests/",
                     beforeSend: function (request) {
                         request.setRequestHeader("authentication_token", authtoken);
+                        request.setRequestHeader("accept", "application/json");
                     },
                     success: function ( userTagsData, textStatus, jqXHR ) {
                         console.log("Successfully retrieved list of user's interests for subsetting");
@@ -2604,6 +2688,7 @@ Artbot.interests = {
             url: Artbot.var.jsonDomain + "/interests/",
             beforeSend: function (request) {
                 request.setRequestHeader("authentication_token", authtoken);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function ( data, textStatus, jqXHR ) {
                 console.log("Successfully retrieved list of user's interests");
@@ -2640,7 +2725,7 @@ Artbot.login = {
             // If that page was one of the Forgot Password pages, redirect to Discover
             if (Artbot.signupModal.vars.returnToPage.substring(0, 7) == "/forgot") {
                 
-                Artbot.signupModal.vars.returnToPage = "/index.html";
+                Artbot.signupModal.vars.returnToPage = "/";
             }
 
             //console.log("Artbot.signupModal.vars.returnToPage: " + Artbot.signupModal.vars.returnToPage);
@@ -2655,6 +2740,9 @@ Artbot.login = {
             data: {
                 email: $("#signin-email").val(),
                 password:  $("#signin-password").val()
+            },
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
             },
             success: function( data ){
                 console.log("Login successful! Saving our signin info");
@@ -2686,7 +2774,7 @@ Artbot.login = {
                 if ((Artbot.signupModal.vars.returnToPage !== undefined) && (Artbot.signupModal.vars.returnToPage !== "")) {
                     $.mobile.pageContainer.pagecontainer ("change", Artbot.signupModal.vars.returnToPage, {reloadPage: true});
                 } else {
-                    $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
+                    $.mobile.pageContainer.pagecontainer ("change", "/", {reloadPage: true});
                 }
                 
             },
@@ -2694,42 +2782,54 @@ Artbot.login = {
                 console.log("User login submit failed");
                 Artbot.errors.logAjaxError(jqXHR, error, errorThrown, true);
 
-                /* If authentication fails with a 403 or 404 error, it will return a generic error payload and we can't run it through the usual showFormError because there's no form field ID provided */
 
-                if ((jqXHR.status == 403) || (jqXHR.status == 404)) { 
+                /* If authentication fails, it will return a generic error payload and we can't run it through the usual showFormError because there's no form field ID provided */
+
+                if ((jqXHR.status == 403) || (jqXHR.status == 404) || (jqXHR.status == 422)) { 
 
                     // Get results from JSON error
                     var result = $.parseJSON(jqXHR.responseText);
                     var errorText;
                     var $errorSource;
+                    var errorSourceId;
                     var errorLabelHTML;
                     var $errorLabel;
 
                     $.each(result, function(k, v) {
-                        errorText = v.capitalize();
-                        //console.log("Error text: " + errorText);
+                        
+                        errorText = k.capitalize() + " " + v.toString();
+                        console.log("Error text: " + errorText);
+
+                        if (k == "email") {
+                            $errorSource = $("#signin-email");
+                            errorSourceId = "signin-email";
+                        } else if (k == "password") {
+                            $errorSource = $("#signin-password");
+                            errorSourceId = "signin-password";
+                        }
+
+                        if ($("#" + errorSourceId + "-error").length > 0) {
+                            console.log("Error already exists");
+                            $errorLabel = $("#signin-password-error");
+                            $errorLabel.html(errorText).show();
+                        } else {
+                            console.log("Error is new");
+                            $errorLabel = $("<label>")
+                                .attr("id", "#" + errorSourceId + "-error")
+                                .addClass("error")
+                                .html(errorText)
+                                .attr( "for", errorSourceId);
+                            $errorLabel.insertAfter( $errorSource );
+                        }
+
+                        $errorSource
+                            .removeClass("valid")
+                            .addClass("error")
+                            .attr( "aria-invalid", true );
                     });
 
-                    if (jqXHR.status == 403) { // Password wrong
-                        $errorLabel = $("<label>")
-                            .attr("id", "signin-password-error")
-                            .addClass("error")
-                            .html(errorText)
-                            .attr( "for", "signin-password");
-                        $("#signin-password").addClass("error");
-                        $errorLabel.insertAfter( $("#signin-password") );
-                    } else if (jqXHR.status == 404) { // Email doesn't exist
-                        $errorLabel = $("<label>")
-                            .attr("id", "signin-email-error")
-                            .addClass("error")
-                            .html(errorText)
-                            .attr( "for", "signin-email");
-                        $("#signin-email").addClass("error");
-                        $errorLabel.insertAfter( $("#signin-email") );
-                    }
-
                 } else {
-                    Artbot.errors.showFormError(jqXHR.responseText);
+                    Artbot.errors.showFormError(jqXHR.responseText, "signin-form");
                 }
 
             },
@@ -2758,7 +2858,7 @@ Artbot.logout = {
             // Remove the "is-logged-in" class from the HTML element
             Artbot.el.html.removeClass("is-logged-in");
             // Send them back to the main Discover page
-            $.mobile.pageContainer.pagecontainer ("change", "index.html", {reloadPage: true});
+            $.mobile.pageContainer.pagecontainer ("change", "/", {reloadPage: true});
         });
     }
 };
@@ -2859,6 +2959,9 @@ Artbot.byLocation = {
                 "per_page": 1000
             },
             url: Artbot.var.jsonDomain + "/locations/",
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function( data ){
                 console.log("Map data successfully fetched");
                 //console.log(JSON.stringify(data));
@@ -2886,6 +2989,9 @@ Artbot.byLocation = {
                 "per_page": 10
             },
             url: Artbot.var.jsonDomain + "/locations/" + locationID + "/events",
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function( data ){
                 console.log("Event data successfully fetched");
                 var eventData = JSON.stringify(data.events);
@@ -3052,6 +3158,9 @@ Artbot.forgotPassword = {
             data: {
                 email: $("#email").val()
             },
+            beforeSend: function (request) {
+                request.setRequestHeader("accept", "application/json");
+            },
             success: function(data, textStatus, jqXHR) {
                 console.log("Password reset request sent");
                 $.mobile.pageContainer.pagecontainer ("change", "forgot-password-confirm.html", {reloadPage: true});
@@ -3094,8 +3203,6 @@ Artbot.forgotPassword = {
 Artbot.resetPassword = {
     token: "",
     init: function() {
-        // TODO: see if there's a way to disable the signup popup on this page?
-
         if ($("#passwordreset-form").length > 0) {
             console.log("Initializing Reset Password form");
 
@@ -3110,7 +3217,7 @@ Artbot.resetPassword = {
                     submitHandler: Artbot.resetPassword.ajaxSubmit
                 });
             } else {
-                // What should we do if the token is not accepted for any reason?
+                // What should we do if the token is not present for any reason?
             }
         }
     },
@@ -3130,6 +3237,7 @@ Artbot.resetPassword = {
             },
             beforeSend: function (request) {
                 request.setRequestHeader("reset_password_token", Artbot.resetPassword.token);
+                request.setRequestHeader("accept", "application/json");
             },
             success: function(data, textStatus, jqXHR) {
                 console.log("Password reset successful");
@@ -3137,9 +3245,8 @@ Artbot.resetPassword = {
             },
             error: function (jqXHR, error, errorThrown) {
                 console.log("Error resetting password");
-                Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
-
-                // TODO: error handling?
+                //Artbot.errors.logAjaxError(jqXHR, error, errorThrown);
+                Artbot.errors.showFormError(jqXHR.responseText, "passwordreset-form");
             },
             complete: function() {
                 $.mobile.loading('hide');
@@ -3229,6 +3336,12 @@ Artbot.startup = {
             }
         }
 
+        /*
+        alert("My Number of page divs: " + $("[data-role=page]").length);
+        $("[data-role=page]").each(function() {
+            alert("Data url: " + $(this).attr("data-url"));
+        }); */
+
         //console.log("**End of scripts finalizing");
     }
 };
@@ -3315,6 +3428,7 @@ $(document).on( "pagecontainerbeforeshow", function( event ) {
     console.log("****JQM pagecontainerbeforeshow event firing");
 });
 */
+
 
 $(document).on( "pagecontainershow", function( event ) {
 
