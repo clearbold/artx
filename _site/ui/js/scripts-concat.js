@@ -23171,7 +23171,7 @@ Artbot.errors = {
     logAjaxError: function (jqXHR, error, errorThrown, isErrorAjaxResponse) {
         console.log("Error: " + errorThrown);
         console.log("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
-        alert("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
+        //alert("jqXHR status: " + jqXHR.status + " " + jqXHR.statusText);
         if (isErrorAjaxResponse) {
             console.log("jqXHR response: " + jqXHR.responseText);
         }
