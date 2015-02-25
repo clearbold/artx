@@ -46,7 +46,7 @@ $panel-font-family: 'Lato','lucida grande',tahoma,verdana,arial,sans-serif;
 $panel-font-size: 15px;
 $panel-background : #333;
 $panel-background-shadow-color : #222;
-$panel-text-color: #FFF;
+$panel-text-color: $text-color;
 
 $base-font-size:    16px;
 $base-line-height:  24px;

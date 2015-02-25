@@ -224,9 +224,9 @@ html .ui-alt-icon .ui-radio-off:after {
 html .ui-bar-a .ui-bar-inherit,
 html .ui-body-a .ui-bar-inherit,
 html body .ui-group-theme-a .ui-bar-inherit {
-	background-color: #484848 /*{a-bar-background-color}*/;
+	background-color: $masthead-bg /*{a-bar-background-color}*/;
 	border-color: 484848 /*{a-bar-border}*/;
-	color: #ffffff /*{a-bar-color}*/;
+	color: $text-color /*{a-bar-color}*/;
 	text-shadow: 0px /*{a-bar-shadow-x}*/ 0px /*{a-bar-shadow-y}*/ 0px /*{a-bar-shadow-radius}*/  /*{a-bar-shadow-color}*/;
 	font-weight: bold;
 }
@@ -238,8 +238,8 @@ html body .ui-group-theme-a .ui-bar-inherit {
 .ui-overlay-a,
 .ui-page-theme-a,
 .ui-page-theme-a .ui-panel-wrapper {
-	background-color: #373737 /*{a-page-background-color}*/;
-	border-color: #373737 /*{a-page-border}*/;
+	background-color: $page-bg /*{a-page-background-color}*/;
+	border-color: $page-bg /*{a-page-border}*/;
 	color: #ffffff /*{a-page-color}*/;
 	text-shadow: 0px /*{a-page-shadow-x}*/ 0px /*{a-page-shadow-y}*/ 0px /*{a-page-shadow-radius}*/ #ffffff /*{a-page-shadow-color}*/;
 }
